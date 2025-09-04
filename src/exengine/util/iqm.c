@@ -267,13 +267,13 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
       m->texture = ex_cache_texture(tex_name);
     
       // spec
-      char spec[strlen(tex_name)+strlen(tex_types[0])];
+      char spec[strlen(tex_name) + strlen(tex_types[0]) + 1];
       strcpy(spec, tex_types[0]);
       strcpy(&spec[strlen(tex_types[0])], tex_name);
       m->texture_spec = ex_cache_texture(spec);
 
       // norm
-      char norm[strlen(tex_name)+strlen(tex_types[1])];
+      char norm[strlen(tex_name) + strlen(tex_types[1]) + 1];
       strcpy(norm, tex_types[1]);
       strcpy(&norm[strlen(tex_types[1])], tex_name);
       m->texture_norm = ex_cache_texture(norm);

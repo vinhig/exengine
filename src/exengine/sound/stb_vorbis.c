@@ -79,7 +79,7 @@ extern "C" {
 
 // Individual stb_vorbis* handles are not thread-safe; you cannot decode from
 // them from multiple threads at the same time. However, you can have multiple
-// stb_vorbis* handles and decode from them independently in multiple thrads.
+// stb_vorbis* handles and decode from them independently in multiple threads.
 
 
 ///////////   MEMORY ALLOCATION
@@ -4480,7 +4480,7 @@ static uint32 vorbis_find_page(stb_vorbis *f, uint32 *end, uint32 *last)
                header[i] = get8(f);
             if (f->eof) return 0;
             if (header[4] != 0) goto invalid;
-            goal = header[22] + (header[23] << 8) + (header[24]<<16) + (header[25]<<24);
+            goal = (uint32)(header[22]) + ((uint32)(header[23]) << 8) + ((uint32)(header[24])<<16) + ((uint32)(header[25])<<24);
             for (i=22; i < 26; ++i)
                header[i] = 0;
             crc = 0;

@@ -8,7 +8,7 @@ ex_texture_t* ex_texture_load(const char *file_name, int get_data)
 {
   // prepend file directory
   size_t len = strlen(EX_TEXTURE_LOC);
-  char file_dir[len + strlen(file_name)];
+  char file_dir[len + strlen(file_name) + 1];
   strcpy(file_dir, EX_TEXTURE_LOC);
   strcpy(&file_dir[len], file_name);
 

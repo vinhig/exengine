@@ -18,7 +18,6 @@ ex_octree_t* ex_octree_new(uint8_t type)
   o->built    = 0;
   o->first    = 1;
   o->obj_list = ex_list_new();
-  ex_octree_min_size = ex_octree_min_size;
 
   o->data_len    = 0;
   o->data_type   = type;

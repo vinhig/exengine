@@ -3,6 +3,7 @@
 #include <physfs.h>
 #include "util/io.h"
 #include "sound/sound.h"
+#define STB_VORBIS_HEADER_ONLY
 #include "sound/stb_vorbis.c"
 
 ex_sound_t ex_sound;

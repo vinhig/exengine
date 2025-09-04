@@ -92,25 +92,23 @@ void game_update(double dt, double ft)
     float f = vec3_len(p);
     if (f > 1.5f) {
       ex_keys_down[SDL_SCANCODE_LCTRL] = 0;
-      goto ctrl_end;
-    }
+    } else {
+      if (f > 1.0f)
+        f *= f;
 
-    if (f > 1.0f)
-      f *= f;
+      vec3_norm(p, p);
+      vec3_scale(p, p, f*35.0f);
+      f = cube->velocity[1];
+      memcpy(cube->velocity, p, sizeof(vec3));
+      cube->velocity[1] += f*0.1f;
 
-    vec3_norm(p, p);
-    vec3_scale(p, p, f*35.0f);
-    f = cube->velocity[1];
-    memcpy(cube->velocity, p, sizeof(vec3));
-    cube->velocity[1] += f*0.1f;
-
-    if (ex_buttons_down[SDL_BUTTON_RIGHT]) {
-      vec3_scale(temp, camera->front, 80.0f);
-      vec3_add(cube->velocity, cube->velocity, temp);
-      ex_keys_down[SDL_SCANCODE_LCTRL] = 0;
+      if (ex_buttons_down[SDL_BUTTON_RIGHT]) {
+        vec3_scale(temp, camera->front, 80.0f);
+        vec3_add(cube->velocity, cube->velocity, temp);
+        ex_keys_down[SDL_SCANCODE_LCTRL] = 0;
+      }
     }
   }
-ctrl_end:
 
   if (ex_keys_down[SDL_SCANCODE_F]) {
     float r = (float)rand()/(float)(RAND_MAX/1.0f);

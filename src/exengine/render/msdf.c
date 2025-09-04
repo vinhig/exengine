@@ -662,11 +662,12 @@ float* ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
     return NULL;
   }
 
-  // determin what vertices belong to what contours
+  // determine what vertices belong to what contours
   typedef struct {
-    size_t start,end;
+    size_t start, end;
   } indices_t;
-  indices_t *contours = malloc(sizeof(indices_t) * contour_count);
+
+  indices_t *contours = malloc(sizeof(indices_t) * (contour_count + 1));
   int j = 0;
   for (int i=0; i<=num_verts; i++) {
     if (verts[i].type == STBTT_vmove) {

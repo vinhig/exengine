@@ -21,7 +21,7 @@
 
 #define EX_DATA_FILE "data.ex"
 
-#include "glad/glad.h"
+#include <glad/glad.h>
 #include <SDL2/SDL.h>
 
 #include <inttypes.h>
