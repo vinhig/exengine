@@ -12,6 +12,7 @@ layout (location = 7) in mat4 in_instancematrix;
 
 out vec3 frag;
 out vec3 normal;
+out vec4 position;
 out vec2 uv;
 out mat3 TBN;
 
@@ -40,6 +41,7 @@ void main()
   normal         = mat3(transpose(inverse(u_view * transform))) * in_normals;
   frag           = vec3(u_view * in_instancematrix * vec4(in_position, 1.0f));
   uv             = in_uv;
+  position       = vec4(frag, 1.0);
 
   // calculate tbn matrix for normal mapping
   vec3 T = normalize(vec3(u_view * transform * vec4(in_tangents.xyz, 0.0)));
@@ -53,10 +55,13 @@ void main()
 #START FS
 #version 330 core
 
-out vec4 color;
+layout(location = 0) out vec4 out_color;
+layout(location = 1) out vec4 out_normal;
+layout(location = 2) out vec4 out_position;
 
 in vec3 frag;
 in vec3 normal;
+in vec4 position;
 in vec2 uv;
 in mat3 TBN;
 
@@ -124,7 +129,7 @@ uniform bool        u_point_active;
 
 vec3 pcf_offset[20] = vec3[]
 (
-  vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+  vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
@@ -140,7 +145,7 @@ vec3 calc_point_light(point_light light)
   vec3 normals = texture(u_norm, uv).rgb;
   normals = normalize(normals * 2.0 - 1.0);
   normals = normalize(TBN * normals);
-  
+
   vec3 diff    = texture(u_texture, uv).rgb;
   vec3 spec   = texture(u_spec, uv).rgb;
 
@@ -148,7 +153,7 @@ vec3 calc_point_light(point_light light)
   vec3 light_dir = l.position - fragpos;
   float dist = length(light_dir);
   light_dir = normalize(light_dir);
-  
+
   // diffuse
   vec3 diffuse   = max(dot(light_dir, normals), 0.0) * diff * l.color;
 
@@ -158,7 +163,7 @@ vec3 calc_point_light(point_light light)
   vec3 specular = l.color * specs * spec;
 
   // attenuation
-  float attenuation = 1.0f / (1.0f + 0.14f * dist + 0.07f * (dist * dist));
+  float attenuation = 1.0f / (1.0f + 0.8f * dist + 0.055f * (dist * dist));
   diffuse  *= attenuation;
   specular *= attenuation;
 
@@ -194,18 +199,24 @@ void main()
   vec3 diffuse = vec3(0.0f);
 
   if (u_ambient_pass) {
-    diffuse += texture(u_texture, uv).rgb * 0.025;
+    diffuse += texture(u_texture, uv).rgb * 0.075;
   } else {
     // shadow casters
     if (u_point_active && u_point_count <= 0)
       diffuse += calc_point_light(u_point_light);
   }
-    
+
   // non shadow casters
   if (u_point_count > 0)
     for (int i=0; i<u_point_count; i++)
       diffuse += calc_point_light(u_point_lights[i]);
 
-  color = vec4(diffuse, 1.0);
+  if (u_point_active ) {
+    out_position = position;
+    out_normal = vec4(normal * 0.5 + 0.5, 1.0);
+    // out_normal = vec4(normal, 1.0);
+  }
+
+  out_color = vec4(diffuse, 1.0);
 }
 #END FS

@@ -1,5 +1,6 @@
 #include "math/mathlib.h"
 #include "render.h"
+#include "ssao.h"
 
 // projections
 mat4x4 projection_90deg;
@@ -14,11 +15,22 @@ GLuint screenquad_vao, screenquad_vbo;
 
 // framebuffers
 typedef struct {
-  GLuint fbo, rbo, cbo;
+  GLuint fbo;
+  GLuint rbo;
+  GLuint color_bo;
+  GLuint normal_bo;
+  GLuint position_bo;
+  GLuint ssao_bo;
   GLuint vao, vbo;
   size_t width, height;
 } ex_framebuffer_t;
+
 ex_framebuffer_t framebuffer;
+
+void opengl_debug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, void *userParam) {
+  if (type == GL_DEBUG_TYPE_ERROR)
+    printf("%s\n", message);
+}
 
 // some default textures
 GLuint default_texture_diffuse;
@@ -26,12 +38,15 @@ GLuint default_texture_normal;
 GLuint default_texture_specular;
 
 void ex_render_init() {
+  glEnable(GL_DEBUG_OUTPUT);
+  glDebugMessageCallback((GLDEBUGPROC)&opengl_debug, nullptr);
+
   /* -- SHADERS -- */
   pointfbo_shader = ex_shader("pointfbo.glsl");
   framebuffer_shader = ex_shader("fboshader.glsl");
 
   // set up a 90 degree projection
-  // mostly for omni-directional lights
+  // mostly for omnidirectional lights
   float aspect = (float)SHADOW_MAP_SIZE / (float)SHADOW_MAP_SIZE;
   mat4x4_perspective(projection_90deg, rad(90.0f), aspect, 0.1f, EX_POINT_FAR_PLANE);
   /* ------------- */
@@ -42,10 +57,11 @@ void ex_render_init() {
       &default_texture_normal,
       &default_texture_specular};
 
-  char colors[][4] = {
+  uint8_t colors[][4] = {
       {0, 0, 0, 255},
       {128, 127, 255, 255},
-      {0, 0, 0, 255}};
+      {0, 0, 0, 255},
+  };
 
   for (int i = 0; i < 3; i++) {
     glGenTextures(1, textures[i]);
@@ -74,7 +90,7 @@ void ex_render_init() {
   glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
 
   // position
-  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, (GLvoid *)0);
+  glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 4, nullptr);
   glEnableVertexAttribArray(0);
 
   // tex coords
@@ -86,12 +102,17 @@ void ex_render_init() {
   /* -- FRAMEBUFFER -- */
   glGenFramebuffers(1, &framebuffer.fbo);
   glGenRenderbuffers(1, &framebuffer.rbo);
-  glGenTextures(1, &framebuffer.cbo);
+  glGenTextures(1, &framebuffer.color_bo);
+  glGenTextures(1, &framebuffer.normal_bo);
+  glGenTextures(1, &framebuffer.position_bo);
+  glGenTextures(1, &framebuffer.ssao_bo);
   framebuffer.vao = screenquad_vao;
   framebuffer.vbo = screenquad_vbo;
 
   ex_render_resize(display.width, display.height);
   /* ----------------- */
+
+  ssao_init();
 }
 
 void ex_render(ex_renderer_e renderer, ex_renderable_t *renderables) {
@@ -105,15 +126,16 @@ void ex_render(ex_renderer_e renderer, ex_renderable_t *renderables) {
   for (int i = 0; i < point_lights->count; i++) {
     ex_point_light_t *light = (ex_point_light_t *)point_lights->nodes[i].obj;
 
-    if ((light->dynamic || light->update) && light->is_shadow && light->is_visible) {
+    if ((light->dynamic || light->update) && light->cast_shadow && light->is_visible) {
       ex_render_point_light_begin(light, pointfbo_shader);
 
       // render all shadow-casting models
       for (int j = 0; j < models->count; j++) {
         ex_model_t *model = (ex_model_t *)models->nodes[j].obj;
 
-        if (model->is_shadow)
+        if (model->cast_shadow) {
           ex_render_model(model, pointfbo_shader);
+        }
       }
     }
   }
@@ -147,8 +169,9 @@ void ex_render_forward(ex_renderable_t *renderables) {
   glEnable(GL_CULL_FACE);
   glCullFace(GL_BACK);
 
-  if (!forward_shader)
+  if (!forward_shader) {
     forward_shader = ex_shader("forward.glsl");
+  }
   /* --------------- */
 
   /* FIRST PASS */
@@ -164,13 +187,13 @@ void ex_render_forward(ex_renderable_t *renderables) {
   glDisable(GL_BLEND);
   glCullFace(GL_BACK);
 
-  // do all non shadow casting lights in a single pass
+  // do all non-shadow casting lights in a single pass
   char buff[64];
   size_t pcount = 0;
   for (int i = 0; i < point_lights->count; i++) {
     ex_point_light_t *light = (ex_point_light_t *)point_lights->nodes[i].obj;
 
-    if (light->is_visible && !light->is_shadow) {
+    if (light->is_visible && !light->cast_shadow) {
       sprintf(buff, "u_point_lights[%u]", (uint32_t)pcount++);
       ex_render_point_light(light, forward_shader, buff);
     }
@@ -187,8 +210,14 @@ void ex_render_forward(ex_renderable_t *renderables) {
   glUniform1i(ex_uniform(forward_shader, "u_point_count"), 0);
   /* ------------ */
 
-  /* SECOND PASS */
+  /* INTERMEDIATE PASS : SSAO */
+  ssao_render(camera->projection, camera->view, framebuffer.position_bo, framebuffer.normal_bo, framebuffer.vao);
+
+  /* THIRD PASS */
   // enable blending for second pass onwards
+  ex_shader_use(forward_shader);
+  glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.fbo);
+
   glEnable(GL_BLEND);
   glBlendFunc(GL_SRC_ALPHA, GL_ONE);
 
@@ -197,15 +226,17 @@ void ex_render_forward(ex_renderable_t *renderables) {
   for (int i = 0; i < point_lights->count; i++) {
     ex_point_light_t *light = (ex_point_light_t *)point_lights->nodes[i].obj;
 
-    if (!light->is_shadow || !light->is_visible)
+    if (!light->cast_shadow || !light->is_visible) {
       continue;
+    }
 
     ex_render_point_light(light, forward_shader, NULL);
-    for (int i = 0; i < models->count; i++) {
-      ex_model_t *model = (ex_model_t *)models->nodes[i].obj;
+    for (size_t j = 0; j < models->count; j++) {
+      ex_model_t *model = models->nodes[j].obj;
       ex_render_model(model, forward_shader);
     }
   }
+
   glDisable(GL_BLEND);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   /* ----------- */
@@ -220,8 +251,10 @@ void ex_render_forward(ex_renderable_t *renderables) {
   glBindVertexArray(framebuffer.vao);
   glActiveTexture(GL_TEXTURE0);
   glUniform1i(ex_uniform(framebuffer_shader, "u_texture"), 0);
-  glBindTexture(GL_TEXTURE_2D, framebuffer.cbo);
+  glBindTexture(GL_TEXTURE_2D, framebuffer.color_bo);
+  ssao_bind_texture(framebuffer_shader);
   glDrawArrays(GL_TRIANGLES, 0, 6);
+
   glBindVertexArray(0);
   glBindTexture(GL_TEXTURE_2D, 0);
   /* ---------------- */
@@ -254,8 +287,9 @@ void ex_render_model(ex_model_t *model, GLuint shader) {
     memcpy(ptr, &model->transforms[0], model->instance_count * sizeof(mat4x4));
     glUnmapBuffer(GL_ARRAY_BUFFER);
 
-    if (model->is_static)
+    if (model->is_static) {
       model->is_static = 2;
+    }
   }
 
   // these remain the same for each mesh
@@ -265,8 +299,9 @@ void ex_render_model(ex_model_t *model, GLuint shader) {
 
   // render meshes
   for (int i = 0; i < EX_MODEL_MAX_MESHES; i++) {
-    if (model->meshes[i] == NULL)
+    if (model->meshes[i] == NULL) {
       continue;
+    }
 
     glUniform1i(ex_uniform(shader, "u_is_lit"), model->is_lit);
     ex_render_mesh(model->meshes[i], shader, model->instance_count);
@@ -280,24 +315,27 @@ void ex_render_mesh(ex_mesh_t *mesh, GLuint shader, size_t count) {
 
   // diffuse
   glActiveTexture(GL_TEXTURE4);
-  if (mesh->texture < 1)
+  if (mesh->texture < 1) {
     glBindTexture(GL_TEXTURE_2D, default_texture_diffuse);
-  else
+  } else {
     glBindTexture(GL_TEXTURE_2D, mesh->texture);
+  }
 
   // specular
   glActiveTexture(GL_TEXTURE5);
-  if (mesh->texture_spec < 1)
+  if (mesh->texture_spec < 1) {
     glBindTexture(GL_TEXTURE_2D, default_texture_specular);
-  else
+  } else {
     glBindTexture(GL_TEXTURE_2D, mesh->texture_spec);
+  }
 
   // normal
   glActiveTexture(GL_TEXTURE6);
-  if (mesh->texture_norm < 1)
+  if (mesh->texture_norm < 1) {
     glBindTexture(GL_TEXTURE_2D, default_texture_normal);
-  else
+  } else {
     glBindTexture(GL_TEXTURE_2D, mesh->texture_norm);
+  }
 
   // draw mesh
   glDrawElementsInstanced(GL_TRIANGLES, mesh->icount, GL_UNSIGNED_INT, 0, count);
@@ -358,7 +396,7 @@ void ex_render_point_light_begin(ex_point_light_t *light, GLuint shader) {
 }
 
 void ex_render_point_light(ex_point_light_t *light, GLuint shader, const char *prefix) {
-  if (light->is_shadow) {
+  if (light->cast_shadow) {
     glUniform1i(ex_uniform(shader, "u_point_light.is_shadow"), 1);
 
     glUniform1i(ex_uniform(shader, "u_point_depth"), 7);
@@ -388,24 +426,44 @@ void ex_render_point_light(ex_point_light_t *light, GLuint shader, const char *p
 }
 
 void ex_render_resize(size_t width, size_t height) {
-  /* -- resze framebuffer -- */
+  /* -- resize framebuffer -- */
   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.fbo);
 
   framebuffer.width = display.width;
   framebuffer.height = display.height;
 
-  glBindTexture(GL_TEXTURE_2D, framebuffer.cbo);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB10_A2, framebuffer.width, framebuffer.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-
+  // color output texture
+  glBindTexture(GL_TEXTURE_2D, framebuffer.color_bo);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, framebuffer.width, framebuffer.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-  GLfloat border[] = {1.0, 1.0, 1.0, 1.0};
-  glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, border);
+  GLfloat border_one[] = {1.0f, 1.0f, 1.0f, 1.0f};
+  glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, border_one);
   glBindTexture(GL_TEXTURE_2D, 0);
-  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.cbo, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, framebuffer.color_bo, 0);
+
+  // normal output texture
+  glGenTextures(1, &framebuffer.normal_bo);
+  glBindTexture(GL_TEXTURE_2D, framebuffer.normal_bo);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT1, GL_TEXTURE_2D, framebuffer.normal_bo, 0);
+
+  // position output texture
+  glGenTextures(1, &framebuffer.position_bo);
+  glBindTexture(GL_TEXTURE_2D, framebuffer.position_bo);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA16F, width, height, 0, GL_RGBA, GL_FLOAT, NULL);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT2, GL_TEXTURE_2D, framebuffer.position_bo, 0);
 
   // depth buffer
   glBindRenderbuffer(GL_RENDERBUFFER, framebuffer.rbo);
@@ -413,9 +471,13 @@ void ex_render_resize(size_t width, size_t height) {
   glBindRenderbuffer(GL_RENDERBUFFER, 0);
   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, framebuffer.rbo);
 
+  const GLenum attachment_names[] = {GL_COLOR_ATTACHMENT0, GL_COLOR_ATTACHMENT1, GL_COLOR_ATTACHMENT2};
+  glDrawBuffers(3, &attachment_names[0]);
+
   // test framebuffer
-  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE)
+  if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
     printf("Error! Framebuffer is not complete\n");
+  }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   /* ----------------- */
 }
@@ -423,7 +485,9 @@ void ex_render_resize(size_t width, size_t height) {
 void ex_render_destroy() {
   glDeleteRenderbuffers(1, &framebuffer.rbo);
   glDeleteFramebuffers(1, &framebuffer.fbo);
-  glDeleteTextures(1, &framebuffer.cbo);
+  glDeleteTextures(1, &framebuffer.color_bo);
+  glDeleteTextures(1, &framebuffer.normal_bo);
+  glDeleteTextures(1, &framebuffer.position_bo);
 
   glDeleteBuffers(1, &screenquad_vbo);
   glDeleteVertexArrays(1, &screenquad_vao);

@@ -31,7 +31,7 @@ uniform mat4 u_view;
 uniform vec2 u_screensize;
 
 int kernel_size = 32;
-float radius = 0.8;
+float radius = 1.2;
 float bias = 0.2;
 
 void main()
@@ -50,7 +50,7 @@ void main()
 
   // calculate occlusion factor
   float occlusion = 0.0;
-  for (int i=0; i<kernel_size; i++) {
+  for (int i=0; i < kernel_size; i++) {
     // convert from tangent to view space
     vec3 sample = TBN * u_samples[i];
     // get sample pos

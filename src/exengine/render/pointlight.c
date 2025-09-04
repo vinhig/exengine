@@ -37,7 +37,7 @@ ex_point_light_t *ex_point_light_new(vec3 pos, vec3 color, int dynamic) {
 
   l->dynamic = dynamic;
   l->update = 1;
-  l->is_shadow = 1;
+  l->cast_shadow = 1;
   l->is_visible = 1;
 
   return l;

@@ -29,17 +29,17 @@ typedef struct {
   vec3 position, color;
   mat4x4 transform[6];
   GLuint depth_map, depth_map_fbo, shader;
-  int dynamic, update, is_shadow, is_visible;
+  int dynamic, update, cast_shadow, is_visible;
   float distance_to_cam;
 } ex_point_light_t;
 
 /**
- * [ex_point_light_init init the pointlight module]
+ * [ex_point_light_init init the point-light module]
  */
 void ex_point_light_init();
 
 /**
- * [ex_point_light_new defines a new pointlight]
+ * [ex_point_light_new defines a new point-light]
  * @param  pos     [the initial position]
  * @param  color   [the initial color]
  * @param  dynamic [1 if the shadows are dynamic]
@@ -48,8 +48,8 @@ void ex_point_light_init();
 ex_point_light_t *ex_point_light_new(vec3 pos, vec3 color, int dynamic);
 
 /**
- * [ex_point_light_destroy cleanup a pointlights data]
- * @param l [the pointlight to destroy]
+ * [ex_point_light_destroy cleanup a point-light data]
+ * @param l [the point-light to destroy]
  */
 void ex_point_light_destroy(ex_point_light_t *l);
 

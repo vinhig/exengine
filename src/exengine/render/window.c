@@ -58,6 +58,7 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   SDL_SetRelativeMouseMode(SDL_TRUE);
   SDL_CaptureMouse(SDL_TRUE);
   SDL_SetWindowGrab(display.window, SDL_TRUE);
+  SDL_GL_SetSwapInterval(1);
 
   display.width = width;
   display.height = height;

@@ -19,7 +19,7 @@ void game_init() {
   camera = ex_fps_camera_new(0.0f, 0.0f, 0.0f, 0.1f, 70.0f);
 
   m6 = ex_iqm_load_model(scene, "data/level.iqm", EX_KEEP_VERTICES);
-  m6->is_shadow = 1;
+  m6->cast_shadow = 1;
   ex_scene_add_model(scene, m6);
 
   e = ex_entity_new(scene, (vec3){0.5f, 1.0f, 0.5f});
@@ -30,12 +30,16 @@ void game_init() {
   sound = ex_sound_load("data/ambient.ogg", EX_SOURCE_STREAMING, EX_SOURCE_LOOPING);
   ex_sound_master_volume(0.5f);
 
-  pl = ex_point_light_new((vec3){0.0f, 5.0f, 0.0f}, (vec3){1.0f, 1.0f, 1.0f}, 1);
+  pl = ex_point_light_new((vec3){0.0f, 5.0f, 4.0f}, (vec3){0.85f, 0.85f, 0.85f}, 1);
   ex_scene_add_pointlight(scene, pl);
-  pl->is_shadow = 1;
+  pl->cast_shadow = 1;
+
+  pl = ex_point_light_new((vec3){0.0f, 5.0f, -4.0f}, (vec3){0.85f, 0.85f, 0.85f}, 1);
+  ex_scene_add_pointlight(scene, pl);
+  pl->cast_shadow = 1;
 
   box = ex_iqm_load_model(scene, "data/cube.iqm", 0);
-  box->is_shadow = 1;
+  box->cast_shadow = 1;
   printf("box->anims == %lu\n", box->anims_len);
   ex_scene_add_model(scene, box);
 
@@ -56,7 +60,6 @@ void game_update(double dt, double ft) {
 
   memcpy(camera->position, e->position, sizeof(vec3));
   camera->position[1] += e->radius[1];
-  // memcpy(pl->position, camera->position, sizeof(vec3));
 
   memcpy(box->position, cube->position, sizeof(vec3));
 
@@ -72,8 +75,9 @@ void game_update(double dt, double ft) {
 
   vec3_scale(temp, cube->velocity, 5.0f * dt);
   temp[1] = 0.0f;
-  if (cube->grounded == 1)
+  if (cube->grounded == 1) {
     vec3_sub(cube->velocity, cube->velocity, temp);
+  }
 
   cube->velocity[1] -= (100.0f * dt);
 
@@ -89,8 +93,9 @@ void game_update(double dt, double ft) {
     if (f > 1.5f) {
       ex_keys_down[SDL_SCANCODE_LCTRL] = 0;
     } else {
-      if (f > 1.0f)
+      if (f > 1.0f) {
         f *= f;
+      }
 
       vec3_norm(p, p);
       vec3_scale(p, p, f * 35.0f);
@@ -107,13 +112,13 @@ void game_update(double dt, double ft) {
   }
 
   if (ex_keys_down[SDL_SCANCODE_F]) {
-    float r = (float)rand()/(float)(RAND_MAX/1.0f);
-    float g = (float)rand()/(float)(RAND_MAX/1.0f);
-    float b = (float)rand()/(float)(RAND_MAX/1.0f);
+    float r = (float)rand() / (float)(RAND_MAX / 1.0f);
+    float g = (float)rand() / (float)(RAND_MAX / 1.0f);
+    float b = (float)rand() / (float)(RAND_MAX / 1.0f);
     ex_point_light_t *l = ex_point_light_new((vec3){0.0f, 0.0f, 0.0f}, (vec3){r, g, b}, 0);
     memcpy(l->position, camera->position, sizeof(vec3));
     ex_scene_add_pointlight(scene, l);
-    l->is_shadow = 1;
+    l->cast_shadow = 1;
     ex_keys_down[SDL_SCANCODE_F] = 0;
   }
 
@@ -121,10 +126,11 @@ void game_update(double dt, double ft) {
   vec3_scale(temp, e->velocity, 15.0f * dt);
   temp[1] = 0.0f;
 
-  if (e->grounded == 1)
+  if (e->grounded == 1) {
     vec3_sub(e->velocity, e->velocity, temp);
-  else
+  } else {
     move_speed = 50.0f;
+  }
 
   e->velocity[1] -= (100.0f * dt);
 
@@ -155,10 +161,12 @@ void game_update(double dt, double ft) {
     side[1] = 0.0f;
     vec3_add(e->velocity, e->velocity, side);
   }
-  if (ex_keys_down[SDL_SCANCODE_Q])
+  if (ex_keys_down[SDL_SCANCODE_Q]) {
     e->velocity[1] = 50.0f;
-  if (ex_keys_down[SDL_SCANCODE_Z])
+  }
+  if (ex_keys_down[SDL_SCANCODE_Z]) {
     e->velocity[1] = -50.0f;
+  }
   if (ex_keys_down[SDL_SCANCODE_SPACE] && e->grounded == 1) {
     e->velocity[1] = 20.0f;
   }
@@ -170,25 +178,23 @@ void game_update(double dt, double ft) {
   ex_scene_update(scene, dt);
   ex_fps_camera_update(camera);
 
-  ex_vga_clear();
+  // ex_vga_clear();
 
-  char buf[64];
-  ex_vga_setfg(255, 255, 255, 255);
-  ex_vga_setbg(0, 0, 0, 255);
-  sprintf(buf, "exengine dbg build %c", 1);
-  ex_vga_print(2, 1, buf);
-
-  sprintf(buf, "framerate %.2f", 1.0 / ft);
-  ex_vga_setfg(255, 255, 0, 255);
-  ex_vga_setbg(255, 255, 255, 0);
-  ex_vga_print(2, 2, buf);
+  // char buf[64];
+  // ex_vga_setfg(255, 255, 255, 255);
+  // ex_vga_setbg(0, 0, 0, 255);
+  // sprintf(buf, "exengine dbg build %c", 1);
+  // ex_vga_print(2, 1, buf);
+  //
+  // sprintf(buf, "framerate %.2f", 1.0 / ft);
+  // ex_vga_setfg(255, 255, 0, 255);
+  // ex_vga_setbg(255, 255, 255, 0);
+  // ex_vga_print(2, 2, buf);
 }
 
 void game_draw() {
   ex_scene_draw(scene, 0, 0, 0, 0, &camera->matrices);
   ex_fps_camera_resize(camera);
-
-  ex_font_dbg(font);
 
   ex_vga_render();
 }

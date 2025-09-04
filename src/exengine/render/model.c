@@ -9,7 +9,7 @@ ex_model_t *ex_model_new() {
   memset(m->position, 0, sizeof(vec3));
   memset(m->rotation, 0, sizeof(vec3));
   m->scale = 1.0f;
-  m->is_shadow = 1;
+  m->cast_shadow = 1;
   m->is_lit = 1;
   m->use_transform = 0;
 

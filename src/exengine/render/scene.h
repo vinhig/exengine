@@ -33,15 +33,6 @@
 
 #define EX_SCENE_MAX_MODELS 500
 
-/*
-  The renderer feature flags,
-  OR these together in the flags argument
-  of ex_scene_new to enable the
-  renderer features you want.
-*/
-#define EX_SCENE_SSAO 1
-#define EX_SCENE_DEFERRED 2
-
 typedef struct {
   vec3 gravity;
 

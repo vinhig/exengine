@@ -45,7 +45,7 @@ typedef struct {
 
   vec3 position, rotation;
   float scale;
-  uint8_t is_lit, is_shadow;
+  uint8_t is_lit, cast_shadow;
 
   ex_anim_t *current_anim;
   float current_time;
