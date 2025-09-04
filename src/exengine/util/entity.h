@@ -8,7 +8,7 @@
   http://www.peroxide.dk/papers/collision/collision.pdf
 
   A more robust response step has been implemented
-  based on the follow up paper to the above by 
+  based on the follow-up paper to the above by
   Jeff Linahan.
   https://arxiv.org/ftp/arxiv/papers/1211/1211.0059.pdf
 */
@@ -16,8 +16,8 @@
 #ifndef EX_ENTITY_H
 #define EX_ENTITY_H
 
-#include "math/mathlib.h"
 #include "math/collision.h"
+#include "math/mathlib.h"
 #include "math/octree.h"
 #include "render/scene.h"
 
@@ -34,7 +34,7 @@ typedef struct {
  * @param  radius [the radius of the ellipsoid]
  * @return        [the new entity]
  */
-ex_entity_t* ex_entity_new(ex_scene_t *scene, vec3 radius);
+ex_entity_t *ex_entity_new(ex_scene_t *scene, vec3 radius);
 
 /**
  * [ex_entity_collide_and_slide]

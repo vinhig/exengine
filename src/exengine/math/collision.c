@@ -1,11 +1,10 @@
 #include "math/collision.h"
-#include <math.h>
-#include <string.h>
 #include <inttypes.h>
+#include <math.h>
 #include <stdio.h>
+#include <string.h>
 
-ex_plane_t ex_plane_new(const vec3 a, const vec3 b)
-{
+ex_plane_t ex_plane_new(const vec3 a, const vec3 b) {
   ex_plane_t plane;
   memcpy(plane.origin, a, sizeof(vec3));
   memcpy(plane.normal, b, sizeof(vec3));
@@ -17,8 +16,7 @@ ex_plane_t ex_plane_new(const vec3 a, const vec3 b)
   return plane;
 }
 
-ex_plane_t ex_triangle_to_plane(const vec3 a, const vec3 b, const vec3 c)
-{
+ex_plane_t ex_triangle_to_plane(const vec3 a, const vec3 b, const vec3 c) {
   vec3 ba, ca;
   vec3_sub(ba, b, a);
   vec3_sub(ca, c, a);
@@ -39,29 +37,26 @@ ex_plane_t ex_triangle_to_plane(const vec3 a, const vec3 b, const vec3 c)
   return plane;
 }
 
-float ex_signed_distance_to_plane(const vec3 base_point, const ex_plane_t *plane)
-{
+float ex_signed_distance_to_plane(const vec3 base_point, const ex_plane_t *plane) {
   // return vec3_mul_inner(base_point, plane->normal) - vec3_mul_inner(plane->normal, plane->origin);// + plane->equation[3];
   return vec3_mul_inner(base_point, plane->normal) + plane->equation[3];
 }
 
-int ex_is_front_facing(ex_plane_t *plane, const vec3 direction)
-{
+int ex_is_front_facing(ex_plane_t *plane, const vec3 direction) {
   double f = vec3_mul_inner(plane->normal, direction);
-  
+
   if (f <= 0.0)
     return 1;
 
   return 0;
 }
 
-int ex_check_point_in_triangle(const vec3 point, const vec3 p1, const vec3 p2, const vec3 p3)
-{
+int ex_check_point_in_triangle(const vec3 point, const vec3 p1, const vec3 p2, const vec3 p3) {
   vec3 u, v, w, vw, vu, uw, uv;
   vec3_sub(u, p2, p1);
   vec3_sub(v, p3, p1);
   vec3_sub(w, point, p1);
-  
+
   vec3_mul_cross(vw, v, w);
   vec3_mul_cross(vu, v, u);
 
@@ -83,10 +78,9 @@ int ex_check_point_in_triangle(const vec3 point, const vec3 p1, const vec3 p2, c
   return ((r + t) <= 1.0f);
 }
 
-int ex_get_lowest_root(float a, float b, float c, float max, float *root)
-{
+int ex_get_lowest_root(float a, float b, float c, float max, float *root) {
   // check if solution exists
-  float determinant = b*b - 4.0f*a*c;
+  float determinant = b * b - 4.0f * a * c;
 
   // if negative there is no solution
   if (determinant < 0.0f)
@@ -94,8 +88,8 @@ int ex_get_lowest_root(float a, float b, float c, float max, float *root)
 
   // calculate two roots
   float sqrtD = sqrtf(determinant);
-  float r1 = (-b - sqrtD) / (2.0f*a);
-  float r2 = (-b + sqrtD) / (2.0f*a);
+  float r1 = (-b - sqrtD) / (2.0f * a);
+  float r2 = (-b + sqrtD) / (2.0f * a);
 
   // set x1 <= x2
   if (r1 > r2) {
@@ -120,8 +114,7 @@ int ex_get_lowest_root(float a, float b, float c, float max, float *root)
 }
 
 // Möller–Trumbore intersection algorithm
-int ray_in_tri(vec3 from, vec3 to, vec3 v0, vec3 v1, vec3 v2, vec3 intersect)
-{
+int ray_in_tri(vec3 from, vec3 to, vec3 v0, vec3 v1, vec3 v2, vec3 intersect) {
   vec3 vector;
   vec3_norm(vector, to);
 
@@ -135,8 +128,8 @@ int ray_in_tri(vec3 from, vec3 to, vec3 v0, vec3 v1, vec3 v2, vec3 intersect)
   if (a > -FLT_EPSILON && a < FLT_EPSILON)
     return 0;
 
-  float f = 1.0/a;
-  
+  float f = 1.0 / a;
+
   vec3_sub(s, from, v0);
 
   float u = f * vec3_mul_inner(s, h);
@@ -159,14 +152,13 @@ int ray_in_tri(vec3 from, vec3 to, vec3 v0, vec3 v1, vec3 v2, vec3 intersect)
   return 0;
 }
 
-void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const vec3 p2, const vec3 p3)
-{
+void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const vec3 p2, const vec3 p3) {
   ex_plane_t plane = ex_triangle_to_plane(p1, p2, p3);
 
   // only check front facing triangles
   if (!ex_is_front_facing(&plane, packet->e_norm_velocity))
     return;
-  
+
   // get interval of plane intersection
   double t0, t1;
   int embedded_in_plane = 0;
@@ -180,7 +172,7 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
   // if sphere is moving parrallel to plane
   if (normal_dot_vel == 0.0f) {
     if (fabs(signed_dist_to_plane) >= 1.0f) {
-      // no collision possible 
+      // no collision possible
       return;
     } else {
       // sphere is in plane in whole range [0..1]
@@ -191,8 +183,8 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
   } else {
     // N dot D is not 0, calc intersect interval
     // float nvi = 1.0f / normal_dot_vel;
-    t0=(-1.0 - signed_dist_to_plane) / normal_dot_vel;
-    t1=( 1.0 - signed_dist_to_plane) / normal_dot_vel;
+    t0 = (-1.0 - signed_dist_to_plane) / normal_dot_vel;
+    t1 = (1.0 - signed_dist_to_plane) / normal_dot_vel;
 
     // swap so t0 < t1
     if (t0 > t1) {
@@ -208,10 +200,14 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
     }
 
     // clamp to [0,1]
-    if (t0 < 0.0) t0 = 0.0;
-    if (t1 < 0.0) t1 = 0.0;
-    if (t0 > 1.0) t0 = 1.0;
-    if (t1 > 1.0) t1 = 1.0;
+    if (t0 < 0.0)
+      t0 = 0.0;
+    if (t1 < 0.0)
+      t1 = 0.0;
+    if (t0 > 1.0)
+      t0 = 1.0;
+    if (t1 > 1.0)
+      t1 = 1.0;
   }
 
   // time to check for a collision
@@ -233,15 +229,14 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
     }
   }
 
-
   // no collision yet, check against points and edges
   if (found_collision == 0) {
     vec3 velocity, base, temp;
     memcpy(velocity, packet->e_velocity, sizeof(vec3));
     memcpy(base, packet->e_base_point, sizeof(vec3));
-  
+
     float velocity_sqrt_length = vec3_len2(velocity);
-    float a,b,c;
+    float a, b, c;
     float new_t;
 
     // equation is a*t^2 + b*t + c = 0
@@ -250,7 +245,7 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
 
     // p1
     vec3_sub(temp, base, p1);
-    b = 2.0f*(vec3_mul_inner(velocity, temp));
+    b = 2.0f * (vec3_mul_inner(velocity, temp));
     vec3_sub(temp, p1, base);
     c = vec3_len2(temp) - 1.0;
     if (ex_get_lowest_root(a, b, c, t, &new_t) == 1) {
@@ -262,7 +257,7 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
     // p2
     if (found_collision == 0) {
       vec3_sub(temp, base, p2);
-      b = 2.0f*(vec3_mul_inner(velocity, temp));
+      b = 2.0f * (vec3_mul_inner(velocity, temp));
       vec3_sub(temp, p2, base);
       c = vec3_len2(temp) - 1.0;
       if (ex_get_lowest_root(a, b, c, t, &new_t) == 1) {
@@ -275,7 +270,7 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
     // p3
     if (found_collision == 0) {
       vec3_sub(temp, base, p3);
-      b = 2.0f*(vec3_mul_inner(velocity, temp));
+      b = 2.0f * (vec3_mul_inner(velocity, temp));
       vec3_sub(temp, p3, base);
       c = vec3_len2(temp) - 1.0;
       if (ex_get_lowest_root(a, b, c, t, &new_t) == 1) {
@@ -290,8 +285,8 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
     vec3 edge, base_to_vertex;
     vec3_sub(edge, p2, p1);
     vec3_sub(base_to_vertex, p1, base);
-    float edge_sqrt_length        = vec3_len2(edge);
-    float edge_dot_velocity       = vec3_mul_inner(edge, velocity);
+    float edge_sqrt_length = vec3_len2(edge);
+    float edge_dot_velocity = vec3_mul_inner(edge, velocity);
     float edge_dot_base_to_vertex = vec3_mul_inner(edge, base_to_vertex);
 
     // calculate params for equation
@@ -314,12 +309,11 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
       }
     }
 
-
     // p2 -> p3
     vec3_sub(edge, p3, p2);
     vec3_sub(base_to_vertex, p2, base);
-    edge_sqrt_length        = vec3_len2(edge);
-    edge_dot_velocity       = vec3_mul_inner(edge, velocity);
+    edge_sqrt_length = vec3_len2(edge);
+    edge_dot_velocity = vec3_mul_inner(edge, velocity);
     edge_dot_base_to_vertex = vec3_mul_inner(edge, base_to_vertex);
 
     // calculate params for equation
@@ -342,12 +336,11 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
       }
     }
 
-
     // p3 -> p1
     vec3_sub(edge, p1, p3);
     vec3_sub(base_to_vertex, p3, base);
-    edge_sqrt_length        = vec3_len2(edge);
-    edge_dot_velocity       = vec3_mul_inner(edge, velocity);
+    edge_sqrt_length = vec3_len2(edge);
+    edge_dot_velocity = vec3_mul_inner(edge, velocity);
     edge_dot_base_to_vertex = vec3_mul_inner(edge, base_to_vertex);
 
     // calculate params for equation
@@ -374,8 +367,8 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
   // set results
   if (found_collision == 1) {
     // distance to collision, t is time of collision
-    double dist_to_coll = t*vec3_len(packet->e_velocity);
-    
+    double dist_to_coll = t * vec3_len(packet->e_velocity);
+
     // are we the closest hit?
     if (packet->found_collision == 0 || dist_to_coll < packet->nearest_distance) {
       packet->nearest_distance = dist_to_coll;

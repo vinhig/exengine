@@ -19,8 +19,8 @@
 #ifndef EX_INPUT_H
 #define EX_INPUT_H
 
-#include <inttypes.h>
 #include <SDL2/SDL.h>
+#include <inttypes.h>
 
 #include "scancodes.h"
 

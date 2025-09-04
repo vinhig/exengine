@@ -4,8 +4,7 @@
 #define STB_IMAGE_IMPLEMENTATION
 #include "render/stb_image.h"
 
-ex_texture_t* ex_texture_load(const char *file_name, int get_data)
-{
+ex_texture_t *ex_texture_load(const char *file_name, int get_data) {
   // prepend file directory
   size_t len = strlen(EX_TEXTURE_LOC);
   char file_dir[len + strlen(file_name) + 1];
@@ -25,14 +24,14 @@ ex_texture_t* ex_texture_load(const char *file_name, int get_data)
   size_t size = PHYSFS_fileLength(file);
 
   // read into buffer
-  char *buff = malloc(size+1);
+  char *buff = malloc(size + 1);
   PHYSFS_readBytes(file, buff, size);
   buff[size] = '\0';
   PHYSFS_close(file);
 
   // attempt to load image
-  int w,h,n;
-  uint8_t *data = stbi_load_from_memory((uint8_t*)buff, size, &w, &h, &n, 4);
+  int w, h, n;
+  uint8_t *data = stbi_load_from_memory((uint8_t *)buff, size, &w, &h, &n, 4);
   if (data == NULL) {
     printf("Could not load texture %s\n", file_dir);
     return NULL;
@@ -40,23 +39,23 @@ ex_texture_t* ex_texture_load(const char *file_name, int get_data)
 
   // create texture obj
   ex_texture_t *t = malloc(sizeof(ex_texture_t));
-  t->width  = w;
+  t->width = w;
   t->height = h;
   strncpy(t->name, file_name, 32);
-  
+
   // do we want the data?
   if (get_data == 1) {
     // we force 4 attributes
-    size_t size = (w*h)*4;
-    
+    size_t size = (w * h) * 4;
+
     // copy image data
     t->data = malloc(size);
     memcpy(t->data, data, size);
-    
+
     // free stbi data
     stbi_image_free(data);
     free(buff);
-    
+
     return t;
   }
 
@@ -81,7 +80,7 @@ ex_texture_t* ex_texture_load(const char *file_name, int get_data)
 
   // unset texture
   glBindTexture(GL_TEXTURE_2D, 0);
-  
+
   t->id = texture;
 
   // clean up data

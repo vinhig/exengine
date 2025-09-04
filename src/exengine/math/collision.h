@@ -28,7 +28,7 @@ typedef struct {
   vec3 e_base_point;
 
   // original tri points
-  vec3 a,b,c;
+  vec3 a, b, c;
 
   // hit information
   int found_collision;

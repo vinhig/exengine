@@ -20,7 +20,7 @@ typedef struct {
 
 void ex_font_init();
 
-ex_font_t* ex_font_load(const char *path, const char *letters);
+ex_font_t *ex_font_load(const char *path, const char *letters);
 
 void ex_font_dbg(ex_font_t *f);
 

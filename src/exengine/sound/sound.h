@@ -20,14 +20,14 @@
 
 #define EX_DEVICE_LEN 32
 
-#include <inttypes.h>
 #include "AL/al.h"
 #include "AL/alc.h"
+#include <stdlib.h>
 
 typedef enum {
-  EX_SOURCE_STATIC    = 0,
+  EX_SOURCE_STATIC = 0,
   EX_SOURCE_STREAMING = 1,
-  EX_SOURCE_LOOPING   = 1,
+  EX_SOURCE_LOOPING = 1,
   EX_SOURCE_LEN
 } ex_source_type_e;
 
@@ -38,7 +38,7 @@ typedef struct {
 
 typedef struct {
   ALuint id, buffers[3];
-  ALint  ready_buffers[3];
+  ALint ready_buffers[3];
   int looping, stopped;
 
   // for streaming source
@@ -85,7 +85,7 @@ void ex_sound_set_output(const ALCchar *device);
  * @param  loop   [1 if the sound is looping]
  * @return        [the new sound]
  */
-ex_source_t* ex_sound_load(const char *path, int type, int looping);
+ex_source_t *ex_sound_load(const char *path, int type, int looping);
 
 /**
  * [ex_sound_restart restart a sound]

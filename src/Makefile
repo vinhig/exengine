@@ -1,7 +1,7 @@
 # Example Makefile
 
 # -- Dirs -- #
-CC      =gcc
+CC      =clang
 EDIR    =exengine
 LDIR    =lib
 BDIR    =build
@@ -18,7 +18,7 @@ FLAGS   =-g -lm -ldl -Wall -Wno-unused -Wno-uninitialized -lstdc++ \
 -lGL -lSDL2 -I. $(IDIRS) '-Wl,-z,origin' '-Wl,-rpath,$$ORIGIN/lib'
 #
 CFLAGS  =$(FLAGS)
-CFLAGS +=-std=c99 -O2
+CFLAGS +=-std=gnu11 -O0 -ggdb -fsanitize=address,undefined
 
 # -- Windows -- #
 ifeq ($(OS),Windows_NT)
@@ -40,7 +40,7 @@ FLAGS   =-g -lstdc++ -framework OpenGl -framework Foundation \
 -I. $(IDIRS) -Wno-unused-command-line-argument
 #
 CFLAGS  =$(FLAGS)
-CFLAGS +=-std=c99 -O2
+CFLAGS +=-std=c99 -O0 -ggdb
 endif
 
 # -- OpenBSD -- #

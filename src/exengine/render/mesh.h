@@ -1,6 +1,6 @@
 /* mesh
   A generic mesh container.
-  
+
   Each mesh has a single set of
   textures applied to it, models
   contain a mesh per texture set used.
@@ -16,8 +16,8 @@
 
 #include <string.h>
 
-#include "math/mathlib.h"
 #include "glad/glad.h"
+#include "math/mathlib.h"
 
 typedef struct {
   float position[3];
@@ -44,14 +44,14 @@ typedef struct {
  * @param  texture  [the texture's uint]
  * @return          [ex_mesh_t pointer]
  */
-ex_mesh_t* ex_mesh_new(ex_vertex_t *vertices, size_t vcount, GLuint *indices, size_t icount, GLuint texture);
+ex_mesh_t *ex_mesh_new(ex_vertex_t *vertices, size_t vcount, GLuint *indices, size_t icount, GLuint texture);
 
 /**
  * [ex_mesh_copy duplicates a mesh]
  * @param  mesh [the mesh to copy]
  * @return      [the new copy]
  */
-ex_mesh_t* ex_mesh_copy(ex_mesh_t *mesh);
+ex_mesh_t *ex_mesh_copy(ex_mesh_t *mesh);
 
 /**
  * [ex_mesh_destroy free any malloc'd data]

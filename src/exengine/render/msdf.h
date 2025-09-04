@@ -9,26 +9,26 @@
   Based on the C++ implementation by Viktor Chlumský.
   https://github.com/Chlumsky/msdfgen
 
-  You probably dont want to use this directly.
+  You probably don't want to use this directly.
   Instead, use text.h
 */
 
 #ifndef EX_MSDF_H
 #define EX_MSDF_H
 
-#include <string.h>
+#include "render/stb_truetype.h"
 #include <inttypes.h>
 #include <math.h>
-#include <stdlib.h>
 #include <stdio.h>
-#include "render/stb_truetype.h"
+#include <stdlib.h>
+#include <string.h>
 
 typedef struct {
   int left_bearing;
   int advance;
   int ix0, ix1;
   int iy0, iy1;
-  int tx,  ty;
+  int tx, ty;
   uint32_t character;
 } ex_metrics_t;
 
@@ -41,7 +41,7 @@ typedef struct {
  * @param  metrics [the metrics for the specified glyph (c)]
  * @return         [3-channel float array, remember to free this]
  */
-float* ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_metrics_t *metrics);
+float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_metrics_t *metrics);
 
 static inline uint32_t ex_utf8(const char *c) {
   uint32_t val = 0;
@@ -52,19 +52,16 @@ static inline uint32_t ex_utf8(const char *c) {
     val |= (c[2] & 0x3F) << 6;
     val |= (c[1] & 0x3F) << 12;
     val |= (c[0] & 0x07) << 18;
-  }
-  else if ((c[0] & 0xF0) == 0xE0) {
+  } else if ((c[0] & 0xF0) == 0xE0) {
     // 3 byte
     val |= (c[2] & 0x3F);
     val |= (c[1] & 0x3F) << 6;
     val |= (c[0] & 0x0F) << 12;
-  }
-  else if ((c[0] & 0xE0) == 0xC0) {
+  } else if ((c[0] & 0xE0) == 0xC0) {
     // 2 byte
     val |= (c[1] & 0x3F);
     val |= (c[0] & 0x1F) << 6;
-  }
-  else {
+  } else {
     // 1 byte
     val = c[0];
   }

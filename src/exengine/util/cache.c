@@ -1,25 +1,22 @@
 #include "util/cache.h"
-#include "util/list.h"
 #include "render/scene.h"
+#include "util/list.h"
 
 ex_list_t *texture_list, *model_list;
 
-void ex_cache_init()
-{
+void ex_cache_init() {
   // init lists
   texture_list = ex_list_new();
-  model_list   = ex_list_new();
+  model_list = ex_list_new();
 }
 
-void ex_cache_model(ex_model_t *model)
-{
+void ex_cache_model(ex_model_t *model) {
   printf("Caching model %s\n", model->path);
 
   ex_list_add(model_list, model);
 }
 
-ex_model_t* ex_cache_get_model(const char *path)
-{
+ex_model_t *ex_cache_get_model(const char *path) {
   // check of model already exists
   ex_list_node_t *n = model_list;
   while (n->data != NULL) {
@@ -42,8 +39,7 @@ ex_model_t* ex_cache_get_model(const char *path)
   return NULL;
 }
 
-GLuint ex_cache_texture(const char *path)
-{
+GLuint ex_cache_texture(const char *path) {
   // check if texture already exists
   ex_list_node_t *n = texture_list;
   while (n->data != NULL) {
@@ -67,20 +63,19 @@ GLuint ex_cache_texture(const char *path)
   ex_texture_t *t = ex_texture_load(path, 0);
   if (t != NULL) {
     // store it in the list
-    ex_list_add(texture_list, (void*)t);
+    ex_list_add(texture_list, (void *)t);
     return t->id;
   }
 
   return 0;
 }
 
-void ex_cache_flush()
-{
+void ex_cache_flush() {
   // cleanup textures
   ex_list_node_t *n = texture_list;
   while (n->data != NULL) {
     ex_texture_t *t = n->data;
-    
+
     // free texture data
     glDeleteTextures(1, &t->id);
     free(t);

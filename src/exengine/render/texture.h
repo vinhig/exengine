@@ -29,6 +29,6 @@ typedef struct {
  * @param  file [file path string]
  * @return      [texture var]
  */
-ex_texture_t* ex_texture_load(const char *file, int get_data);
+ex_texture_t *ex_texture_load(const char *file, int get_data);
 
 #endif // EX_TEXTURE_H

@@ -5,10 +5,10 @@
   Supports two variable types, strings and floats,
   make sure you cast values to your required type.
   key=value pairs *must* be in a [section].
-  
+
   File extension doesn't matter, as long as its a
   text file and not a binary.
-  
+
   Example conf.ini:
 
   # [graphics]
@@ -21,9 +21,9 @@
 #ifndef EX_INI_H
 #define EX_INI_H
 
+#include <ctype.h>
 #include <inttypes.h>
 #include <stdlib.h>
-#include <ctype.h>
 #include <string.h>
 
 typedef enum {

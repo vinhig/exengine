@@ -20,7 +20,7 @@ typedef struct {
 
 extern ex_window_t display;
 
-void ex_resize_callback(SDL_Window* window, int width, int height);
+void ex_resize_callback(SDL_Window *window, int width, int height);
 
 /**
  * [ex_window_init creates the window and gl context]

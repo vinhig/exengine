@@ -1,6 +1,6 @@
 /* engine
   The core of exengine, inits all internal
-  modules, runs the main game loop, and 
+  modules, runs the main game loop, and
   handles all user callbacks.
 
   It implements a fixed timestep for physics
@@ -21,19 +21,18 @@
 
 #define EX_DATA_FILE "data.ex"
 
-#include <glad/glad.h>
 #include <SDL2/SDL.h>
+#include <glad/glad.h>
 
 #include <inttypes.h>
-#include <stdbool.h>
 #include <physfs.h>
-#include <inttypes.h>
+#include <stdbool.h>
 
-#include "render/render.h"
 #include "input/input.h"
-#include "util/util.h"
-#include "sound/sound.h"
 #include "math/math.h"
+#include "render/render.h"
+#include "sound/sound.h"
+#include "util/util.h"
 
 /*
   The module flags, OR these together when
@@ -57,9 +56,9 @@ extern void (*ex_mousemotion_ptr)(int, int);
 extern void (*ex_mousewheel_ptr)(int32_t, int32_t);
 extern void (*ex_resize_ptr)(uint32_t, uint32_t);
 // custom event handling
-extern void (*ex_event_handler)(SDL_Event*);
+extern void (*ex_event_handler)(SDL_Event *);
 // allows full override of default event handler
-extern void (*ex_event_handler_full)(SDL_Event*);
+extern void (*ex_event_handler_full)(SDL_Event *);
 
 /**
  * [exengine starts the internal engine loop]

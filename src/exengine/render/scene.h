@@ -7,7 +7,7 @@
   which are stored in an internal
   octree.
 
-  Currently it uses a deferred renderer,
+  Currently, it uses a deferred renderer,
   and has semi-function light culling.
 
   The following are features that need implementing:
@@ -17,9 +17,9 @@
 #ifndef EX_SCENE_H
 #define EX_SCENE_H
 
+#include "math/octree.h"
 #include "render/render.h"
 #include "util/list.h"
-#include "math/octree.h"
 
 #include "glad/glad.h"
 #include <SDL2/SDL.h>
@@ -44,7 +44,7 @@
 
 typedef struct {
   vec3 gravity;
-  
+
   ex_list_t *coll_list;
   ex_octree_t *coll_tree;
   int collision_built;
@@ -59,7 +59,7 @@ typedef struct {
  * @param  flags [the features to enable]
  * @return       [the new scene]
  */
-ex_scene_t* ex_scene_new(uint8_t flags);
+ex_scene_t *ex_scene_new(uint8_t flags);
 
 /**
  * [ex_scene_add_collision add a models vertices to the coll tree]

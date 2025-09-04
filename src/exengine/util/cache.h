@@ -36,7 +36,7 @@ void ex_cache_model(ex_model_t *m);
  * @param  path  [path to the model file]
  * @return       [a copy of the requested model]
  */
-ex_model_t* ex_cache_get_model(const char *path);
+ex_model_t *ex_cache_get_model(const char *path);
 
 /**
  * [ex_cache_texture store texture in cache and/or return cached texture]

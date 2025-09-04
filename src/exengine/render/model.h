@@ -12,9 +12,9 @@
 
 #include "glad/glad.h"
 
-#include "util/list.h"
 #include "math/octree.h"
 #include "render/mesh.h"
+#include "util/list.h"
 
 #define EX_MODEL_MAX_MESHES 128
 
@@ -38,7 +38,7 @@ typedef struct {
   quat rotate;
 } ex_pose_t;
 
-typedef ex_pose_t* ex_frame_t;
+typedef ex_pose_t *ex_frame_t;
 
 typedef struct {
   ex_mesh_t *meshes[EX_MODEL_MAX_MESHES];
@@ -48,8 +48,8 @@ typedef struct {
   uint8_t is_lit, is_shadow;
 
   ex_anim_t *current_anim;
-  float     current_time;
-  uint32_t  current_frame;
+  float current_time;
+  uint32_t current_frame;
 
   mat4x4 *inverse_base, *skeleton;
   ex_bone_t *bones;
@@ -66,7 +66,7 @@ typedef struct {
   mat4x4 *transforms;
   GLuint instance_vbo;
   size_t instance_count;
-  int    is_static;
+  int is_static;
 
   char path[512];
 } ex_model_t;
@@ -75,14 +75,14 @@ typedef struct {
  * [ex_model_new define a new model]
  * @return [a new, empty model]
  */
-ex_model_t* ex_model_new();
+ex_model_t *ex_model_new();
 
 /**
  * [ex_model_copy create a copy that uses on the same data]
  * @param  model [the model to copy]
  * @return       [the new instance of the given model]
  */
-ex_model_t* ex_model_copy(ex_model_t *model);
+ex_model_t *ex_model_copy(ex_model_t *model);
 
 /**
  * [ex_model_add_mesh add a mesh to the render list]
@@ -158,6 +158,5 @@ void ex_calc_bone_matrix(mat4x4 m, vec3 pos, quat rot, vec3 scale);
  * @param weight [how much to transpose (0 to 1.0)]
  */
 void ex_mix_pose(ex_model_t *m, ex_frame_t a, ex_frame_t b, float weight);
-
 
 #endif // EX_MODEL_H

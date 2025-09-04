@@ -1,12 +1,12 @@
 /* list
-* A simple arbitrary linked-list implementation.
-*/
+ * A simple arbitrary linked-list implementation.
+ */
 
 #ifndef EX_LIST_H
 #define EX_LIST_H
 
-#include <stdlib.h>
 #include <stdio.h>
+#include <stdlib.h>
 
 typedef struct ex_list_node_t ex_list_node_t;
 typedef ex_list_node_t ex_list_t;
@@ -20,8 +20,7 @@ struct ex_list_node_t {
  * [ex_list_new initialize a new list]
  * @return [ex_list_t pointer]
  */
-static ex_list_node_t* ex_list_new()
-{
+static ex_list_node_t *ex_list_new() {
   ex_list_node_t *n = malloc(sizeof(ex_list_node_t));
   n->prev = NULL;
   n->next = NULL;
@@ -35,8 +34,7 @@ static ex_list_node_t* ex_list_new()
  * @param n    [ex_list_t to add element]
  * @param data [void pointer of data to add]
  */
-static void ex_list_add(ex_list_node_t *n, void *data)
-{
+static void ex_list_add(ex_list_node_t *n, void *data) {
   // get next empty node
   while (n->data != NULL) {
     if (n->next != NULL)
@@ -59,8 +57,7 @@ static void ex_list_add(ex_list_node_t *n, void *data)
  * @param  data [void pointer of data to remove]
  * @return      [restructured ex_list_t pointer]
  */
-static ex_list_t* ex_list_remove(ex_list_node_t *n, void *data)
-{
+static ex_list_t *ex_list_remove(ex_list_node_t *n, void *data) {
   ex_list_t *root = n;
 
   // find node with matching data addr
@@ -96,8 +93,7 @@ static ex_list_t* ex_list_remove(ex_list_node_t *n, void *data)
  * [ex_list_destroy cleanup mallocs etc]
  * @param n [ex_list_t pointer to delete]
  */
-static void ex_list_destroy(ex_list_node_t *n)
-{
+static void ex_list_destroy(ex_list_node_t *n) {
   if (n == NULL)
     return;
 

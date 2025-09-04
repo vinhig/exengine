@@ -29,7 +29,7 @@ typedef struct {
  * @param  y [y position]
  * @param  z [z position]
  */
-ex_fps_camera_t* ex_fps_camera_new(float x, float y, float z, float sensitivity, float fov);
+ex_fps_camera_t *ex_fps_camera_new(float x, float y, float z, float sensitivity, float fov);
 
 /**
  * [ex_fps_camera_resize adjust the projection matrices]

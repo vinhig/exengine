@@ -18,10 +18,10 @@
 #ifndef EX_RENDERER_H
 #define EX_RENDERER_H
 
-#include "pointlight.h"
-#include "model.h"
 #include "camera.h"
 #include "math/mathlib.h"
+#include "model.h"
+#include "pointlight.h"
 
 #include "glad/glad.h"
 #include <stdlib.h>
@@ -87,7 +87,7 @@ static inline ex_rendernode_t *ex_rendernode_push(ex_renderlist_t *list) {
 static inline void ex_rendernode_pop(ex_renderlist_t *list, void *obj) {
   ex_rendernode_t *node = NULL;
 
-  for (int i=0; i<list->count; i++) {
+  for (int i = 0; i < list->count; i++) {
     if (list->nodes[i].obj == obj) {
       node = &list->nodes[i];
       break;
@@ -100,14 +100,13 @@ static inline void ex_rendernode_pop(ex_renderlist_t *list, void *obj) {
   // node is somewhere middle of list, pop from list
   if (node->index < list->count) {
     size_t index = node->index;
-    for (int i=index+1; i<list->count; i++)
+    for (int i = index + 1; i < list->count; i++)
       list->nodes[index++] = list->nodes[i];
-  
   }
   list->count--;
 
   // realloc if count is considerably lower than count
-  if (list->count < list->length-EX_RENDER_LIST_INC) {
+  if (list->count < list->length - EX_RENDER_LIST_INC) {
     list->length -= EX_RENDER_LIST_INC;
     size_t len = sizeof(ex_rendernode_t) * list->length;
     ex_rendernode_t *nodes = realloc(list->nodes, len);

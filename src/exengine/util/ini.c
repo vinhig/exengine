@@ -1,8 +1,7 @@
 #include "ini.h"
 #include "io.h"
 
-int ex_ini_load(ex_ini_t *ini, const char *path)
-{
+int ex_ini_load(ex_ini_t *ini, const char *path) {
   printf("Loading config file %s\n", path);
 
   // read config file contents
@@ -12,7 +11,7 @@ int ex_ini_load(ex_ini_t *ini, const char *path)
 
   // strip white-space
   int j = 0;
-  for (int i=0; i<strlen(buff); i++)
+  for (int i = 0; i < strlen(buff); i++)
     if (buff[i] != ' ' && buff[i] != '\t')
       buff[j++] = buff[i];
   buff[j] = '\0';
@@ -22,13 +21,13 @@ int ex_ini_load(ex_ini_t *ini, const char *path)
   char *token = strtok(buff, "\t\n");
   while (token) {
     // check if section
-    if (token[0] == '[' && token[strlen(token)-1] == ']') {
+    if (token[0] == '[' && token[strlen(token) - 1] == ']') {
       char section[256] = {0};
-      strncpy(section, &token[1], strlen(token)-2);
+      strncpy(section, &token[1], strlen(token) - 2);
 
       // attempt set active section
       int i;
-      for (i=0; i<ini->length; i++) {
+      for (i = 0; i < ini->length; i++) {
         if (strcmp(ini->sections[i].name, section) == 0) {
           cur_section = i;
           break;
@@ -50,20 +49,20 @@ int ex_ini_load(ex_ini_t *ini, const char *path)
       key = token;
       value = &e[1];
       e[0] = '\0';
-      
+
       if (cur_section > -1) {
         ex_ini_section_t *section = &ini->sections[cur_section];
-        
+
         // check to see if key already exists
         ex_ini_var_t *cur_var = NULL;
-        for (int i=0; i<section->length; i++) {
+        for (int i = 0; i < section->length; i++) {
           // key found
           if (strcmp(section->vars[i].key, key) == 0) {
             cur_var = &section->vars[i];
             break;
           }
         }
-        
+
         // no key found, make it
         if (!cur_var) {
           strcpy(section->vars[section->length].key, key);
@@ -94,38 +93,37 @@ int ex_ini_load(ex_ini_t *ini, const char *path)
   return 1;
 }
 
-void ex_ini_save(ex_ini_t *ini, const char *path)
-{
+void ex_ini_save(ex_ini_t *ini, const char *path) {
   // empty the file
   ex_io_write(path, "", 0, 0);
 
   printf("Saving configuration file to %s\n", path);
- 
+
   // now save the actual data
   char buf[1024];
-  for (int i=0; i<ini->length; i++) {
+  for (int i = 0; i < ini->length; i++) {
     ex_ini_section_t *section = &ini->sections[i];
 
     // write section
     sprintf(buf, "[%s]\n", section->name);
     ex_io_write(path, buf, strlen(buf), 1);
 
-    for (int j=0; j<section->length; j++) {
+    for (int j = 0; j < section->length; j++) {
       ex_ini_var_t *var = &section->vars[j];
 
       // format a buffer for writing
       switch (var->type) {
-        case ex_ini_type_string: {
-          sprintf(buf, "%s = %s\n", var->key, var->s);
-          break;
-        }
-        case ex_ini_type_float: {
-          sprintf(buf, "%s = %.2f\n", var->key, var->f);
-          break;
-        }
-        case ex_ini_type_undefined: {
-          break;
-        }
+      case ex_ini_type_string: {
+        sprintf(buf, "%s = %s\n", var->key, var->s);
+        break;
+      }
+      case ex_ini_type_float: {
+        sprintf(buf, "%s = %.2f\n", var->key, var->f);
+        break;
+      }
+      case ex_ini_type_undefined: {
+        break;
+      }
       }
 
       // write a key-value pair
@@ -136,13 +134,12 @@ void ex_ini_save(ex_ini_t *ini, const char *path)
   }
 }
 
-ex_ini_var_t *ex_ini_new_var(ex_ini_t *ini, const char *sec, const char *key)
-{
+ex_ini_var_t *ex_ini_new_var(ex_ini_t *ini, const char *sec, const char *key) {
   ex_ini_section_t *section = NULL;
   ex_ini_var_t *var = NULL;
 
   // see if section already exists
-  for (int i=0; i<ini->length; i++) {
+  for (int i = 0; i < ini->length; i++) {
     if (strcmp(ini->sections[i].name, sec) == 0) {
       section = &ini->sections[i];
       break;
@@ -159,7 +156,7 @@ ex_ini_var_t *ex_ini_new_var(ex_ini_t *ini, const char *sec, const char *key)
   // something bad happened
   if (!section)
     return NULL;
-  
+
   // add the key
   var = &section->vars[section->length];
   strcpy(var->key, key);
@@ -168,15 +165,14 @@ ex_ini_var_t *ex_ini_new_var(ex_ini_t *ini, const char *sec, const char *key)
   return var;
 }
 
-ex_ini_var_t *ex_ini_get_var(ex_ini_t *ini, const char *sec, const char *key)
-{
-  for (int i=0; i<ini->length; i++) {
+ex_ini_var_t *ex_ini_get_var(ex_ini_t *ini, const char *sec, const char *key) {
+  for (int i = 0; i < ini->length; i++) {
     ex_ini_section_t *section = &ini->sections[i];
 
     if (strcmp(section->name, sec) != 0)
       continue;
 
-    for (int j=0; j<section->length; j++) {
+    for (int j = 0; j < section->length; j++) {
       ex_ini_var_t *var = &section->vars[j];
       if (strcmp(var->key, key) == 0) {
         return var;
@@ -188,8 +184,7 @@ ex_ini_var_t *ex_ini_get_var(ex_ini_t *ini, const char *sec, const char *key)
   return ex_ini_new_var(ini, sec, key);
 }
 
-char *ex_ini_get_string(ex_ini_t *ini, const char *sec, const char *key)
-{
+char *ex_ini_get_string(ex_ini_t *ini, const char *sec, const char *key) {
   ex_ini_var_t *var = ex_ini_get_var(ini, sec, key);
 
   if (var && var->type == ex_ini_type_string)
@@ -198,8 +193,7 @@ char *ex_ini_get_string(ex_ini_t *ini, const char *sec, const char *key)
   return "";
 }
 
-float ex_ini_get_float(ex_ini_t *ini, const char *sec, const char *key)
-{
+float ex_ini_get_float(ex_ini_t *ini, const char *sec, const char *key) {
   ex_ini_var_t *var = ex_ini_get_var(ini, sec, key);
 
   if (var && var->type == ex_ini_type_float)
@@ -208,8 +202,7 @@ float ex_ini_get_float(ex_ini_t *ini, const char *sec, const char *key)
   return 0.0f;
 }
 
-void ex_ini_set_string(ex_ini_t *ini, const char *sec, const char *key, const char *value)
-{
+void ex_ini_set_string(ex_ini_t *ini, const char *sec, const char *key, const char *value) {
   ex_ini_var_t *var = ex_ini_get_var(ini, sec, key);
 
   if (var) {
@@ -218,8 +211,7 @@ void ex_ini_set_string(ex_ini_t *ini, const char *sec, const char *key, const ch
   }
 }
 
-void ex_ini_set_float(ex_ini_t *ini, const char *sec, const char *key, const float value)
-{
+void ex_ini_set_float(ex_ini_t *ini, const char *sec, const char *key, const float value) {
   ex_ini_var_t *var = ex_ini_get_var(ini, sec, key);
 
   if (var) {

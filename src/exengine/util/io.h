@@ -6,10 +6,10 @@
 #ifndef EX_IO_H
 #define EX_IO_H
 
+#include <physfs.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <physfs.h>
 
 /**
  * [ex_io_read reads a file into a char array]
@@ -17,8 +17,7 @@
  * @param  mode [access mode]
  * @return      [malloc'd char array, remember to free]
  */
-static char* ex_io_read(const char *path, const char *mode, size_t *len)
-{
+static char *ex_io_read(const char *path, const char *mode, size_t *len) {
   if (!PHYSFS_exists(path)) {
     printf("[IO] Could not load file %s\n", path);
     return NULL;
@@ -34,7 +33,7 @@ static char* ex_io_read(const char *path, const char *mode, size_t *len)
     *len = size;
 
   // allocate space for file data
-  char *buff = malloc(size+1);
+  char *buff = malloc(size + 1);
 
   // read file contents into buffer
   PHYSFS_readBytes(file, buff, size);
@@ -47,7 +46,6 @@ static char* ex_io_read(const char *path, const char *mode, size_t *len)
   return buff;
 }
 
-
 /**
  * [ex_io_prefix_str prefix a string with another]
  * @param  dest   [destination string]
@@ -55,8 +53,7 @@ static char* ex_io_read(const char *path, const char *mode, size_t *len)
  * @param  prefix [prefix string]
  * @return        [input string with prefix]
  */
-static inline void ex_io_prefix_str(char *dest, const char *src, const char *prefix)
-{
+static inline void ex_io_prefix_str(char *dest, const char *src, const char *prefix) {
   if (src == NULL) {
     dest[0] = '\0';
     return;
@@ -72,8 +69,7 @@ static inline void ex_io_prefix_str(char *dest, const char *src, const char *pre
  * @param dest [destination string]
  * @param src  [source string]
  */
-static inline void ex_io_get_extension(char *dest, const char *src)
-{
+static inline void ex_io_get_extension(char *dest, const char *src) {
   dest[0] = '\0';
 
   if (src == NULL)
@@ -91,8 +87,7 @@ static inline void ex_io_get_extension(char *dest, const char *src)
  * @param len    [length of data]
  * @param append [if set to 1, append to end of file]
  */
-static inline void ex_io_write(const char *path, const void *data, size_t len, int append)
-{
+static inline void ex_io_write(const char *path, const void *data, size_t len, int append) {
   // attempt to open file for writing
   PHYSFS_File *file = NULL;
   if (append)
@@ -107,7 +102,7 @@ static inline void ex_io_write(const char *path, const void *data, size_t len, i
   }
 
   // attempt to write bytes to file
-  if (PHYSFS_writeBytes(file, (void*)data, len) < len) {
+  if (PHYSFS_writeBytes(file, (void *)data, len) < len) {
     printf("Unable to write bytes to file %s\n", path);
     return;
   }

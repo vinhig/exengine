@@ -12,18 +12,17 @@ void (*ex_mousemotion_ptr)(int, int) = NULL;
 void (*ex_mousewheel_ptr)(int32_t, int32_t) = NULL;
 void (*ex_resize_ptr)(uint32_t, uint32_t) = NULL;
 // custom event handling
-void (*ex_event_handler)(SDL_Event*) = NULL;
+void (*ex_event_handler)(SDL_Event *) = NULL;
 // allows full override of default event handler
-void (*ex_event_handler_full)(SDL_Event*) = NULL;
+void (*ex_event_handler_full)(SDL_Event *) = NULL;
 
 ex_ini_t *conf;
 
-void exengine(char **argv, const char *appname, uint8_t flags)
-{
+void exengine(char **argv, const char *appname, uint8_t flags) {
   /* -- INIT ENGINE -- */
   // init physfs filesystem
   PHYSFS_init(argv[0]);
-  
+
   // set the safe writing dir
   // most often these directories will be..
   // linux: ~/.local/share/appname
@@ -56,7 +55,7 @@ void exengine(char **argv, const char *appname, uint8_t flags)
   if (!ex_ini_load(conf, "data/conf.ini")) {
     printf("Failed loading engine config.\n");
   }
-  
+
   // load user config file
   // overwrites any matching variables already loaded
   // from the engine config file
@@ -70,7 +69,7 @@ void exengine(char **argv, const char *appname, uint8_t flags)
   uint32_t width = 0, height = 0;
   width = (int)ex_ini_get_float(conf, "graphics", "window_width");
   height = (int)ex_ini_get_float(conf, "graphics", "window_height");
-  
+
   // init the window and gl
   if (!ex_window_init(width, height, "exengine-testing")) {
     ex_exit_ptr();
@@ -79,11 +78,10 @@ void exengine(char **argv, const char *appname, uint8_t flags)
 
   // init rendering modules
   ex_font_init();
-  
+
   // user init callback
   ex_init_ptr();
   /* ----------------- */
-
 
   /* -- UPDATE ENGINE -- */
   // main engine loop
@@ -118,30 +116,30 @@ void exengine(char **argv, const char *appname, uint8_t flags)
 
         // default event handler
         switch (event.type) {
-          // cya
-          case SDL_QUIT:
-            running = 0;
-            break;
+        // cya
+        case SDL_QUIT:
+          running = 0;
+          break;
 
-          // input events
-          case SDL_KEYDOWN:
-          case SDL_KEYUP:
-          case SDL_MOUSEBUTTONDOWN:
-          case SDL_MOUSEBUTTONUP:
-          case SDL_MOUSEWHEEL:
-          case SDL_TEXTEDITING:
-          case SDL_TEXTINPUT:
-          case SDL_MOUSEMOTION:
-          case SDL_KEYMAPCHANGED: {
-            ex_input_event(&event);
-            break;
-          }
+        // input events
+        case SDL_KEYDOWN:
+        case SDL_KEYUP:
+        case SDL_MOUSEBUTTONDOWN:
+        case SDL_MOUSEBUTTONUP:
+        case SDL_MOUSEWHEEL:
+        case SDL_TEXTEDITING:
+        case SDL_TEXTINPUT:
+        case SDL_MOUSEMOTION:
+        case SDL_KEYMAPCHANGED: {
+          ex_input_event(&event);
+          break;
+        }
 
-          // window events
-          case SDL_WINDOWEVENT: {
-            ex_window_event(&event);
-            break;
-          }
+        // window events
+        case SDL_WINDOWEVENT: {
+          ex_window_event(&event);
+          break;
+        }
         }
       }
 
@@ -154,7 +152,6 @@ void exengine(char **argv, const char *appname, uint8_t flags)
       accumulator -= phys_delta_time;
     }
 
-    
     // user draw callback
     ex_draw_ptr();
 
@@ -162,7 +159,6 @@ void exengine(char **argv, const char *appname, uint8_t flags)
     SDL_GL_SwapWindow(display.window);
   }
   /* ------------------- */
-
 
   // -- CLEAN UP -- */
   free(conf);

@@ -10,12 +10,12 @@
 #ifndef EX_IQM_LOADER_H
 #define EX_IQM_LOADER_H
 
+#include "render/model.h"
+#include "render/scene.h"
 #include <inttypes.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include "render/scene.h"
-#include "render/model.h"
 
 #define uint uint32_t
 #define EX_IQM_MAGIC "INTERQUAKEMODEL"
@@ -51,24 +51,24 @@ typedef struct {
 } ex_iqm_header_t;
 
 enum {
-  IQM_POSITION     = 0,
-  IQM_TEXCOORD     = 1,
-  IQM_NORMAL       = 2,
-  IQM_TANGENT      = 3,
+  IQM_POSITION = 0,
+  IQM_TEXCOORD = 1,
+  IQM_NORMAL = 2,
+  IQM_TANGENT = 3,
   IQM_BLENDINDEXES = 4,
   IQM_BLENDWEIGHTS = 5,
-  IQM_COLOR        = 6,
-  IQM_CUSTOM       = 0x10,
-  IQM_BYTE   = 0,
-  IQM_UBYTE  = 1,
-  IQM_SHORT  = 2,
+  IQM_COLOR = 6,
+  IQM_CUSTOM = 0x10,
+  IQM_BYTE = 0,
+  IQM_UBYTE = 1,
+  IQM_SHORT = 2,
   IQM_USHORT = 3,
-  IQM_INT    = 4,
-  IQM_UINT   = 5,
-  IQM_HALF   = 6,
-  IQM_FLOAT  = 7,
+  IQM_INT = 4,
+  IQM_UINT = 5,
+  IQM_HALF = 6,
+  IQM_FLOAT = 7,
   IQM_DOUBLE = 8,
-  IQM_LOOP   = 1<<0
+  IQM_LOOP = 1 << 0
 };
 
 typedef struct {
@@ -124,7 +124,7 @@ typedef struct {
  */
 ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags);
 
-static inline uint ex_get_uint(uint8_t *data) { 
+static inline uint ex_get_uint(uint8_t *data) {
   return (data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
 }
 

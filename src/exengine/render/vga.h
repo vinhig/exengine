@@ -6,9 +6,9 @@
 #ifndef EX_VGA_H
 #define EX_VGA_H
 
+#include "glad/glad.h"
 #include <inttypes.h>
 #include <stdlib.h>
-#include "glad/glad.h"
 
 extern uint32_t ex_vga_fg;
 extern uint32_t ex_vga_bg;

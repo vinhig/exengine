@@ -28,5 +28,5 @@ if(TARGET SDL2::SDL2main)
 endif()
 
 target_link_libraries(exengine PRIVATE SDL2::SDL2 m)
-target_compile_options(exengine PUBLIC -fsanitize=undefined)
-target_link_options(exengine PUBLIC -fsanitize=undefined)
+#target_compile_options(exengine PUBLIC -fsanitize=undefined)
+#target_link_options(exengine PUBLIC -fsanitize=undefined)

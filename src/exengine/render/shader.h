@@ -51,5 +51,4 @@ GLuint ex_shader(const char *path);
  */
 void ex_shader_use(GLuint shader);
 
-
 #endif // EX_SHADER_H
