@@ -1,5 +1,12 @@
 #include "engine.h"
 
+#include <physfs.h>
+
+#include "input/input.h"
+#include "math/math.h"
+#include "render/render.h"
+#include "util/util.h"
+
 // user defined function callback pointers
 void (*ex_init_ptr)(void) = NULL;
 void (*ex_update_ptr)(double, double) = NULL;
@@ -56,22 +63,21 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
     printf("Failed loading engine config.\n");
   }
 
-  // load user config file
-  // overwrites any matching variables already loaded
-  // from the engine config file
-  ex_ini_load(conf, "conf.ini");
-
   // save the combined user and engine configs
   // to the save location
   ex_ini_save(conf, "conf.ini");
 
   // load config vars
   uint32_t width = 0, height = 0;
+  bool fullscreen = false, vsync = false;
+
   width = (int)ex_ini_get_float(conf, "graphics", "window_width");
   height = (int)ex_ini_get_float(conf, "graphics", "window_height");
+  fullscreen = ex_ini_get_bool(conf, "graphics", "fullscreen");
+  vsync = ex_ini_get_bool(conf, "graphics", "vsync");
 
   // init the window and gl
-  if (!ex_window_init(width, height, "exengine-testing")) {
+  if (!ex_window_init(width, height, "exengine-testing", fullscreen, vsync)) {
     ex_exit_ptr();
     return;
   }

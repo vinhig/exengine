@@ -25,7 +25,7 @@ void ex_entity_collide_and_slide(ex_entity_t *entity) {
   memcpy(entity->packet.r3_velocity, entity->velocity, sizeof(vec3));
   memcpy(entity->packet.e_radius, entity->radius, sizeof(vec3));
 
-  // y velocity in a seperate pass
+  // y velocity in a separate pass
   vec3 gravity = {0.0f};
   gravity[DOWN_AXIS] = entity->packet.r3_velocity[DOWN_AXIS];
   entity->packet.r3_velocity[DOWN_AXIS] = 0.0f;
@@ -204,8 +204,10 @@ void ex_entity_update(ex_entity_t *entity, double dt) {
   dt = dt / 5.0;
 
   vec3_scale(entity->velocity, entity->velocity, dt);
+
   for (int i = 0; i < 5; i++)
     ex_entity_collide_and_slide(entity);
+
   vec3_sub(entity->velocity, entity->position, entity->packet.r3_position);
   vec3_scale(entity->velocity, entity->velocity, 1.0 / dt);
 }

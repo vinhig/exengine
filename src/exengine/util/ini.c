@@ -5,15 +5,18 @@ int ex_ini_load(ex_ini_t *ini, const char *path) {
   printf("Loading config file %s\n", path);
 
   // read config file contents
-  char *buff = ex_io_read(path, "r", NULL);
-  if (buff == NULL)
+  char *buff = ex_io_read(path, "r", nullptr);
+  if (buff == NULL) {
     return 0;
+  }
 
   // strip white-space
   int j = 0;
-  for (int i = 0; i < strlen(buff); i++)
-    if (buff[i] != ' ' && buff[i] != '\t')
+  for (int i = 0; i < strlen(buff); i++) {
+    if (buff[i] != ' ' && buff[i] != '\t') {
       buff[j++] = buff[i];
+    }
+  }
   buff[j] = '\0';
 
   // tokenize buffer
@@ -154,8 +157,9 @@ ex_ini_var_t *ex_ini_new_var(ex_ini_t *ini, const char *sec, const char *key) {
   }
 
   // something bad happened
-  if (!section)
+  if (!section) {
     return NULL;
+  }
 
   // add the key
   var = &section->vars[section->length];
@@ -169,8 +173,9 @@ ex_ini_var_t *ex_ini_get_var(ex_ini_t *ini, const char *sec, const char *key) {
   for (int i = 0; i < ini->length; i++) {
     ex_ini_section_t *section = &ini->sections[i];
 
-    if (strcmp(section->name, sec) != 0)
+    if (strcmp(section->name, sec) != 0) {
       continue;
+    }
 
     for (int j = 0; j < section->length; j++) {
       ex_ini_var_t *var = &section->vars[j];
@@ -187,17 +192,29 @@ ex_ini_var_t *ex_ini_get_var(ex_ini_t *ini, const char *sec, const char *key) {
 char *ex_ini_get_string(ex_ini_t *ini, const char *sec, const char *key) {
   ex_ini_var_t *var = ex_ini_get_var(ini, sec, key);
 
-  if (var && var->type == ex_ini_type_string)
+  if (var && var->type == ex_ini_type_string) {
     return var->s;
+  }
 
   return "";
+}
+
+bool ex_ini_get_bool(ex_ini_t *ini, const char *sec, const char *key) {
+  auto str = ex_ini_get_string(ini, sec, key);
+
+  if (strcmp(str, "true") == 0) {
+    return true;
+  }
+
+  return false;
 }
 
 float ex_ini_get_float(ex_ini_t *ini, const char *sec, const char *key) {
   ex_ini_var_t *var = ex_ini_get_var(ini, sec, key);
 
-  if (var && var->type == ex_ini_type_float)
+  if (var && var->type == ex_ini_type_float) {
     return var->f;
+  }
 
   return 0.0f;
 }

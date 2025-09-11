@@ -4,19 +4,16 @@
 #include "input/input.h"
 #include <stdio.h>
 
-#define DEFAULT_FLAGS SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE
+#define DEFAULT_FLAGS SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
 
 ex_window_t display;
 
-int ex_window_init(uint32_t width, uint32_t height, const char *title) {
+int ex_window_init(uint32_t width, uint32_t height, const char *title, bool fullscreen, bool vsync) {
   if (SDL_Init(SDL_INIT_VIDEO)) {
     printf("Failed to init SDL\n%s", SDL_GetError());
     return 0;
   }
 
-  SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-  SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 0);
-  SDL_GL_SetAttribute(SDL_GL_ACCELERATED_VISUAL, 1);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
@@ -26,23 +23,36 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   display.window = SDL_CreateWindow(title,
                                     SDL_WINDOWPOS_CENTERED,
                                     SDL_WINDOWPOS_CENTERED,
-                                    width,
-                                    height,
+                                    (int32_t)width,
+                                    (int32_t)height,
                                     DEFAULT_FLAGS);
+
   if (!display.window) {
     printf("Failed to open SDL window\n%s", SDL_GetError());
     return 0;
   }
 
+  if (fullscreen) {
+    SDL_SetWindowFullscreen(display.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+  }
+
   // attempt to setup GL
+  SDL_GL_MakeCurrent(display.window, display.context);
   display.context = SDL_GL_CreateContext(display.window);
   if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
     printf("Failed creating GL context");
     return 0;
   }
 
-  // set vsync
-  SDL_GL_SetSwapInterval(0);
+  if (vsync) {
+    if (SDL_GL_SetSwapInterval(1) != 0) {
+      printf("Error setting vsync.\n");
+    }
+  } else {
+    if (SDL_GL_SetSwapInterval(0) != 0) {
+      printf("Error setting vsync.\n");
+    }
+  }
 
   // set viewport etc
   glViewport(0, 0, width, height);
@@ -58,7 +68,6 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   SDL_SetRelativeMouseMode(SDL_TRUE);
   SDL_CaptureMouse(SDL_TRUE);
   SDL_SetWindowGrab(display.window, SDL_TRUE);
-  SDL_GL_SetSwapInterval(1);
 
   display.width = width;
   display.height = height;
@@ -72,8 +81,9 @@ void ex_window_event(SDL_Event *event) {
   case SDL_WINDOWEVENT_RESIZED: {
     display.width = event->window.data1;
     display.height = event->window.data2;
-    if (ex_resize_ptr)
+    if (ex_resize_ptr) {
       ex_resize_ptr(event->window.data1, event->window.data2);
+    }
     break;
   }
   }

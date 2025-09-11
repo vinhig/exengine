@@ -1,5 +1,9 @@
 #include "inc/game.h"
 #include "engine.h"
+#include "input/input.h"
+#include "render/camera.h"
+#include "util/entity.h"
+#include "util/iqm.h"
 
 ex_fps_camera_t *camera;
 ex_scene_t *scene;
@@ -178,18 +182,18 @@ void game_update(double dt, double ft) {
   ex_scene_update(scene, dt);
   ex_fps_camera_update(camera);
 
-  // ex_vga_clear();
+  ex_vga_clear();
 
-  // char buf[64];
-  // ex_vga_setfg(255, 255, 255, 255);
-  // ex_vga_setbg(0, 0, 0, 255);
-  // sprintf(buf, "exengine dbg build %c", 1);
-  // ex_vga_print(2, 1, buf);
-  //
-  // sprintf(buf, "framerate %.2f", 1.0 / ft);
-  // ex_vga_setfg(255, 255, 0, 255);
-  // ex_vga_setbg(255, 255, 255, 0);
-  // ex_vga_print(2, 2, buf);
+  char buf[64];
+  ex_vga_setfg(255, 255, 255, 255);
+  ex_vga_setbg(0, 0, 0, 255);
+  sprintf(buf, "exengine dbg build %c", 1);
+  ex_vga_print(2, 1, buf);
+
+  sprintf(buf, "framerate %.2f", 1.0 / ft);
+  ex_vga_setfg(255, 255, 0, 255);
+  ex_vga_setbg(255, 255, 255, 0);
+  ex_vga_print(2, 2, buf);
 }
 
 void game_draw() {

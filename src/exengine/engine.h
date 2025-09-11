@@ -22,17 +22,10 @@
 #define EX_DATA_FILE "data.ex"
 
 #include <SDL2/SDL.h>
-#include <glad/glad.h>
 
 #include <inttypes.h>
-#include <physfs.h>
-#include <stdbool.h>
 
-#include "input/input.h"
-#include "math/math.h"
-#include "render/render.h"
 #include "sound/sound.h"
-#include "util/util.h"
 
 /*
   The module flags, OR these together when

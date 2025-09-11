@@ -86,6 +86,15 @@ ex_ini_var_t *ex_ini_get_var(ex_ini_t *ini, const char *sec, const char *key);
 char *ex_ini_get_string(ex_ini_t *ini, const char *sec, const char *key);
 
 /**
+ * [ex_ini_get_bool get a boolean variable]
+ * @param  ini [ini instance to use]
+ * @param  sec [variable section]
+ * @param  key [variable key]
+ * @return     [boolean value]
+ */
+bool ex_ini_get_bool(ex_ini_t *ini, const char *sec, const char *key);
+
+/**
  * [ex_ini_get_float get a float variable]
  * @param  ini [ini instance to use]
  * @param  sec [variable section]
