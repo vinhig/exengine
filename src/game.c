@@ -42,10 +42,17 @@ void game_init() {
   ex_scene_add_pointlight(scene, pl);
   pl->cast_shadow = 1;
 
-  box = ex_iqm_load_model(scene, "data/cube.iqm", 0);
+  box = ex_iqm_load_model(scene, "data/erebus.iqm", 0);
   box->cast_shadow = 1;
-  printf("box->anims == %lu\n", box->anims_len);
+  box->scale = 0.025f;
+  box->rotation[0] = -90.0f;
+  printf("animation count %lu\n", box->anims_len);
+  for (int i =0; i < box->anims_len; i++) {
+    printf("%s\n", box->anims[i].name);
+  }
   ex_scene_add_model(scene, box);
+
+  ex_model_set_anim(box, "run");
 
   cube = ex_entity_new(scene, (vec3){0.95f, 0.95f, 0.95f});
   cube->position[2] = 5.0f;

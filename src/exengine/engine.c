@@ -3,25 +3,25 @@
 #include <physfs.h>
 
 #include "input/input.h"
-#include "math/math.h"
 #include "render/render.h"
-#include "util/util.h"
+#include "util/cache.h"
+#include "util/ini.h"
 
 // user defined function callback pointers
-void (*ex_init_ptr)(void) = NULL;
-void (*ex_update_ptr)(double, double) = NULL;
-void (*ex_draw_ptr)(void) = NULL;
-void (*ex_exit_ptr)(void) = NULL;
+void (*ex_init_ptr)(void) = nullptr;
+void (*ex_update_ptr)(double, double) = nullptr;
+void (*ex_draw_ptr)(void) = nullptr;
+void (*ex_exit_ptr)(void) = nullptr;
 // non-essential user callbacks
-void (*ex_keypressed_ptr)(uint32_t) = NULL;
-void (*ex_mousepressed_ptr)(uint8_t) = NULL;
-void (*ex_mousemotion_ptr)(int, int) = NULL;
-void (*ex_mousewheel_ptr)(int32_t, int32_t) = NULL;
-void (*ex_resize_ptr)(uint32_t, uint32_t) = NULL;
+void (*ex_keypressed_ptr)(uint32_t) = nullptr;
+void (*ex_mousepressed_ptr)(uint8_t) = nullptr;
+void (*ex_mousemotion_ptr)(int, int) = nullptr;
+void (*ex_mousewheel_ptr)(int32_t, int32_t) = nullptr;
+void (*ex_resize_ptr)(uint32_t, uint32_t) = nullptr;
 // custom event handling
-void (*ex_event_handler)(SDL_Event *) = NULL;
+void (*ex_event_handler)(SDL_Event *) = nullptr;
 // allows full override of default event handler
-void (*ex_event_handler_full)(SDL_Event *) = NULL;
+void (*ex_event_handler_full)(SDL_Event *) = nullptr;
 
 ex_ini_t *conf;
 
@@ -35,14 +35,14 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
   // linux: ~/.local/share/appname
   // windows: AppData\\Roaming\\appname\\appname
   const char *write_path = PHYSFS_getPrefDir(appname, appname);
-  if (write_path != NULL)
+  if (write_path != nullptr)
     PHYSFS_setWriteDir(write_path);
   else
     printf("PhysFS was unable to set the write directory!\n");
 
   // append data and write paths to search paths
-  PHYSFS_mount(write_path, NULL, 1);
-  PHYSFS_mount(EX_DATA_FILE, NULL, 1);
+  PHYSFS_mount(write_path, nullptr, 1);
+  PHYSFS_mount(EX_DATA_FILE, nullptr, 1);
 
   // init engine file data cache
   ex_cache_init();
@@ -91,9 +91,9 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
 
   /* -- UPDATE ENGINE -- */
   // main engine loop
-  double last_ex_frame_time = SDL_GetPerformanceCounter();
+  double last_ex_frame_time = (double)SDL_GetPerformanceCounter();
   int running = 1;
-  SDL_Event e;
+
   while (running) {
     // calculate delta time
     double current_ex_frame_time = (double)SDL_GetPerformanceCounter();

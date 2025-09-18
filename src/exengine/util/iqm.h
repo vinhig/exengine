@@ -124,16 +124,8 @@ typedef struct {
  */
 ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags);
 
-static inline uint ex_get_uint(uint8_t *data) {
-  return (data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
-}
+uint ex_get_uint(const uint8_t *data);
 
-static void ex_iqm_get_args(const char *str, vec4 args) {
-  char *end;
-  args[0] = strtof(str, &end);
-  args[1] = strtof(&end[1], &end);
-  args[2] = strtof(&end[1], &end);
-  args[3] = strtof(&end[1], &end);
-}
+void ex_iqm_get_args(const char *str, vec4 args);
 
 #endif // EX_IQM_LOADER_H

@@ -830,7 +830,7 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       contour_data[i].edges = malloc(sizeof(edge_segment_t) * 3);
       contour_data[i].edge_count = 3;
       for (int j = 0; j < 3; j++)
-        memcpy(&contour_data[i].edges[j], &parts[j], sizeof(edge_segment_t));
+        memcpy(&contour_data[i].edges[j], &parts[j], sizeof(edge_segment_t*));
     }
   }
 

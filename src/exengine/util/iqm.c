@@ -6,16 +6,17 @@
 ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags) {
   // check if its already in the cache
   ex_model_t *m_cache = ex_cache_get_model(path);
-  if (m_cache != NULL)
+  if (m_cache != nullptr) {
     return m_cache;
+  }
 
   printf("Loading IQM model file %s\n", path);
 
   // read in the file data
-  uint8_t *data = (uint8_t *)ex_io_read(path, "rb", NULL);
-  if (data == NULL) {
+  uint8_t *data = (uint8_t *)ex_io_read(path, "rb", nullptr);
+  if (data == nullptr) {
     printf("Failed to load IQM model file %s\n", path);
-    return NULL;
+    return nullptr;
   }
 
   // the header contents
@@ -28,7 +29,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   if (strcmp(header.magic, EX_IQM_MAGIC) != 0 || header.version != EX_IQM_VERSION) {
     printf("Loaded IQM model version is not 2.0\nFailed loading %s\n", path);
     free(data);
-    return NULL;
+    return nullptr;
   }
 
   // get the rest of the header weeeeee
@@ -48,53 +49,60 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
     switch (va.type) {
     case IQM_POSITION: {
       position = (float *)&data[va.offset];
-      for (int x = 0; x < header.num_vertexes; x++)
+      for (int x = 0; x < header.num_vertexes; x++) {
         memcpy(&vertices[x].position, &position[x * va.size], va.size * sizeof(float));
+      }
       break;
     }
     case IQM_TEXCOORD: {
       uv = (float *)&data[va.offset];
-      for (int x = 0; x < header.num_vertexes; x++)
+      for (int x = 0; x < header.num_vertexes; x++) {
         memcpy(&vertices[x].uv, &uv[x * va.size], va.size * sizeof(float));
+      }
       break;
     }
     case IQM_NORMAL: {
       normal = (float *)&data[va.offset];
-      for (int x = 0; x < header.num_vertexes; x++)
+      for (int x = 0; x < header.num_vertexes; x++) {
         memcpy(&vertices[x].normal, &normal[x * va.size], va.size * sizeof(float));
+      }
       break;
     }
     case IQM_TANGENT: {
       tangent = (float *)&data[va.offset];
-      for (int x = 0; x < header.num_vertexes; x++)
+      for (int x = 0; x < header.num_vertexes; x++) {
         memcpy(&vertices[x].tangent, &tangent[x * va.size], va.size * sizeof(float));
+      }
       break;
     }
     case IQM_BLENDINDEXES: {
       blend_indexes = (uint8_t *)&data[va.offset];
-      for (int x = 0; x < header.num_vertexes; x++)
+      for (int x = 0; x < header.num_vertexes; x++) {
         memcpy(&vertices[x].blend_indexes, &blend_indexes[x * va.size], va.size * sizeof(uint8_t));
+      }
       break;
     }
     case IQM_BLENDWEIGHTS: {
       blend_weights = (uint8_t *)&data[va.offset];
-      for (int x = 0; x < header.num_vertexes; x++)
+      for (int x = 0; x < header.num_vertexes; x++) {
         memcpy(&vertices[x].blend_weights, &blend_weights[x * va.size], va.size * sizeof(uint8_t));
+      }
       break;
     }
     case IQM_COLOR: {
       color = (uint8_t *)&data[va.offset];
-      for (int x = 0; x < header.num_vertexes; x++)
+      for (int x = 0; x < header.num_vertexes; x++) {
         memcpy(&vertices[x].color, &color[x * va.size], va.size * sizeof(uint8_t));
+      }
       break;
     }
     }
   }
 
   // bones and joints
-  ex_bone_t *bones = NULL;
-  ex_frame_t bind_pose = NULL;
-  ex_frame_t pose = NULL;
+  ex_bone_t *bones = nullptr;
+  ex_frame_t bind_pose = nullptr;
+  ex_frame_t pose = nullptr;
   ex_iqmjoint_t *joints = (ex_iqmjoint_t *)&data[header.ofs_joints];
   if (header.ofs_joints > 0) {
     bones = malloc(sizeof(ex_bone_t) * header.num_joints);
@@ -117,7 +125,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   }
 
   // anims
-  ex_anim_t *anims = NULL;
+  ex_anim_t *anims = nullptr;
   ex_iqmex_anim_t *animdata = (ex_iqmex_anim_t *)&data[header.ofs_anims];
   if (header.ofs_anims > 0) {
     anims = malloc(sizeof(ex_anim_t) * header.num_anims);
@@ -141,8 +149,8 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   }
 
   // poses
-  unsigned short *framedata = NULL;
-  ex_frame_t *frames = NULL;
+  unsigned short *framedata = nullptr;
+  ex_frame_t *frames = nullptr;
   ex_iqmex_pose_t *posedata = (ex_iqmex_pose_t *)&data[header.ofs_poses];
   if (header.ofs_poses > 0) {
     frames = malloc(sizeof(ex_frame_t) * header.num_frames);
@@ -175,8 +183,8 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   // indices
   GLuint *indices = malloc(sizeof(GLuint) * (header.num_triangles * 3));
   memcpy(indices, &data[header.ofs_triangles], (header.num_triangles * 3) * sizeof(GLuint));
-  int i, a;
-  for (i = 0; i < header.num_triangles * 3; i += 3) {
+  uint32_t a;
+  for (int i = 0; i < header.num_triangles * 3; i += 3) {
     a = indices[i + 0];
     indices[i + 0] = indices[i + 2];
     indices[i + 2] = a;
@@ -192,15 +200,16 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   model->frames_len = header.num_frames;
   model->bind_pose = bind_pose;
   model->pose = pose;
-  model->vertices = NULL;
-  model->octree_data = NULL;
+  model->vertices = nullptr;
+  model->octree_data = nullptr;
 
   // calc inverse base pose
-  model->inverse_base = NULL;
-  model->skeleton = NULL;
+  model->inverse_base = nullptr;
+  model->skeleton = nullptr;
   for (int i = 0; i < header.num_joints; i++) {
-    if (header.ofs_joints < 1)
+    if (header.ofs_joints < 1) {
       break;
+    }
 
     if (!i) {
       model->inverse_base = malloc(sizeof(mat4x4) * header.num_joints);
@@ -219,8 +228,9 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
       mat4x4_dup(model->inverse_base[i], inv);
     }
 
-    if (i >= header.num_joints - 1)
+    if (i >= header.num_joints - 1) {
       ex_model_update_matrices(model);
+    }
   }
 
   // backup vertices of visible meshes
@@ -238,8 +248,9 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
     for (int k = 0; k < meshes[i].num_triangles * 3; k++) {
       ind[k] -= index_offset;
 
-      if (ind[k] > offset)
+      if (ind[k] > offset) {
         offset = ind[k];
+      }
     }
     index_offset += ++offset;
 
@@ -253,15 +264,16 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
     // store vertices
     if (flags & EX_KEEP_VERTICES) {
       size_t size = meshes[i].num_triangles * 3;
-      for (int j = 0; j < size; j++)
+      for (int j = 0; j < size; j++) {
         memcpy(&vis_vertices[vis_len + j], vert[ind[j]].position, sizeof(vec3));
+      }
 
       vis_len += size;
     }
 
     // load textures
     char *tex_types[] = {"spec_", "norm_"};
-    if (is_file != NULL) {
+    if (is_file != nullptr) {
       // diffuse
       m->texture = ex_cache_texture(tex_name);
 
@@ -303,4 +315,16 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   // store the model in the cache and return an instance of it
   ex_cache_model(model);
   return ex_cache_get_model(path);
+}
+
+uint32_t ex_get_uint(const uint8_t *data) {
+  return (data[0] | (data[1] << 8) | (data[2] << 16) | (data[3] << 24));
+}
+
+void ex_iqm_get_args(const char *str, vec4 args) {
+  char *end;
+  args[0] = strtof(str, &end);
+  args[1] = strtof(&end[1], &end);
+  args[2] = strtof(&end[1], &end);
+  args[3] = strtof(&end[1], &end);
 }

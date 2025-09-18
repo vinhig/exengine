@@ -918,7 +918,8 @@ static DirHandle *openDirectory(PHYSFS_Io *io, const char *d, int forWriting)
     if ((!retval) && (created_io))
         io->destroy(io);
 
-    BAIL_IF(!retval, claimed ? errcode : PHYSFS_ERR_UNSUPPORTED, NULL);
+  int err = (claimed ? errcode : PHYSFS_ERR_UNSUPPORTED);
+    BAIL_IF(!retval, err, NULL);
     return retval;
 } /* openDirectory */
 

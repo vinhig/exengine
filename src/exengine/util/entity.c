@@ -31,7 +31,7 @@ void ex_entity_collide_and_slide(ex_entity_t *entity) {
   entity->packet.r3_velocity[DOWN_AXIS] = 0.0f;
 
   // lets get e-spacey?
-  vec3 e_position, e_velocity, final_position;
+  vec3 e_position, e_velocity;
   vec3_div(e_position, entity->packet.r3_position, entity->packet.e_radius);
   vec3_div(e_velocity, entity->packet.r3_velocity, entity->packet.e_radius);
 
