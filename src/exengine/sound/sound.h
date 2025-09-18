@@ -4,7 +4,7 @@
 
   Based on OpenAL (the good one),
   still requires the ability to
-  stream sound sources.  Currently
+  stream sound sources.  Currently,
   also only supports ogg sound files.
 
   This needs a lot of work:
@@ -15,8 +15,7 @@
     position, etc.
 */
 
-#ifndef EX_SOUND_H
-#define EX_SOUND_H
+#pragma once
 
 #define EX_DEVICE_LEN 32
 
@@ -128,5 +127,3 @@ static inline int ex_sound_playing(ex_source_t *s) {
   alGetSourcei(s->id, AL_SOURCE_STATE, &state);
   return (state == AL_PLAYING);
 }
-
-#endif // EX_SOUND_H

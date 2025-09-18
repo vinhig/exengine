@@ -3,13 +3,9 @@
   saving and loading data.
 */
 
-#ifndef EX_IO_H
-#define EX_IO_H
+#pragma once
 
-#include <physfs.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 /**
  * [ex_io_read reads a file into a char array]
@@ -43,5 +39,3 @@ void ex_io_get_extension(char *dest, const char *src);
  * @param append [if set to 1, append to end of file]
  */
 void ex_io_write(const char *path, const void *data, size_t len, int append);
-
-#endif // EX_IO_H

@@ -11,11 +11,9 @@
   the iqm loader) call these internally already.
 */
 
-#ifndef EX_CACHE_H
-#define EX_CACHE_H
+#pragma once
 
 #include "glad/glad.h"
-#include <SDL2/SDL.h>
 
 #include "render/model.h"
 
@@ -49,5 +47,3 @@ GLuint ex_cache_texture(const char *path);
  * [ex_cache_flush cleanup all data from the cache]
  */
 void ex_cache_flush();
-
-#endif // EX_CACHE_H

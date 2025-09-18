@@ -1,4 +1,6 @@
 #include "render/model.h"
+
+#include <stdio.h>
 #include <string.h>
 
 ex_model_t *ex_model_new() {

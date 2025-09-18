@@ -6,17 +6,11 @@
   geometry shader if specified.
 */
 
-#ifndef EX_SHADER_H
-#define EX_SHADER_H
+#pragma once
 
 #define EX_SHADER_LOC "data/shaders/"
 
-#include <stdio.h>
-#include <stdlib.h>
-
 #include "glad/glad.h"
-
-#include "util/io.h"
 
 typedef struct {
   GLuint ID;
@@ -50,5 +44,3 @@ GLuint ex_shader(const char *path);
  * @param shader [shader to use]
  */
 void ex_shader_use(GLuint shader);
-
-#endif // EX_SHADER_H

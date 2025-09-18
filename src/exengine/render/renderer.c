@@ -1,6 +1,12 @@
+#include "renderer.h"
+
 #include "math/mathlib.h"
-#include "render.h"
+#include "pointlight.h"
+#include "shader.h"
 #include "ssao.h"
+#include "window.h"
+
+#include <stdio.h>
 
 // projections
 mat4x4 projection_90deg;

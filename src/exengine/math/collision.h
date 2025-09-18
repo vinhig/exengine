@@ -6,8 +6,7 @@
   http://www.peroxide.dk/papers/collision/collision.pdf
 */
 
-#ifndef EX_COLLISION_H
-#define EX_COLLISION_H
+#pragma once
 
 #include "math/mathlib.h"
 
@@ -115,5 +114,3 @@ int ray_in_tri(vec3 from, vec3 to, vec3 v0, vec3 v1, vec3 v2, vec3 intersect);
  * @param p3     [tri point c]
  */
 void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const vec3 p2, const vec3 p3);
-
-#endif // EX_COLLISION_H

@@ -7,6 +7,8 @@
 #define STB_VORBIS_HEADER_ONLY
 #include "sound/stb_vorbis.c"
 
+#include <string.h>
+
 ex_sound_t ex_sound;
 ex_sound_devices_t *ex_sound_outputs = NULL;
 ex_sound_devices_t *ex_sound_inputs = NULL;

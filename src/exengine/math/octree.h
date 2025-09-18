@@ -6,8 +6,7 @@
   render culling etc.
 */
 
-#ifndef EX_OCTREE_H
-#define EX_OCTREE_H
+#pragma once
 
 #include "glad/glad.h"
 
@@ -220,6 +219,4 @@ static inline rect_t ex_rect_from_triangle(vec3 tri[3]) {
   vec3_max(box.max, box.max, tri[2]);
 
   return box;
-};
-
-#endif // EX_OCTREE_H
+}

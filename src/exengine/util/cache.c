@@ -1,6 +1,9 @@
 #include "util/cache.h"
 #include "render/scene.h"
+#include "render/texture.h"
 #include "util/list.h"
+
+#include <stdio.h>
 
 ex_list_t *texture_list, *model_list;
 

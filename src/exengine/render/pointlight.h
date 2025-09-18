@@ -1,14 +1,13 @@
 /* pointlight
   Defines both the shadow casting
-  and non shadow casting pointlights.
+  and non-shadow casting point-lights.
 
   Shadows are cast using geometry shaders
   to reduce the amount of draw calls per
   light source.
 */
 
-#ifndef EX_POINTLIGHT_H
-#define EX_POINTLIGHT_H
+#pragma once
 
 #include "math/mathlib.h"
 
@@ -52,5 +51,3 @@ ex_point_light_t *ex_point_light_new(vec3 pos, vec3 color, int dynamic);
  * @param l [the point-light to destroy]
  */
 void ex_point_light_destroy(ex_point_light_t *l);
-
-#endif // EX_POINTLIGHT_H

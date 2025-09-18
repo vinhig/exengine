@@ -2,10 +2,12 @@
 #include "math/mathlib.h"
 #include "render/shader.h"
 #include "util/io.h"
+
 #include <stdio.h>
 #include <string.h>
 
 #define STB_TRUETYPE_IMPLEMENTATION
+#include "SDL2/SDL_timer.h"
 #include "stb_truetype.h"
 
 #define SIZE 32

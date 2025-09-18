@@ -1,6 +1,8 @@
 #include "render/msdf.h"
 #include "math/mathlib.h"
 
+#include <stdlib.h>
+
 // pixel at (x, y) in bitmap (arr)
 #define P(x, y, w, arr) ((vec3){arr[(3 * (((y) * w) + x))], arr[(3 * (((y) * w) + x)) + 1], arr[(3 * (((y) * w) + x)) + 2]})
 

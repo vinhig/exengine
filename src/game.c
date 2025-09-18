@@ -2,6 +2,8 @@
 #include "engine.h"
 #include "input/input.h"
 #include "render/camera.h"
+#include "render/text.h"
+#include "render/vga.h"
 #include "util/entity.h"
 #include "util/iqm.h"
 

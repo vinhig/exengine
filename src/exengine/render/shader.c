@@ -1,4 +1,8 @@
 #include "render/shader.h"
+
+#include "util/io.h"
+
+#include <stdlib.h>
 #include <string.h>
 
 #define EX_MAX_SHADERS 512

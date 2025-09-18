@@ -16,8 +16,7 @@
   doing.
 */
 
-#ifndef EX_ENGINE_H
-#define EX_ENGINE_H
+#pragma once
 
 #define EX_DATA_FILE "data.ex"
 
@@ -60,5 +59,3 @@ extern void (*ex_event_handler_full)(SDL_Event *);
  * @param flags [defines what modules to enable]
  */
 void exengine(char **argv, const char *appname, uint8_t flags);
-
-#endif // EX_ENGINE_H

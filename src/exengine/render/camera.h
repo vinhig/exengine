@@ -3,10 +3,7 @@
   of cameras.
 */
 
-#ifndef EX_CAMERA_H
-#define EX_CAMERA_H
-
-#include "glad/glad.h"
+#pragma once
 
 #include "math/mathlib.h"
 #include "render/model.h"
@@ -47,5 +44,3 @@ void ex_fps_camera_resize(ex_fps_camera_t *cam);
  * @param yrel           [y motion]
  */
 void ex_fps_camera_update(ex_fps_camera_t *cam);
-
-#endif // EX_CAMERA_H

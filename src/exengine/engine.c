@@ -3,7 +3,8 @@
 #include <physfs.h>
 
 #include "input/input.h"
-#include "render/render.h"
+#include "render/text.h"
+#include "render/window.h"
 #include "util/cache.h"
 #include "util/ini.h"
 

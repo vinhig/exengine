@@ -16,8 +16,7 @@
   an event fires.  See engine.h for details.
 */
 
-#ifndef EX_INPUT_H
-#define EX_INPUT_H
+#pragma once
 
 #include <SDL2/SDL.h>
 #include <inttypes.h>
@@ -38,5 +37,3 @@ void ex_input_event(SDL_Event *event);
  * [ex_input_update handles more frequent input updates]
  */
 void ex_input_update();
-
-#endif // EX_INPUT_H

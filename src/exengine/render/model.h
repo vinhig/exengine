@@ -7,14 +7,12 @@
   its meshes.
 */
 
-#ifndef EX_MODEL_H
-#define EX_MODEL_H
+#pragma once
 
 #include "glad/glad.h"
 
 #include "math/octree.h"
 #include "render/mesh.h"
-#include "util/list.h"
 
 #define EX_MODEL_MAX_MESHES 128
 
@@ -158,5 +156,3 @@ void ex_calc_bone_matrix(mat4x4 m, vec3 pos, quat rot, vec3 scale);
  * @param weight [how much to transpose (0 to 1.0)]
  */
 void ex_mix_pose(ex_model_t *m, ex_frame_t a, ex_frame_t b, float weight);
-
-#endif // EX_MODEL_H

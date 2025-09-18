@@ -5,10 +5,8 @@
   callbacks.
 */
 
-#ifndef EX_WINDOW_H
-#define EX_WINDOW_H
+#pragma once
 
-#include "glad/glad.h"
 #include <SDL2/SDL.h>
 #include <inttypes.h>
 
@@ -42,5 +40,3 @@ void ex_window_event(SDL_Event *event);
  * [window_exit clean up any data]
  */
 void ex_window_destroy();
-
-#endif // EX_WINDOW_H

@@ -7,15 +7,11 @@
   uses the cache system.
 */
 
-#ifndef EX_IQM_LOADER_H
-#define EX_IQM_LOADER_H
+#pragma once
 
 #include "render/model.h"
 #include "render/scene.h"
 #include <inttypes.h>
-#include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 #define uint uint32_t
 #define EX_IQM_MAGIC "INTERQUAKEMODEL"
@@ -127,5 +123,3 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
 uint ex_get_uint(const uint8_t *data);
 
 void ex_iqm_get_args(const char *str, vec4 args);
-
-#endif // EX_IQM_LOADER_H

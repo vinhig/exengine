@@ -1,5 +1,4 @@
-#ifndef EX_SCANCODE_H
-#define EX_SCANCODE_H
+#pragma once
 
 #include <SDL2/SDL_scancode.h>
 
@@ -268,5 +267,3 @@ typedef enum {
 
   EX_NUM_SCANCODES = SDL_NUM_SCANCODES
 } ex_scancode_e;
-
-#endif // EX_SCANCODE_H

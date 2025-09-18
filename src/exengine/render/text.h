@@ -1,11 +1,9 @@
 /* text
  */
 
-#ifndef EX_TEXT_H
-#define EX_TEXT_H
+#pragma once
 
 #include "glad/glad.h"
-#include <SDL2/SDL.h>
 
 #include "render/msdf.h"
 
@@ -23,5 +21,3 @@ void ex_font_init();
 ex_font_t *ex_font_load(const char *path, const char *letters);
 
 void ex_font_dbg(ex_font_t *f);
-
-#endif // EX_TEXT_H

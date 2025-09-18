@@ -11,13 +11,11 @@
   via code.
 */
 
-#ifndef EX_MESH_H
-#define EX_MESH_H
+#pragma once
 
 #include <string.h>
 
 #include "glad/glad.h"
-#include "math/mathlib.h"
 
 typedef struct {
   float position[3];
@@ -58,5 +56,3 @@ ex_mesh_t *ex_mesh_copy(ex_mesh_t *mesh);
  * @param m [ex_mesh_t pointer]
  */
 void ex_mesh_destroy(ex_mesh_t *m);
-
-#endif // EX_MESH_H

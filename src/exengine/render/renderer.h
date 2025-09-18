@@ -15,8 +15,8 @@
   with some metadata like rectangle bounds
   for culling, etc.
 */
-#ifndef EX_RENDERER_H
-#define EX_RENDERER_H
+
+#pragma once
 
 #include "camera.h"
 #include "math/mathlib.h"
@@ -175,5 +175,3 @@ void ex_render_resize(size_t width, size_t height);
  * [ex_render_destroy cleans up data]
  */
 void ex_render_destroy();
-
-#endif // EX_RENDERER_H

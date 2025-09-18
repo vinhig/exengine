@@ -13,12 +13,10 @@
   https://arxiv.org/ftp/arxiv/papers/1211/1211.0059.pdf
 */
 
-#ifndef EX_ENTITY_H
-#define EX_ENTITY_H
+#pragma once
 
 #include "math/collision.h"
 #include "math/mathlib.h"
-#include "math/octree.h"
 #include "render/scene.h"
 
 typedef struct {
@@ -68,5 +66,3 @@ void ex_entity_check_grounded(ex_entity_t *entity);
  * @param dt     [delta time]
  */
 void ex_entity_update(ex_entity_t *entity, double dt);
-
-#endif // EX_ENTITY_H

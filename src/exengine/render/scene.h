@@ -14,15 +14,12 @@
   * Frustrum culling for models, lights etc
 */
 
-#ifndef EX_SCENE_H
-#define EX_SCENE_H
+#pragma once
+
+#include "renderer.h"
 
 #include "math/octree.h"
-#include "render/render.h"
 #include "util/list.h"
-
-#include "glad/glad.h"
-#include <SDL2/SDL.h>
 
 #define EX_MAX_POINT_LIGHTS 500
 #define EX_MAX_SPOT_LIGHTS 128
@@ -33,7 +30,7 @@
 
 #define EX_SCENE_MAX_MODELS 500
 
-typedef struct {
+typedef struct ex_scene_t {
   vec3 gravity;
 
   ex_list_t *coll_list;
@@ -120,5 +117,3 @@ void ex_scene_resize(ex_scene_t *s, int width, int height);
  * @param s [the scene to destroy]
  */
 void ex_scene_destroy(ex_scene_t *s);
-
-#endif // EX_SCENE_H

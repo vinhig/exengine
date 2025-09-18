@@ -18,13 +18,8 @@
   # [input]
   # bind_left = a
 */
-#ifndef EX_INI_H
-#define EX_INI_H
 
-#include <ctype.h>
-#include <inttypes.h>
-#include <stdlib.h>
-#include <string.h>
+#pragma once
 
 typedef enum {
   ex_ini_type_undefined,
@@ -120,5 +115,3 @@ void ex_ini_set_string(ex_ini_t *ini, const char *sec, const char *key, const ch
  * @param value [float value]
  */
 void ex_ini_set_float(ex_ini_t *ini, const char *sec, const char *key, const float value);
-
-#endif // EX_INI_H

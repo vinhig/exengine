@@ -3,13 +3,11 @@ A half-kernel ssao implementation,
   pretty performance heavy.
 */
 
-#ifndef EX_SSAO_H
-#define EX_SSAO_H
+#pragma once
 
 #include "math/mathlib.h"
 
 #include "glad/glad.h"
-#include <SDL2/SDL.h>
 
 #define SSAO_NUM_SAMPLES 32
 
@@ -36,5 +34,3 @@ void ssao_bind_texture(GLuint shader);
  * @param shader [shader to use]
  */
 void ssao_bind_default(GLuint shader);
-
-#endif // EX_SSAO_H

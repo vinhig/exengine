@@ -3,10 +3,8 @@
   for debug information, not for production use.
 */
 
-#ifndef EX_VGA_H
-#define EX_VGA_H
+#pragma once
 
-#include "glad/glad.h"
 #include <inttypes.h>
 #include <stdlib.h>
 
@@ -58,5 +56,3 @@ void ex_vga_setbg(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
  * [ex_vga_destroy clean up vga systems]
  */
 void ex_vga_destroy();
-
-#endif // EX_VGA_H

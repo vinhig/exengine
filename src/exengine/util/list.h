@@ -2,11 +2,7 @@
  * A simple arbitrary linked-list implementation.
  */
 
-#ifndef EX_LIST_H
-#define EX_LIST_H
-
-#include <stdio.h>
-#include <stdlib.h>
+#pragma once
 
 typedef struct ex_list_node_t ex_list_node_t;
 typedef ex_list_node_t ex_list_t;
@@ -42,5 +38,3 @@ ex_list_t *ex_list_remove(ex_list_node_t *n, void *data);
  * @param n [ex_list_t pointer to delete]
  */
 void ex_list_destroy(ex_list_node_t *n);
-
-#endif // EX_LIST_H

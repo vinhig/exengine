@@ -1,6 +1,9 @@
 #include "ini.h"
 #include "io.h"
 
+#include <stdlib.h>
+#include <string.h>
+
 int ex_ini_load(ex_ini_t *ini, const char *path) {
   printf("Loading config file %s\n", path);
 

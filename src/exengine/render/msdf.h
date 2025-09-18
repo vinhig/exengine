@@ -1,5 +1,5 @@
 /* msdf
-  Handles multi-channel signed distance field bitmap
+  Handles multichannel signed distance field bitmap
   generation from given ttf (stb_truetype.h) font.
 
   Depends on stb_truetype.h to load the ttf file.
@@ -13,15 +13,11 @@
   Instead, use text.h
 */
 
-#ifndef EX_MSDF_H
-#define EX_MSDF_H
+#pragma once
 
 #include "render/stb_truetype.h"
 #include <inttypes.h>
-#include <math.h>
 #include <stdio.h>
-#include <stdlib.h>
-#include <string.h>
 
 typedef struct {
   int left_bearing;
@@ -68,5 +64,3 @@ static inline uint32_t ex_utf8(const char *c) {
 
   return val;
 }
-
-#endif // EX_MSDF_H
