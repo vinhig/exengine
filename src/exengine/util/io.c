@@ -9,7 +9,7 @@
 char *ex_io_read(const char *path, const char *mode, size_t *len) {
   if (!PHYSFS_exists(path)) {
     printf("[IO] Could not load file %s\n", path);
-    return NULL;
+    return nullptr;
   }
 
   // load the file
@@ -23,7 +23,7 @@ char *ex_io_read(const char *path, const char *mode, size_t *len) {
   }
 
   // allocate space for file data
-  char *buff = malloc(size + 1);
+  char *buff = calloc(1, size + 1);
 
   // read file contents into buffer
   PHYSFS_readBytes(file, buff, size);
@@ -82,4 +82,8 @@ void ex_io_write(const char *path, const void *data, size_t len, int append) {
   }
 
   PHYSFS_close(file);
+}
+
+bool ex_io_exist(const char *path) {
+  return PHYSFS_exists(path);
 }

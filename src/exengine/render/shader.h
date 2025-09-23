@@ -37,10 +37,10 @@ GLint ex_uniform(GLuint shader, const char *str);
  * in the header.
  */
 
-GLuint ex_shader(const char *path);
+GLuint ex_graphic_pipeline_new(const char *path);
 
 /**
  * [ex_shader_use bind a shader for use assuming it is not already in use]
  * @param shader [shader to use]
  */
-void ex_shader_use(GLuint shader);
+void ex_graphic_pipeline_use(GLuint shader);

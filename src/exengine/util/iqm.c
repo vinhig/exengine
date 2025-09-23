@@ -136,10 +136,9 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
       uint32_t ofs_name = a->name;
       char *name = &file_text[ofs_name];
       uint8_t len = strlen(name);
-      anims[i].name = malloc(sizeof(char) * (len + 1));
+      anims[i].name = calloc(1, sizeof(char) * (len + 1));
 
       strcpy(anims[i].name, name);
-      anims[i].name[len + 1] = '\0';
 
       anims[i].first = a->first_frame;
       anims[i].last = a->num_frames;
@@ -311,6 +310,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   free(vertices);
   free(indices);
   free(data);
+  free(vis_vertices);
 
   // store the model in the cache and return an instance of it
   ex_cache_model(model);

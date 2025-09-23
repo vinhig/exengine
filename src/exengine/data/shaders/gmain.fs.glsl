@@ -1,81 +1,19 @@
-#START VS
 #version 330 core
 
-layout (location = 0) in vec3 in_position;
-layout (location = 1) in vec2 in_uv;
-layout (location = 2) in vec3 in_normals;
-layout (location = 3) in vec4 in_tangents;
-layout (location = 4) in vec4 in_color;
-layout (location = 5) in vec4 in_boneindex;
-layout (location = 6) in vec4 in_boneweights;
-layout (location = 7) in mat4 in_instancematrix;
-
-out vec3 frag;
-out vec3 normal;
-out vec4 position;
-out vec2 uv;
-out mat3 TBN;
-
-uniform mat4 u_view;
-uniform mat4 u_projection;
-uniform mat4 u_bone_matrix[200];
-uniform bool u_has_skeleton;
-
-void main()
-{
-  mat4 transform = in_instancematrix;
-  if (u_has_skeleton == true) {
-    vec4 boneindex = in_boneindex*255.0;
-    vec4 boneweights = in_boneweights*255.0;
-    mat4 skeleton = u_bone_matrix[int(boneindex.x)] * boneweights.x +
-                    u_bone_matrix[int(boneindex.y)] * boneweights.y +
-                    u_bone_matrix[int(boneindex.z)] * boneweights.z +
-                    u_bone_matrix[int(boneindex.w)] * boneweights.w;
-
-    transform = transform * skeleton;
-  }
-
-  vec4 v = u_projection * u_view * transform * vec4(in_position, 1.0);
-
-  gl_Position    = v;
-  normal         = mat3(transpose(inverse(u_view * transform))) * in_normals;
-  frag           = vec3(u_view * in_instancematrix * vec4(in_position, 1.0f));
-  uv             = in_uv;
-  position       = vec4(frag, 1.0);
-
-  // calculate tbn matrix for normal mapping
-  vec3 T = normalize(vec3(u_view * transform * vec4(in_tangents.xyz, 0.0)));
-  vec3 B = normalize(vec3(u_view * transform * in_tangents));
-  vec3 N = normalize(vec3(u_view * transform * vec4(in_normals, 0.0)));
-  TBN    = mat3(T, B, N);
-}
-#END VS
-
-
-#START FS
-#version 330 core
-
-layout(location = 0) out vec4 out_color;
-layout(location = 1) out vec4 out_normal;
-layout(location = 2) out vec4 out_position;
-
-in vec3 frag;
-in vec3 normal;
-in vec4 position;
 in vec2 uv;
-in mat3 TBN;
 
-uniform sampler2D u_texture;
-uniform sampler2D u_spec;
+out vec4 color;
+
+uniform sampler2D u_position;
 uniform sampler2D u_norm;
+uniform sampler2D u_colorspec;
+uniform sampler2D u_ssao;
 
 uniform mat4 u_projection;
 uniform mat4 u_view;
 uniform mat4 u_inverse_view;
 
 uniform bool u_ambient_pass;
-
-uniform samplerCube u_reflection;
 
 /* spot lights */
 const int MAX_SL = 32;
@@ -141,13 +79,11 @@ vec3 calc_point_light(point_light light)
   point_light l = light;
   l.position = vec3(u_view * vec4(l.position, 1.0));
 
-  vec3 fragpos = frag;
-  vec3 normals = texture(u_norm, uv).rgb;
-  normals = normalize(normals * 2.0 - 1.0);
-  normals = normalize(TBN * normals);
-
-  vec3 diff    = texture(u_texture, uv).rgb;
-  vec3 spec   = texture(u_spec, uv).rgb;
+  // point light
+  vec3 fragpos = texture(u_position, uv).rgb;
+  vec3 normals = texture(u_norm, uv).rgb * 2.0 - 1.0;
+  vec3 diff    = texture(u_colorspec, uv).rgb;
+  float spec   = texture(u_colorspec, uv).a*1.0f;
 
   vec3 view_dir  = normalize(-fragpos);
   vec3 light_dir = l.position - fragpos;
@@ -163,7 +99,10 @@ vec3 calc_point_light(point_light light)
   vec3 specular = l.color * specs * spec;
 
   // attenuation
-  float attenuation = 1.0f / (1.0f + 0.8f * dist + 0.055f * (dist * dist));
+  // float attenuation = 1.0f / (1.0f + 0.1f * (dist * dist));
+  float attenuation = 1.0f / (1.0f + 0.14f * dist + 0.07f * (dist * dist));
+  // float attenuation = 1.0f / (1.0f + dist);
+  // float attenuation = max(0.0, 4.0 - pow(dist, 1.0/2.0));
   diffuse  *= attenuation;
   specular *= attenuation;
 
@@ -197,13 +136,28 @@ vec3 calc_point_light(point_light light)
 void main()
 {
   vec3 diffuse = vec3(0.0f);
+  vec3 reflection = vec3(0.0f);
+  float ao = texture(u_ssao, uv).r;
 
   if (u_ambient_pass) {
-    diffuse += texture(u_texture, uv).rgb * 0.075;
+    diffuse += texture(u_colorspec, uv).rgb * 0.06;
+
+    // vec3 normals = normalize(mat3(u_inverse_view) * normalize(texture(u_norm, uv).rgb));
+    // vec3 fragpos = mat3(u_inverse_view) * texture(u_position, uv).rgb;
+    // float spec   = texture(u_colorspec, uv).a;
+    // vec3 eye = normalize(u_eye_dir);
+    // eye = normalize(fragpos);
+    // eye.y = -eye.y;
+    // vec3 reflected = normalize(reflect(eye, normals));
+    // reflection = texture(u_reflection, reflected).rgb * 5.5;
+    // diffuse *= reflection * spec;
   } else {
     // shadow casters
     if (u_point_active && u_point_count <= 0)
       diffuse += calc_point_light(u_point_light);
+
+    // if (u_spot_active && u_spot_count <= 0)
+      // diffuse += calc_spot_light(u_spot_light);
   }
 
   // non shadow casters
@@ -211,12 +165,6 @@ void main()
     for (int i=0; i<u_point_count; i++)
       diffuse += calc_point_light(u_point_lights[i]);
 
-  if (u_point_active ) {
-    out_position = position;
-    out_normal = vec4(normal * 0.5 + 0.5, 1.0);
-    // out_normal = vec4(normal, 1.0);
-  }
-
-  out_color = vec4(diffuse, 1.0);
+  color = vec4(diffuse * ao, 1.0);
+  color *= min(100.0 / length(texture(u_position, uv).rgb), 1.0);
 }
-#END FS

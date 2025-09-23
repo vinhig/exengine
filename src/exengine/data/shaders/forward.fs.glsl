@@ -1,36 +1,26 @@
-#START VS
 #version 330 core
 
-layout (location = 0) in vec2 in_position;
-layout (location = 1) in vec2 in_uv;
+layout(location = 0) out vec4 out_color;
+layout(location = 1) out vec4 out_normal;
+layout(location = 2) out vec4 out_position;
 
-out vec2 uv;
-
-void main() 
-{
-  gl_Position = vec4(in_position.x, in_position.y, 0.0f, 1.0f);
-  uv = in_uv;
-}
-#END VS
-
-
-#START FS
-#version 330 core
-
+in vec3 frag;
+in vec3 normal;
+in vec4 position;
 in vec2 uv;
+in mat3 TBN;
 
-out vec4 color;
-
-uniform sampler2D u_position;
+uniform sampler2D u_texture;
+uniform sampler2D u_spec;
 uniform sampler2D u_norm;
-uniform sampler2D u_colorspec;
-uniform sampler2D u_ssao;
 
 uniform mat4 u_projection;
 uniform mat4 u_view;
 uniform mat4 u_inverse_view;
 
 uniform bool u_ambient_pass;
+
+uniform samplerCube u_reflection;
 
 /* spot lights */
 const int MAX_SL = 32;
@@ -84,7 +74,7 @@ uniform bool        u_point_active;
 
 vec3 pcf_offset[20] = vec3[]
 (
-  vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1), 
+  vec3( 1,  1,  1), vec3( 1, -1,  1), vec3(-1, -1,  1), vec3(-1,  1,  1),
   vec3( 1,  1, -1), vec3( 1, -1, -1), vec3(-1, -1, -1), vec3(-1,  1, -1),
   vec3( 1,  1,  0), vec3( 1, -1,  0), vec3(-1, -1,  0), vec3(-1,  1,  0),
   vec3( 1,  0,  1), vec3(-1,  0,  1), vec3( 1,  0, -1), vec3(-1,  0, -1),
@@ -96,17 +86,19 @@ vec3 calc_point_light(point_light light)
   point_light l = light;
   l.position = vec3(u_view * vec4(l.position, 1.0));
 
-  // point light
-  vec3 fragpos = texture(u_position, uv).rgb;
-  vec3 normals = texture(u_norm, uv).rgb * 2.0 - 1.0;
-  vec3 diff    = texture(u_colorspec, uv).rgb;
-  float spec   = texture(u_colorspec, uv).a*1.0f;
+  vec3 fragpos = frag;
+  vec3 normals = texture(u_norm, uv).rgb;
+  normals = normalize(normals * 2.0 - 1.0);
+  normals = normalize(TBN * normals);
+
+  vec3 diff    = texture(u_texture, uv).rgb;
+  vec3 spec   = texture(u_spec, uv).rgb;
 
   vec3 view_dir  = normalize(-fragpos);
   vec3 light_dir = l.position - fragpos;
   float dist = length(light_dir);
   light_dir = normalize(light_dir);
-  
+
   // diffuse
   vec3 diffuse   = max(dot(light_dir, normals), 0.0) * diff * l.color;
 
@@ -116,10 +108,7 @@ vec3 calc_point_light(point_light light)
   vec3 specular = l.color * specs * spec;
 
   // attenuation
-  // float attenuation = 1.0f / (1.0f + 0.1f * (dist * dist));
-  float attenuation = 1.0f / (1.0f + 0.14f * dist + 0.07f * (dist * dist));
-  // float attenuation = 1.0f / (1.0f + dist);
-  // float attenuation = max(0.0, 4.0 - pow(dist, 1.0/2.0));
+  float attenuation = 1.0f / (1.0f + 0.8f * dist + 0.055f * (dist * dist));
   diffuse  *= attenuation;
   specular *= attenuation;
 
@@ -153,36 +142,25 @@ vec3 calc_point_light(point_light light)
 void main()
 {
   vec3 diffuse = vec3(0.0f);
-  vec3 reflection = vec3(0.0f);
-  float ao = texture(u_ssao, uv).r;
 
   if (u_ambient_pass) {
-    diffuse += texture(u_colorspec, uv).rgb * 0.06;
-
-    // vec3 normals = normalize(mat3(u_inverse_view) * normalize(texture(u_norm, uv).rgb));
-    // vec3 fragpos = mat3(u_inverse_view) * texture(u_position, uv).rgb;
-    // float spec   = texture(u_colorspec, uv).a;
-    // vec3 eye = normalize(u_eye_dir);
-    // eye = normalize(fragpos);
-    // eye.y = -eye.y;
-    // vec3 reflected = normalize(reflect(eye, normals));
-    // reflection = texture(u_reflection, reflected).rgb * 5.5;
-    // diffuse *= reflection * spec;
+    diffuse += texture(u_texture, uv).rgb * 0.075;
   } else {
     // shadow casters
     if (u_point_active && u_point_count <= 0)
       diffuse += calc_point_light(u_point_light);
-
-    // if (u_spot_active && u_spot_count <= 0)
-      // diffuse += calc_spot_light(u_spot_light);
   }
-    
+
   // non shadow casters
   if (u_point_count > 0)
     for (int i=0; i<u_point_count; i++)
       diffuse += calc_point_light(u_point_lights[i]);
 
-  color = vec4(diffuse * ao, 1.0);
-  color *= min(100.0 / length(texture(u_position, uv).rgb), 1.0);
+  if (u_point_active ) {
+    out_position = position;
+    out_normal = vec4(normal * 0.5 + 0.5, 1.0);
+    // out_normal = vec4(normal, 1.0);
+  }
+
+  out_color = vec4(diffuse, 1.0);
 }
-#END FS

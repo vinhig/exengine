@@ -111,8 +111,8 @@ void ssao_init() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
   // load and init the shaders
-  ssao_shader = ex_shader("ssao.glsl");
-  ssao_blur_shader = ex_shader("ssao.glsl");
+  ssao_shader = ex_graphic_pipeline_new("ssao");
+  ssao_blur_shader = ex_graphic_pipeline_new("ssao");
 }
 
 void ssao_render(mat4x4 projection, mat4x4 view, GLuint gposition, GLuint gnormal, GLuint fbo_vao) {

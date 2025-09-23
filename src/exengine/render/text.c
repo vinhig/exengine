@@ -21,7 +21,7 @@ GLuint text_shader, text_vao, text_vbo;
 mat4x4 projection;
 
 void ex_font_init() {
-  text_shader = ex_shader("text.glsl");
+  text_shader = ex_graphic_pipeline_new("text");
 
   glGenVertexArrays(1, &text_vao);
   glGenBuffers(1, &text_vbo);

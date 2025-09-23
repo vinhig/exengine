@@ -1,20 +1,3 @@
-#START VS
-#version 330 core
-
-layout (location = 0) in vec2 in_position;
-layout (location = 1) in vec2 in_uv;
-
-out vec2 uv;
-
-void main()
-{
-  uv = in_uv;
-  gl_Position = vec4(in_position.x, in_position.y, 0.0, 1.0);
-}
-#END VS
-
-
-#START FS
 #version 330 core
 
 in vec2 uv;
@@ -69,4 +52,3 @@ void main()
   occlusion = 1.0 - (occlusion / kernel_size);
   frag_color = pow(occlusion, 1.0);
 }
-#END FS

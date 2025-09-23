@@ -209,6 +209,8 @@ void game_draw() {
   ex_scene_draw(scene, 0, 0, 0, 0, &camera->matrices);
   ex_fps_camera_resize(camera);
 
+  ex_font_dbg(font);
+
   ex_vga_render();
 }
 

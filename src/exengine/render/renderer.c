@@ -48,8 +48,8 @@ void ex_render_init() {
   glDebugMessageCallback((GLDEBUGPROC)&opengl_debug, nullptr);
 
   /* -- SHADERS -- */
-  pointfbo_shader = ex_shader("pointfbo.glsl");
-  framebuffer_shader = ex_shader("fboshader.glsl");
+  pointfbo_shader = ex_graphic_pipeline_new("pointfbo");
+  framebuffer_shader = ex_graphic_pipeline_new("fboshader");
 
   // set up a 90 degree projection
   // mostly for omnidirectional lights
@@ -128,7 +128,7 @@ void ex_render(ex_renderer_e renderer, ex_renderable_t *renderables) {
 
   // render light depth maps
   glCullFace(GL_BACK);
-  ex_shader_use(pointfbo_shader);
+  ex_graphic_pipeline_use(pointfbo_shader);
   for (int i = 0; i < point_lights->count; i++) {
     ex_point_light_t *light = (ex_point_light_t *)point_lights->nodes[i].obj;
 
@@ -176,12 +176,12 @@ void ex_render_forward(ex_renderable_t *renderables) {
   glCullFace(GL_BACK);
 
   if (!forward_shader) {
-    forward_shader = ex_shader("forward.glsl");
+    forward_shader = ex_graphic_pipeline_new("forward");
   }
   /* --------------- */
 
   /* FIRST PASS */
-  ex_shader_use(forward_shader);
+  ex_graphic_pipeline_use(forward_shader);
 
   // send camera vars to shader
   ex_camera_matrices_t *camera = renderables->camera;
@@ -221,7 +221,7 @@ void ex_render_forward(ex_renderable_t *renderables) {
 
   /* THIRD PASS */
   // enable blending for second pass onwards
-  ex_shader_use(forward_shader);
+  ex_graphic_pipeline_use(forward_shader);
   glBindFramebuffer(GL_FRAMEBUFFER, framebuffer.fbo);
 
   glEnable(GL_BLEND);
@@ -252,7 +252,7 @@ void ex_render_forward(ex_renderable_t *renderables) {
   glDisable(GL_DEPTH_TEST);
   glEnable(GL_FRAMEBUFFER_SRGB);
 
-  ex_shader_use(framebuffer_shader);
+  ex_graphic_pipeline_use(framebuffer_shader);
 
   glBindVertexArray(framebuffer.vao);
   glActiveTexture(GL_TEXTURE0);
