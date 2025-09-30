@@ -1,24 +1,25 @@
 cmake_minimum_required(VERSION 3.31)
 project(HelloWorld)
 
-file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/exengine/**.c)
-file(GLOB_RECURSE PHYSFS_FILES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/src/lib/physfs/**.c)
-
-message("hello guys ${SRC_FILES}")
+file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/source/**.c)
+file(GLOB_RECURSE PHYSFS_FILES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/third_party/physfs/**.c)
 
 add_executable(exengine
         ${SRC_FILES}
         ${PHYSFS_FILES}
-        ${PROJECT_SOURCE_DIR}/src/lib/MojoAL/mojoal.c
+        ${PROJECT_SOURCE_DIR}/third_party/MojoAL/mojoal.c
+        ${PROJECT_SOURCE_DIR}/third_party/stb_vorbis.c
+        ${PROJECT_SOURCE_DIR}/third_party/log/log.c
+        ${PROJECT_SOURCE_DIR}/third_party/glad/glad.c
 
-        ${PROJECT_SOURCE_DIR}/src/game.c
-        ${PROJECT_SOURCE_DIR}/src/main.c
+        ${PROJECT_SOURCE_DIR}/source/game.c
+        ${PROJECT_SOURCE_DIR}/source/main.c
 )
 
-target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/src/inc)
-target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/src/lib)
-target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/src/lib/physfs)
-target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/src/exengine)
+target_compile_definitions(exengine PRIVATE LOG_USE_COLOR)
+
+target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/include)
+target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/third_party)
 
 find_package(SDL2 REQUIRED CONFIG REQUIRED COMPONENTS SDL2)
 find_package(SDL2 REQUIRED CONFIG COMPONENTS SDL2main)
