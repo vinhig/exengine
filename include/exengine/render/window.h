@@ -25,10 +25,9 @@ void ex_resize_callback(SDL_Window *window, int width, int height);
  * @param  width  [window width]
  * @param  height [window height]
  * @param  title  [window title]
- * @param fullscreen
  * @return        [true on success]
  */
-int ex_window_init(uint32_t width, uint32_t height, const char *title, bool fullscreen, bool vsync);
+int ex_window_init(uint32_t width, uint32_t height, const char *title);
 
 /**
  * [ex_window_event window event handler]

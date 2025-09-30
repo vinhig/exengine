@@ -1,3 +1,5 @@
+#include "log/log.h"
+
 #include <exengine/util/io.h>
 
 #include <physfs/physfs.h>
@@ -71,13 +73,13 @@ void ex_io_write(const char *path, const void *data, size_t len, int append) {
 
   // check that file was opened
   if (!file) {
-    printf("Unable to open file %s for writing\n", path);
+    log_error("Unable to open file %s for writing: %s", path, PHYSFS_getLastError());
     return;
   }
 
   // attempt to write bytes to file
   if (PHYSFS_writeBytes(file, (void *)data, len) < len) {
-    printf("Unable to write bytes to file %s\n", path);
+    log_error("Unable to write bytes to file %s", path, PHYSFS_getLastError());
     return;
   }
 

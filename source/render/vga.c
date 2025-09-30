@@ -5,6 +5,8 @@
 #include <exengine/render/window.h>
 #include <stdio.h>
 
+#include <glad/glad.h>
+
 #define EX_VGA_FONT_WIDTH 8
 #define EX_VGA_FONT_HEIGHT 16
 #define EX_VGA_WIDTH 256
@@ -30,8 +32,8 @@ void ex_vga_init() {
 
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 
     // load shader
     vga_shader = ex_graphic_pipeline_new("vga");

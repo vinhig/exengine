@@ -119,7 +119,7 @@ void ex_render_init() {
   ex_render_resize(display.width, display.height);
   /* ----------------- */
 
-  ssao_init();
+  ex_ssao_init();
 }
 
 void ex_render(ex_renderer_e renderer, ex_renderable_t *renderables) {
@@ -218,7 +218,7 @@ void ex_render_forward(ex_renderable_t *renderables) {
   /* ------------ */
 
   /* INTERMEDIATE PASS : SSAO */
-  ssao_render(camera->projection, camera->view, framebuffer.position_bo, framebuffer.normal_bo, framebuffer.vao);
+  ex_ssao_render(camera->projection, camera->view, framebuffer.position_bo, framebuffer.normal_bo, framebuffer.vao);
 
   /* THIRD PASS */
   // enable blending for second pass onwards
@@ -259,7 +259,7 @@ void ex_render_forward(ex_renderable_t *renderables) {
   glActiveTexture(GL_TEXTURE0);
   glUniform1i(ex_uniform(framebuffer_shader, "u_texture"), 0);
   glBindTexture(GL_TEXTURE_2D, framebuffer.color_bo);
-  ssao_bind_texture(framebuffer_shader);
+  ex_ssao_bind_texture(framebuffer_shader);
   glDrawArrays(GL_TRIANGLES, 0, 6);
 
   glBindVertexArray(0);

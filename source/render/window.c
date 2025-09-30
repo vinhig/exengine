@@ -1,5 +1,8 @@
-#include <exengine/render/window.h>
+#include "log/log.h"
+
 #include <exengine/engine.h>
+#include <exengine/render/window.h>
+#include <exengine/util/cvar.h>
 #include <glad/glad.h>
 #include <stdio.h>
 
@@ -7,7 +10,12 @@
 
 ex_window_t display;
 
-int ex_window_init(uint32_t width, uint32_t height, const char *title, bool fullscreen, bool vsync) {
+extern cvar_t cvar_screen_width;
+extern cvar_t cvar_screen_height;
+extern cvar_t cvar_fullscreen;
+extern cvar_t cvar_vsync;
+
+int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   if (SDL_Init(SDL_INIT_VIDEO)) {
     printf("Failed to init SDL\n%s", SDL_GetError());
     return 0;
@@ -31,7 +39,7 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title, bool full
     return 0;
   }
 
-  if (fullscreen) {
+  if (cvar_fullscreen.value.boolean) {
     SDL_SetWindowFullscreen(display.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
   }
 
@@ -39,17 +47,17 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title, bool full
   SDL_GL_MakeCurrent(display.window, display.context);
   display.context = SDL_GL_CreateContext(display.window);
   if (!gladLoadGLLoader((GLADloadproc)SDL_GL_GetProcAddress)) {
-    printf("Failed creating GL context");
+    log_error("Failed creating GL context");
     return 0;
   }
 
-  if (vsync) {
+  if (cvar_vsync.value.boolean) {
     if (SDL_GL_SetSwapInterval(1) != 0) {
-      printf("Error setting vsync.\n");
+      log_error("Failed setting vsync.\n");
     }
   } else {
     if (SDL_GL_SetSwapInterval(0) != 0) {
-      printf("Error setting vsync.\n");
+      log_error("Failed setting vsync.\n");
     }
   }
 
@@ -64,9 +72,9 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title, bool full
   glEnable(GL_FRAMEBUFFER_SRGB);
 
   // lock mouse
-  SDL_SetRelativeMouseMode(SDL_TRUE);
-  SDL_CaptureMouse(SDL_TRUE);
-  SDL_SetWindowGrab(display.window, SDL_TRUE);
+  // SDL_SetRelativeMouseMode(SDL_TRUE);
+  // SDL_CaptureMouse(SDL_TRUE);
+  // SDL_SetWindowGrab(display.window, SDL_TRUE);
 
   display.width = width;
   display.height = height;

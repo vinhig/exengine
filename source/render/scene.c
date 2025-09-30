@@ -1,3 +1,5 @@
+#include "log/log.h"
+
 #include <exengine/render/scene.h>
 
 #include <exengine/sound/sound.h>
@@ -131,7 +133,7 @@ void ex_scene_resize(ex_scene_t *s, int width, int height) {
 }
 
 void ex_scene_destroy(ex_scene_t *s) {
-  printf("Cleaning up scene\n");
+  log_trace("Cleaning up scene.");
 
   for (int i = 0; i < s->renderables.point_lights.count; i++) {
     ex_point_light_t *light = (ex_point_light_t *)s->renderables.point_lights.nodes[i].obj;

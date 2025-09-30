@@ -213,7 +213,7 @@ void game_draw() {
 void game_exit() {
   ex_scene_destroy(scene);
   ex_vga_destroy();
-  printf("Exiting\n");
+  printf("Good bye!\n");
 }
 
 void game_keypressed(uint32_t key) {

@@ -30,10 +30,13 @@ void ex_sound_init() {
   ex_sound_list_devices(ex_sound_inputs, ALC_CAPTURE_DEVICE_SPECIFIER);
 
   // print out available devices
+  log_trace("Available output devices:");
   for (int i = 0; i < ex_sound_outputs->len; i++)
-    printf("Output Device [%s]\n", ex_sound_outputs->names[i]);
+    log_trace("\t- %s", ex_sound_outputs->names[i]);
+
+  log_trace("Available input devices:");
   for (int i = 0; i < ex_sound_inputs->len; i++)
-    printf("Input Device [%s]\n", ex_sound_inputs->names[i]);
+    log_trace("\t- %s", ex_sound_inputs->names[i]);
 
   // set default device as output
   ex_sound_set_output(NULL);
@@ -41,7 +44,7 @@ void ex_sound_init() {
   // init and set context
   ex_sound.context = alcCreateContext(ex_sound.output, NULL);
   if (!alcMakeContextCurrent(ex_sound.context)) {
-    printf("Failed creating OpenAL context\n");
+    log_error("Failed creating OpenAL context.");
     return;
   }
 
@@ -76,7 +79,7 @@ void ex_sound_list_devices(ex_sound_devices_t *list, const ALenum param) {
 void ex_sound_set_output(const ALCchar *device) {
   // set default device
   if (!device) {
-    printf("Output device set as default\n");
+    log_info("Output device set as default\n");
     ex_sound.output = alcOpenDevice(NULL);
     return;
   }
@@ -88,15 +91,15 @@ void ex_sound_set_output(const ALCchar *device) {
   ALCenum error;
   error = alGetError();
   if (error != AL_NO_ERROR) {
-    printf("Error setting audio output device %s\n", device);
+    log_error("Error setting audio output device %s.", device);
   }
 
   // success
-  printf("Output device set as %s\n", device);
+  log_error("Output device set as %s.", device);
 }
 
 ex_source_t *ex_sound_load(const char *path, int type, int looping) {
-  log_trace("Loading audio file %s\n", path);
+  log_trace("Loading audio file %s.", path);
   int channels, rate;
   short *data = NULL;
   int32_t decode_len = 0;
@@ -108,7 +111,7 @@ ex_source_t *ex_sound_load(const char *path, int type, int looping) {
 
   // decode ogg data
   if (strcmp(buf, ".ogg") == 0) {
-    printf("Decoding ogg format\n");
+    log_trace("Decoding ogg format.");
     size_t len = 0;
     uint8_t *file_data = (uint8_t *)ex_io_read(path, "rb", &len);
 
@@ -121,7 +124,7 @@ ex_source_t *ex_sound_load(const char *path, int type, int looping) {
 
       // loading failed
       if (decode_len <= 0) {
-        printf("Failed decoding ogg file %s\n", path);
+        log_error("Failed decoding ogg file %s.", path);
         return NULL;
       }
     } else {
@@ -131,12 +134,12 @@ ex_source_t *ex_sound_load(const char *path, int type, int looping) {
       decoder = stb_vorbis_open_memory(file_data, len, &error, NULL);
 
       if (decoder == NULL)
-        printf("Failed to create ogg decoder for streaming source %s\n", path);
+        log_error("Failed to create ogg decoder for streaming source %s.", path);
     }
   } else {
     // unsupported file format
-    printf("Failed loading sound file %s\n", path);
-    printf("Format \"%s\" is not currently supported\n", buf);
+    log_error("Failed loading sound file %s.", path);
+    log_error("Format \"%s\" is not currently supported.", buf);
     return NULL;
   }
 

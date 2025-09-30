@@ -1,6 +1,9 @@
+#include "log/log.h"
+
 #include <exengine/math/mathlib.h>
 #include <exengine/render/shader.h>
 #include <exengine/render/ssao.h>
+#include <exengine/util/cvar.h>
 #include <exengine/util/ini.h>
 
 #include <stdio.h>
@@ -8,13 +11,10 @@
 #include <string.h>
 #include <time.h>
 
-extern ex_ini_t *conf;
-
 constexpr size_t kernelSize = 16;
 
 vec3 ssao_samples[SSAO_NUM_SAMPLES];
 vec3 ssao_noise[kernelSize];
-
 
 // ssao geometry pass
 GLuint ssao_noise_texture, ssao_fbo, ssao_color_buffer;
@@ -29,7 +29,10 @@ GLuint ssao_blur_shader = 0;
 GLuint ssao_blur_loc = 0;
 GLuint default_texture_ssao = 0;
 
-void ssao_init() {
+extern cvar_t cvar_screen_width;
+extern cvar_t cvar_screen_height;
+
+void ex_ssao_init() {
   srand(time(NULL));
 
   // generate kernel sample hemispheres
@@ -77,20 +80,17 @@ void ssao_init() {
   glGenFramebuffers(1, &ssao_fbo);
   glBindFramebuffer(GL_FRAMEBUFFER, ssao_fbo);
 
-  int width = (int)ex_ini_get_float(conf, "graphics", "window_width");
-  int height = (int)ex_ini_get_float(conf, "graphics", "window_height");
-
   // generate color buffer
   glGenTextures(1, &ssao_color_buffer);
   glBindTexture(GL_TEXTURE_2D, ssao_color_buffer);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, cvar_screen_width.value.i32, cvar_screen_height.value.i32, 0, GL_RGB, GL_FLOAT, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssao_color_buffer, 0);
 
   // test framebuffer
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-    printf("Error! SSAO Framebuffer is not complete\n");
+    log_error("SSAO Framebuffer is not complete.");
   }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -101,14 +101,14 @@ void ssao_init() {
   // generate ssao blur color buffer
   glGenTextures(1, &ssao_color_blur_buffer);
   glBindTexture(GL_TEXTURE_2D, ssao_color_blur_buffer);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, width, height, 0, GL_RGB, GL_FLOAT, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, cvar_screen_width.value.i32, cvar_screen_height.value.i32, 0, GL_RGB, GL_FLOAT, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssao_color_blur_buffer, 0);
 
   // test blur framebuffer
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-    printf("Error! SSAO Blur Framebuffer is not complete\n");
+    log_error("SSAO Blur Framebuffer is not complete.");
   }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
@@ -117,7 +117,7 @@ void ssao_init() {
   ssao_blur_shader = ex_graphic_pipeline_new("ssao");
 }
 
-void ssao_render(mat4x4 projection, mat4x4 view, GLuint gposition, GLuint gnormal, GLuint fbo_vao) {
+void ex_ssao_render(mat4x4 projection, mat4x4 view, GLuint gposition, GLuint gnormal, GLuint fbo_vao) {
   glBindFramebuffer(GL_FRAMEBUFFER, ssao_fbo);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -152,8 +152,8 @@ void ssao_render(mat4x4 projection, mat4x4 view, GLuint gposition, GLuint gnorma
     noise_loc = ex_uniform(ssao_shader, "u_noise");
   }
 
-  int width = (int)ex_ini_get_float(conf, "graphics", "window_width");
-  int height = (int)ex_ini_get_float(conf, "graphics", "window_height");
+  int width = cvar_screen_width.value.i32;
+  int height = cvar_screen_height.value.i32;
   vec2 screensize = {width, height};
 
   glUniform2fv(screensize_loc, 1, (float *)&screensize[0]);
@@ -169,13 +169,13 @@ void ssao_render(mat4x4 projection, mat4x4 view, GLuint gposition, GLuint gnorma
   glDrawArrays(GL_TRIANGLES, 0, 6);
 }
 
-void ssao_bind_texture(GLuint shader) {
+void ex_ssao_bind_texture(GLuint shader) {
   glActiveTexture(GL_TEXTURE3);
   glUniform1i(ex_uniform(shader, "u_ssao"), 3);
   glBindTexture(GL_TEXTURE_2D, ssao_color_buffer);
 }
 
-void ssao_bind_default(GLuint shader) {
+void ex_ssao_bind_default(GLuint shader) {
   glActiveTexture(GL_TEXTURE3);
   glUniform1i(ex_uniform(shader, "u_ssao"), 3);
   glBindTexture(GL_TEXTURE_2D, default_texture_ssao);

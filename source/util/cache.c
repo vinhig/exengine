@@ -1,6 +1,8 @@
-#include <exengine/util/cache.h>
+#include "log/log.h"
+
 #include <exengine/render/scene.h>
 #include <exengine/render/texture.h>
+#include <exengine/util/cache.h>
 #include <exengine/util/list.h>
 
 #include <stdio.h>
@@ -14,7 +16,7 @@ void ex_cache_init() {
 }
 
 void ex_cache_model(ex_model_t *model) {
-  printf("Caching model %s\n", model->path);
+  log_trace("Caching model %s.", model->path);
 
   ex_list_add(model_list, model);
 }
@@ -28,7 +30,7 @@ ex_model_t *ex_cache_get_model(const char *path) {
     // compare file paths
     if (strcmp(path, m->path) == 0) {
       // exists, return it
-      printf("Returning copy of model from cache for %s\n", path);
+      log_trace("Returning copy of model from cache for %s.", path);
       return ex_model_copy(m);
     }
 
@@ -60,7 +62,7 @@ GLuint ex_cache_texture(const char *path) {
       break;
   }
 
-  printf("Caching texture %s\n", path);
+  log_trace("Caching texture %s.", path);
 
   // doesnt exist, create texture
   ex_texture_t *t = ex_texture_load(path, 0);

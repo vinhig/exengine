@@ -53,7 +53,7 @@ typedef struct {
  * @param  path [file path]
  * @return      [non-zero upon success]
  */
-int ex_ini_load(ex_ini_t *ini, const char *path);
+int ex_ini_load_dont_use(ex_ini_t *ini, const char *path);
 
 /**
  * [ex_ini_save saves the ini structure to a file]
@@ -61,6 +61,15 @@ int ex_ini_load(ex_ini_t *ini, const char *path);
  * @param path [file path]
  */
 void ex_ini_save(ex_ini_t *ini, const char *path);
+
+/**
+ * [ex_ini_exists returns true if variable exists in given section]
+ * @param  ini [ini instance to use]
+ * @param  sec [variable section]
+ * @param  key [variable key]
+ * @return     [true if variable exists, false otherwise]
+ */
+bool ex_ini_exists(ex_ini_t *ini, const char *sec, const char *key);
 
 /**
  * [ex_ini_get_var get a key-value variable]
@@ -114,4 +123,13 @@ void ex_ini_set_string(ex_ini_t *ini, const char *sec, const char *key, const ch
  * @param key   [variable key]
  * @param value [float value]
  */
-void ex_ini_set_float(ex_ini_t *ini, const char *sec, const char *key, const float value);
+void ex_ini_set_float(ex_ini_t *ini, const char *sec, const char *key, float value);
+
+/**
+ * [ex_ini_set_bool set a bool variable]
+ * @param ini   [ini instance to use]
+ * @param sec   [variable section]
+ * @param key   [variable key]
+ * @param value [bool value]
+ */
+void ex_ini_set_bool(ex_ini_t *ini, const char *sec, const char *key, bool value);

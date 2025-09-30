@@ -1,11 +1,13 @@
+#include "log/log.h"
+
 #include <exengine/util/ini.h>
 #include <exengine/util/io.h>
 
 #include <stdlib.h>
 #include <string.h>
 
-int ex_ini_load(ex_ini_t *ini, const char *path) {
-  printf("Loading config file %s\n", path);
+int ex_ini_load_dont_use(ex_ini_t *ini, const char *path) {
+  log_info("Loading config file %s", path);
 
   // read config file contents
   char *buff = ex_io_read(path, "r", nullptr);
@@ -103,7 +105,7 @@ void ex_ini_save(ex_ini_t *ini, const char *path) {
   // empty the file
   ex_io_write(path, "", 0, 0);
 
-  printf("Saving configuration file to %s\n", path);
+  log_info("Saving configuration file to %s.", path);
 
   // now save the actual data
   char buf[1024];
@@ -172,6 +174,26 @@ ex_ini_var_t *ex_ini_new_var(ex_ini_t *ini, const char *sec, const char *key) {
   return var;
 }
 
+bool ex_ini_exists(ex_ini_t *ini, const char *sec, const char *key) {
+  for (int i = 0; i < ini->length; i++) {
+    ex_ini_section_t *section = &ini->sections[i];
+
+    if (strcmp(section->name, sec) != 0) {
+      continue;
+    }
+
+    for (int j = 0; j < section->length; j++) {
+      ex_ini_var_t *var = &section->vars[j];
+      if (strcmp(var->key, key) == 0) {
+        return true;
+      }
+    }
+  }
+
+  // no var found
+  return false;
+}
+
 ex_ini_var_t *ex_ini_get_var(ex_ini_t *ini, const char *sec, const char *key) {
   for (int i = 0; i < ini->length; i++) {
     ex_ini_section_t *section = &ini->sections[i];
@@ -238,4 +260,11 @@ void ex_ini_set_float(ex_ini_t *ini, const char *sec, const char *key, const flo
     var->type = ex_ini_type_float;
     var->f = value;
   }
+}
+
+void ex_ini_set_bool(ex_ini_t *ini, const char *sec, const char *key, bool value) {
+  if (value)
+    ex_ini_set_string(ini, sec, key, "true");
+  else
+    ex_ini_set_string(ini, sec, key, "false");
 }

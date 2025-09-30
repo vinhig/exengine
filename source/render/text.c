@@ -8,6 +8,8 @@
 
 #define STB_TRUETYPE_IMPLEMENTATION
 #include "SDL2/SDL_timer.h"
+#include "log/log.h"
+
 #include <stb_truetype.h>
 
 #define SIZE 32
@@ -114,7 +116,8 @@ ex_font_t *ex_font_load(const char *path, const char *letters) {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, 0);
+  float borderColor[] = {0.0f, 0.0f, 0.0f, 0.0f};
+  glTexParameterfv(GL_TEXTURE_2D, GL_TEXTURE_BORDER_COLOR, &borderColor[0]);
 
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB32F, atlas_size, atlas_size, 0, GL_RGB, GL_FLOAT, atlas);
 
@@ -122,7 +125,7 @@ ex_font_t *ex_font_load(const char *path, const char *letters) {
 
   free(data);
   free(atlas);
-  printf("[TEXT] Done generating msdf atlas for font %s\n", path);
+  log_trace("Done generating msdf atlas for font %s.", path);
 
   return f;
 }

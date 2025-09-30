@@ -1,3 +1,5 @@
+#include "log/log.h"
+
 #include <exengine/util/cache.h>
 #include <exengine/util/io.h>
 #include <exengine/util/iqm.h>
@@ -11,12 +13,12 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
     return m_cache;
   }
 
-  printf("Loading IQM model file %s\n", path);
+  log_info("Loading IQM model file %s.", path);
 
   // read in the file data
   uint8_t *data = (uint8_t *)ex_io_read(path, "rb", nullptr);
   if (data == nullptr) {
-    printf("Failed to load IQM model file %s\n", path);
+    log_error("Failed to load IQM model file %s.", path);
     return nullptr;
   }
 
@@ -28,7 +30,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   uint *head = (uint *)&data[16];
   header.version = head[0];
   if (strcmp(header.magic, EX_IQM_MAGIC) != 0 || header.version != EX_IQM_VERSION) {
-    printf("Loaded IQM model version is not 2.0\nFailed loading %s\n", path);
+    log_error("Loaded IQM model (%s) version is not 2.0.", path);
     free(data);
     return nullptr;
   }
@@ -110,11 +112,11 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
     bind_pose = malloc(sizeof(ex_pose_t) * header.num_joints);
     pose = malloc(sizeof(ex_pose_t) * header.num_joints);
 
-    printf("Bones: ");
+    // log_trace("Bones: ");
     for (int i = 0; i < header.num_joints; i++) {
       ex_iqmjoint_t *j = &joints[i];
       strncpy(bones[i].name, &file_text[j->name], 64);
-      printf("%s ", bones[i].name);
+      // log_trace("%s ", bones[i].name);
       bones[i].parent = j->parent;
       memcpy(bones[i].position, j->translate, sizeof(vec3));
       memcpy(bones[i].rotation, j->rotate, sizeof(quat));
@@ -123,7 +125,6 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
       memcpy(bind_pose[i].rotate, j->rotate, sizeof(quat));
       memcpy(bind_pose[i].scale, j->scale, sizeof(vec3));
     }
-    printf("\n");
   }
 
   // anims
@@ -308,7 +309,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   strcpy(model->path, path);
 
   // cleanup data
-  printf("Finished loading IQM model %s\n", path);
+  log_trace("Finished loading IQM model %s.", path);
   free(vertices);
   free(indices);
   free(data);

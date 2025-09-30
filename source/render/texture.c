@@ -2,6 +2,8 @@
 #include <physfs/physfs.h>
 
 #define STB_IMAGE_IMPLEMENTATION
+#include "log/log.h"
+
 #include <stb_image.h>
 
 ex_texture_t *ex_texture_load(const char *file_name, int get_data) {
@@ -11,10 +13,10 @@ ex_texture_t *ex_texture_load(const char *file_name, int get_data) {
   strcpy(file_dir, EX_TEXTURE_LOC);
   strcpy(&file_dir[len], file_name);
 
-  printf("Loading texture %s\n", file_dir);
+  log_trace("Loading texture %s.", file_dir);
 
   if (!PHYSFS_exists(file_dir)) {
-    printf("Texture does not exist %s\n", file_dir);
+    log_error("Texture does not exist %s.", file_dir);
     return NULL;
   }
 
@@ -33,7 +35,7 @@ ex_texture_t *ex_texture_load(const char *file_name, int get_data) {
   int w, h, n;
   uint8_t *data = stbi_load_from_memory((uint8_t *)buff, size, &w, &h, &n, 4);
   if (data == NULL) {
-    printf("Could not load texture %s\n", file_dir);
+    log_error("Could not load texture %s\n", file_dir);
     return NULL;
   }
 
