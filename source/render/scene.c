@@ -1,7 +1,6 @@
-#include "log/log.h"
+#include <log/log.h>
 
 #include <exengine/render/scene.h>
-
 #include <exengine/sound/sound.h>
 
 #include <stdint.h>

@@ -1,3 +1,4 @@
+#include <game/world_scene.h>
 #include <game/game.h>
 #include <exengine/engine.h>
 #include <exengine/input/input.h>
@@ -16,7 +17,7 @@ ex_source_t *sound;
 ex_font_t *font;
 float move_speed = 1.5f;
 
-void game_init() {
+void world_scene_init() {
   // init the scene
   scene = ex_scene_new(0);
   memcpy(scene->gravity, (vec3){0.0f, -0.1f, 0.0f}, sizeof(vec3));
@@ -63,7 +64,7 @@ void game_init() {
   ex_vga_init();
 }
 
-void game_update(double dt, double ft) {
+void world_scene_update(double dt, double ft) {
   ex_entity_update(e, dt);
   ex_entity_update(cube, dt);
 
@@ -201,7 +202,7 @@ void game_update(double dt, double ft) {
   ex_vga_print(2, 2, buf);
 }
 
-void game_draw() {
+void world_scene_draw() {
   ex_scene_draw(scene, 0, 0, 0, 0, &camera->matrices);
   ex_fps_camera_resize(camera);
 
@@ -210,30 +211,22 @@ void game_draw() {
   ex_vga_render();
 }
 
-void game_exit() {
+void world_scene_exit() {
   ex_scene_destroy(scene);
-  ex_vga_destroy();
-  printf("Good bye!\n");
 }
 
-void game_keypressed(uint32_t key) {
-  // printf("key %i\n", key);
+void world_scene_keypressed(uint32_t key) {
 }
 
-void game_mousepressed(uint8_t button) {
-  // printf("button %i\n", button);
-  ex_sound_restart(sound);
+void world_scene_mousepressed(uint8_t button) {
 }
 
-void game_mousemoition(int xrel, int yrel) {
-  // printf("mouse motion x: %i y: %i\n", xrel, yrel);
+void world_scene_mousemoition(int xrel, int yrel) {
 }
 
-void game_mousewheel(int32_t x, int32_t y) {
-  // printf("scroll x: %i y: %i\n", x, y);
+void world_scene_mousewheel(int32_t x, int32_t y) {
 }
 
-void game_resize(uint32_t width, uint32_t height) {
-  // printf("resize x: %i y: %i\n", width, height);
+void world_scene_resize(uint32_t width, uint32_t height) {
   ex_scene_resize(scene, width, height);
 }

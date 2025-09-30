@@ -12,7 +12,6 @@ add_executable(exengine
         ${PROJECT_SOURCE_DIR}/third_party/log/log.c
         ${PROJECT_SOURCE_DIR}/third_party/glad/glad.c
 
-        ${PROJECT_SOURCE_DIR}/source/game.c
         ${PROJECT_SOURCE_DIR}/source/main.c
 )
 
