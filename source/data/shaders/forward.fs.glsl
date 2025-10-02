@@ -159,7 +159,6 @@ void main()
   if (u_point_active ) {
     out_position = position;
     out_normal = vec4(normal * 0.5 + 0.5, 1.0);
-    // out_normal = vec4(normal, 1.0);
   }
 
   out_color = vec4(diffuse, 1.0);

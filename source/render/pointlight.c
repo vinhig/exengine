@@ -1,3 +1,5 @@
+#include "log/log.h"
+
 #include <exengine/render/pointlight.h>
 #include <exengine/render/shader.h>
 
@@ -25,7 +27,7 @@ ex_point_light_t *ex_point_light_new(vec3 pos, vec3 color, int dynamic) {
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_BORDER);
   glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_BORDER);
-  GLfloat border[] = {1.0, 1.0, 1.0, 1.0};
+  GLfloat border[] = {1.0f, 1.0f, 1.0f, 1.0f};
   glTexParameterfv(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_BORDER_COLOR, border);
 
   // only want the depth buffer
@@ -35,7 +37,7 @@ ex_point_light_t *ex_point_light_new(vec3 pos, vec3 color, int dynamic) {
   glDrawBuffer(GL_NONE);
   glReadBuffer(GL_NONE);
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-    printf("Error! Point light framebuffer is not complete!\n");
+    log_error("Error! Point light framebuffer is not complete!");
   }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 

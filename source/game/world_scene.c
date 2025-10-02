@@ -1,5 +1,5 @@
-#include <game/world_scene.h>
-#include <game/game.h>
+#include "exengine/util/cvar.h"
+
 #include <exengine/engine.h>
 #include <exengine/input/input.h>
 #include <exengine/render/camera.h>
@@ -7,32 +7,40 @@
 #include <exengine/render/vga.h>
 #include <exengine/util/entity.h>
 #include <exengine/util/iqm.h>
+#include <game/game.h>
+#include <game/world_scene.h>
 
 ex_fps_camera_t *camera;
 ex_scene_t *scene;
-ex_model_t *m6, *d, *box;
-ex_entity_t *cube, *e;
+ex_model_t *level, *d, *erebus_model;
+ex_entity_t *camera_entity;
 ex_point_light_t *l, *pl;
 ex_source_t *sound;
 ex_font_t *font;
 float move_speed = 1.5f;
 
+extern cvar_t cvar_screen_width;
+extern cvar_t cvar_screen_height;
+
 void world_scene_init() {
   // init the scene
   scene = ex_scene_new(0);
-  memcpy(scene->gravity, (vec3){0.0f, -0.1f, 0.0f}, sizeof(vec3));
+  memcpy(scene->gravity, (vec3){0.0f, 0.0f, 0.0f}, sizeof(vec3));
 
   // init the camera
-  camera = ex_fps_camera_new(0.0f, 0.0f, 0.0f, 0.1f, 70.0f);
+  camera = ex_fps_camera_new(5.0f, 5.0f, 0.0f, 0.1f, 70.0f);
+  camera->yaw = 60.0f;
+  camera->pitch -= 45.0f;
 
-  m6 = ex_iqm_load_model(scene, "data/level.iqm", EX_KEEP_VERTICES);
-  m6->cast_shadow = 1;
-  ex_scene_add_model(scene, m6);
+  level = ex_iqm_load_model(scene, "data/level_3.iqm", EX_KEEP_VERTICES);
+  level->cast_shadow = 1;
+  ex_scene_add_model(scene, level);
 
-  e = ex_entity_new(scene, (vec3){0.5f, 1.0f, 0.5f});
-  e->position[1] = 10.0f;
-  e->position[0] = 5.0f;
-  e->position[2] = 0.0f;
+  camera_entity = ex_entity_new(scene, (vec3){0.5f, 1.0f, 0.5f});
+  camera_entity->position[1] = 10.0f;
+  camera_entity->position[0] = 5.0f;
+  camera_entity->position[2] = 0.0f;
+
   // load a sound
   sound = ex_sound_load("data/ambient.ogg", EX_SOURCE_STREAMING, EX_SOURCE_LOOPING);
   ex_sound_master_volume(0.5f);
@@ -45,18 +53,16 @@ void world_scene_init() {
   ex_scene_add_pointlight(scene, pl);
   pl->cast_shadow = 1;
 
-  box = ex_iqm_load_model(scene, "data/erebus.iqm", 0);
-  box->cast_shadow = 1;
-  box->scale = 0.025f;
-  box->rotation[0] = -90.0f;
-  ex_scene_add_model(scene, box);
+  erebus_model = ex_iqm_load_model(scene, "data/erebus.iqm", 0);
+  erebus_model->cast_shadow = 1;
+  erebus_model->scale = 0.025f;
+  erebus_model->rotation[0] = -90.0f;
+  erebus_model->position[0] = 5.0f;
+  erebus_model->position[1] = 5.0f;
+  erebus_model->position[2] = 5.0f;
+  ex_scene_add_model(scene, erebus_model);
 
-  ex_model_set_anim(box, "run");
-
-  cube = ex_entity_new(scene, (vec3){0.95f, 0.95f, 0.95f});
-  cube->position[2] = 5.0f;
-  cube->position[1] = 5.0f;
-  cube->position[0] = 0.0f;
+  ex_model_set_anim(erebus_model, "run");
 
   // this ain't it
   font = ex_font_load("data/fonts/OpenSans-Regular.ttf", "abcdefghijklmnopqrstuvwxyzHW!_");
@@ -65,128 +71,51 @@ void world_scene_init() {
 }
 
 void world_scene_update(double dt, double ft) {
-  ex_entity_update(e, dt);
-  ex_entity_update(cube, dt);
+  ex_entity_update(camera_entity, dt);
 
-  memcpy(camera->position, e->position, sizeof(vec3));
-  camera->position[1] += e->radius[1];
+  // reduce velocity of the camera_entity
+  camera_entity->velocity[0] *= (float)(1.0 - dt) * 0.95f;
+  camera_entity->velocity[1] *= (float)(1.0 - dt) * 0.95f;
+  camera_entity->velocity[2] *= (float)(1.0 - dt) * 0.95f;
 
-  memcpy(box->position, cube->position, sizeof(vec3));
+  memcpy(camera->position, camera_entity->position, sizeof(vec3));
+  camera->position[1] += camera_entity->radius[1];
 
-  vec3 temp;
-  vec3_sub(temp, cube->position, e->position);
-  float len = vec3_len(temp);
-  if (len <= cube->radius[1] / 2 + e->radius[1]) {
-    vec3_norm(temp, temp);
-    vec3_scale(temp, temp, vec3_len(e->velocity));
-    vec3_add(cube->velocity, cube->velocity, temp);
-    vec3_sub(e->velocity, e->velocity, temp);
-  }
-
-  vec3_scale(temp, cube->velocity, 5.0f * dt);
-  temp[1] = 0.0f;
-  if (cube->grounded == 1) {
-    vec3_sub(cube->velocity, cube->velocity, temp);
-  }
-
-  cube->velocity[1] -= (100.0f * dt);
-
-  if (ex_keys_down[SDL_SCANCODE_LCTRL]) {
-    vec3 p;
-    vec3_scale(p, camera->front, 2.5f);
-    vec3_add(p, p, e->position);
-    p[1] += 0.5f;
-
-    vec3_sub(p, p, cube->position);
-
-    float f = vec3_len(p);
-    if (f > 1.5f) {
-      ex_keys_down[SDL_SCANCODE_LCTRL] = 0;
-    } else {
-      if (f > 1.0f) {
-        f *= f;
-      }
-
-      vec3_norm(p, p);
-      vec3_scale(p, p, f * 35.0f);
-      f = cube->velocity[1];
-      memcpy(cube->velocity, p, sizeof(vec3));
-      cube->velocity[1] += f * 0.1f;
-
-      if (ex_buttons_down[SDL_BUTTON_RIGHT]) {
-        vec3_scale(temp, camera->front, 80.0f);
-        vec3_add(cube->velocity, cube->velocity, temp);
-        ex_keys_down[SDL_SCANCODE_LCTRL] = 0;
-      }
-    }
-  }
-
-  if (ex_keys_down[SDL_SCANCODE_F]) {
-    float r = (float)rand() / (float)(RAND_MAX / 1.0f);
-    float g = (float)rand() / (float)(RAND_MAX / 1.0f);
-    float b = (float)rand() / (float)(RAND_MAX / 1.0f);
-    ex_point_light_t *l = ex_point_light_new((vec3){0.0f, 0.0f, 0.0f}, (vec3){r, g, b}, 0);
-    memcpy(l->position, camera->position, sizeof(vec3));
-    ex_scene_add_pointlight(scene, l);
-    l->cast_shadow = 1;
-    ex_keys_down[SDL_SCANCODE_F] = 0;
-  }
-
-  /* debug entity movement */
-  vec3_scale(temp, e->velocity, 15.0f * dt);
-  temp[1] = 0.0f;
-
-  if (e->grounded == 1) {
-    vec3_sub(e->velocity, e->velocity, temp);
-  } else {
-    move_speed = 50.0f;
-  }
-
-  e->velocity[1] -= (100.0f * dt);
+  // memcpy(box->position, cube->position, sizeof(vec3));
 
   vec3 speed, side;
   if (ex_keys_down[SDL_SCANCODE_W]) {
     vec3_norm(speed, (vec3){camera->front[0], 0.0f, camera->front[2]});
     vec3_scale(speed, speed, move_speed * dt);
     speed[1] = 0.0f;
-    vec3_add(e->velocity, e->velocity, speed);
+    vec3_add(camera_entity->velocity, camera_entity->velocity, speed);
   }
   if (ex_keys_down[SDL_SCANCODE_S]) {
     vec3_norm(speed, (vec3){camera->front[0], 0.0f, camera->front[2]});
     vec3_scale(speed, speed, move_speed * dt);
     speed[1] = 0.0f;
-    vec3_sub(e->velocity, e->velocity, speed);
+    vec3_sub(camera_entity->velocity, camera_entity->velocity, speed);
   }
   if (ex_keys_down[SDL_SCANCODE_A]) {
     vec3_mul_cross(side, camera->front, camera->up);
     vec3_norm(side, side);
     vec3_scale(side, side, (move_speed * 0.9f) * dt);
     side[1] = 0.0f;
-    vec3_sub(e->velocity, e->velocity, side);
+    vec3_sub(camera_entity->velocity, camera_entity->velocity, side);
   }
   if (ex_keys_down[SDL_SCANCODE_D]) {
     vec3_mul_cross(side, camera->front, camera->up);
     vec3_norm(side, side);
     vec3_scale(side, side, (move_speed * 0.9f) * dt);
     side[1] = 0.0f;
-    vec3_add(e->velocity, e->velocity, side);
+    vec3_add(camera_entity->velocity, camera_entity->velocity, side);
   }
-  if (ex_keys_down[SDL_SCANCODE_Q]) {
-    e->velocity[1] = 50.0f;
-  }
-  if (ex_keys_down[SDL_SCANCODE_Z]) {
-    e->velocity[1] = -50.0f;
-  }
-  if (ex_keys_down[SDL_SCANCODE_SPACE] && e->grounded == 1) {
-    e->velocity[1] = 20.0f;
-  }
+
   ex_sound_play(sound);
   move_speed = 100.0f;
 
-  // memcpy(pl->position, e->position, sizeof(vec3));
-  // pl->position[1] += 1.0f;
   ex_scene_update(scene, dt);
-  ex_fps_camera_update(camera);
+  ex_fps_camera_update(camera, false);
 
   ex_vga_clear();
 
@@ -200,6 +129,50 @@ void world_scene_update(double dt, double ft) {
   ex_vga_setfg(255, 255, 0, 255);
   ex_vga_setbg(255, 255, 255, 0);
   ex_vga_print(2, 2, buf);
+
+  float ndc_x = (2.0f * ((float)ex_mouse_x + 0.5f)) / (float)cvar_screen_width.value.i32 - 1.0f;
+  float ndc_y = 1.0f - (2.0f * ((float)ex_mouse_y + 0.5f)) / (float)cvar_screen_height.value.i32;
+
+  printf("ex_mouse_y = %d, ex_mouse_y = %d\n", ex_mouse_x, ex_mouse_y);
+
+  vec4 near_point = {ndc_x, ndc_y, -1.0f, 1.0f};
+  vec4 far_point = {ndc_x, ndc_y, 1.0f, 1.0f};
+
+  mat4x4 view_proj;
+  mat4x4_mul(view_proj, camera->matrices.projection, camera->matrices.view);
+  mat4x4 inv_view_proj;
+  mat4x4_invert(inv_view_proj, view_proj);
+
+  float near_world[4], far_world[4];
+  mat4x4_mul_vec4(near_world, inv_view_proj, near_point);
+  mat4x4_mul_vec4(far_world, inv_view_proj, far_point);
+
+  near_world[0] /= near_world[3];
+  near_world[1] /= near_world[3];
+  near_world[2] /= near_world[3];
+
+  far_world[0] /= far_world[3];
+  far_world[1] /= far_world[3];
+  far_world[2] /= far_world[3];
+
+  vec3 ray_direction;
+  ray_direction[0] = far_world[0] - near_world[0];
+  ray_direction[1] = far_world[1] - near_world[1];
+  ray_direction[2] = far_world[2] - near_world[2];
+
+  vec3_norm(ray_direction, ray_direction);
+
+  ex_plane_t plane = {};
+  vec3 infinite_vector;
+  vec3_mul(infinite_vector, ray_direction, (vec3){9999.0f, 9999.0f, 9999.0f});
+  // vec3_add(infinite_vector, camera->position, infinite_vector);
+  float dist = ex_raycast(camera_entity, camera_entity->position, infinite_vector, &plane);
+
+  if (dist > 0.0f) {
+    erebus_model->position[0] = plane.intersection_point[0];
+    erebus_model->position[1] = plane.intersection_point[1];
+    erebus_model->position[2] = plane.intersection_point[2];
+  }
 }
 
 void world_scene_draw() {

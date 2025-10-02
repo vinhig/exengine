@@ -14,8 +14,8 @@ uniform mat4 u_view;
 uniform vec2 u_screensize;
 
 int kernel_size = 32;
-float radius = 1.2;
-float bias = 0.2;
+float radius = 0.3;
+float bias = 0.1;
 
 void main()
 {
@@ -33,7 +33,7 @@ void main()
 
   // calculate occlusion factor
   float occlusion = 0.0;
-  for (int i=0; i < kernel_size; i++) {
+  for (int i = 0; i < kernel_size; i++) {
     // convert from tangent to view space
     vec3 sample = TBN * u_samples[i];
     // get sample pos
@@ -49,6 +49,7 @@ void main()
     float rangecheck = smoothstep(0.0, 1.0, radius / abs(fragpos.z - sampledepth));
     occlusion += (sampledepth >= sample.z + bias ? 1.0 : 0.0) * rangecheck;
   }
+
   occlusion = 1.0 - (occlusion / kernel_size);
   frag_color = pow(occlusion, 1.0);
 }

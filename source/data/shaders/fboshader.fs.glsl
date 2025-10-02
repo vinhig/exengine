@@ -32,13 +32,13 @@ float ambient_occlusion(vec2 uv)
         1.0,  4.0,  6.0,  4.0, 1.0
     );
 
-    for(int y = -2; y <= 2; y++)
+    for (int y = -2; y <= 2; y++)
     {
-      for(int x = -2; x <= 2; x++)
+      for (int x = -2; x <= 2; x++)
       {
         vec2 sampleUV = uv + vec2(float(x), float(y)) * texelSize;
 
-        if(sampleUV.x >= 0.0 && sampleUV.x <= 1.0 &&
+        if (sampleUV.x >= 0.0 && sampleUV.x <= 1.0 &&
            sampleUV.y >= 0.0 && sampleUV.y <= 1.0)
         {
            int kernelIndex = (y + 2) * 5 + (x + 2);
@@ -57,10 +57,10 @@ void main()
 {
   bool ssao_enabled = true;
   vec3 tex_color = textureLod(u_texture, uv, 0.0).rgb;
-  if (ssao_enabled)
-  {
-    tex_color *= ambient_occlusion(uv);
-  }
+  // if (ssao_enabled)
+  // {
+  //   tex_color *= ambient_occlusion(uv);
+  // }
   tex_color = vec3(1.0) - exp(tex_color / u_white_point);
-  color = vec4(aces_tonemap(tex_color), 1.0);
+  color = vec4(aces_tonemap(tex_color) * ambient_occlusion(uv), 1.0);
 }

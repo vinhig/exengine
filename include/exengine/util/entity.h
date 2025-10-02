@@ -66,3 +66,5 @@ void ex_entity_check_grounded(ex_entity_t *entity);
  * @param dt     [delta time]
  */
 void ex_entity_update(ex_entity_t *entity, double dt);
+
+float ex_raycast(const ex_entity_t *entity, vec3 from, vec3 to, ex_plane_t *plane);

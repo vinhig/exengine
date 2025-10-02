@@ -25,7 +25,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   // the header contents
   ex_iqm_header_t header;
 
-  // check magic string and version
+   // check magic string and version
   memcpy(header.magic, data, 16);
   uint *head = (uint *)&data[16];
   header.version = head[0];

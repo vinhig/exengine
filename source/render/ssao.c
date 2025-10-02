@@ -40,20 +40,21 @@ void ex_ssao_init() {
     float r1 = (float)rand() / (float)(RAND_MAX / 1.0);
     float r2 = (float)rand() / (float)(RAND_MAX / 1.0);
     float r3 = (float)rand() / (float)(RAND_MAX / 1.0);
-    float r4 = (float)rand() / (float)(RAND_MAX / 1.0);
+    // float r4 = (float)rand() / (float)(RAND_MAX / 1.0);
 
     vec3 sample = {r1 * 2.0 - 1.0, r2 * 2.0 - 1.0, r3};
     vec3_norm(sample, sample);
-    sample[0] *= r4;
-    sample[1] *= r4;
-    sample[2] *= r4;
+    // sample[0] *= r4;
+    // sample[1] *= r4;
+    // sample[2] *= r4;
 
     // scale samples to be closer to the center
-    float scale = (float)i / (float)SSAO_NUM_SAMPLES;
-    scale = lerp(0.1f, 1.0f, scale * scale);
-    sample[0] *= scale;
-    sample[1] *= scale;
-    sample[2] *= scale;
+    // float scale = (float)i / (float)SSAO_NUM_SAMPLES;
+    // scale = lerp(0.1f, 1.0f, scale * scale);
+    // sample[0] *= scale;
+    // sample[1] *= scale;
+    // sample[2] *= scale;
+
 
     memcpy(ssao_samples[i], sample, sizeof(vec3));
   }
@@ -83,7 +84,7 @@ void ex_ssao_init() {
   // generate color buffer
   glGenTextures(1, &ssao_color_buffer);
   glBindTexture(GL_TEXTURE_2D, ssao_color_buffer);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RED, cvar_screen_width.value.i32, cvar_screen_height.value.i32, 0, GL_RGB, GL_FLOAT, NULL);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB16F, cvar_screen_width.value.i32, cvar_screen_height.value.i32, 0, GL_RGB, GL_FLOAT, NULL);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, ssao_color_buffer, 0);

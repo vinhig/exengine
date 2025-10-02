@@ -61,6 +61,8 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
     }
   }
 
+  SDL_GL_SetSwapInterval(0);
+
   // set viewport etc
   glViewport(0, 0, width, height);
   glEnable(GL_DEPTH_TEST);
@@ -72,9 +74,9 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   glEnable(GL_FRAMEBUFFER_SRGB);
 
   // lock mouse
-  SDL_SetRelativeMouseMode(SDL_TRUE);
-  SDL_CaptureMouse(SDL_TRUE);
-  SDL_SetWindowGrab(display.window, SDL_TRUE);
+  // SDL_SetRelativeMouseMode(SDL_TRUE);
+  // SDL_CaptureMouse(SDL_TRUE);
+  // SDL_SetWindowGrab(display.window, SDL_TRUE);
 
   display.width = width;
   display.height = height;

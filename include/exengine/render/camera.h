@@ -39,8 +39,7 @@ void ex_fps_camera_resize(ex_fps_camera_t *cam);
 
 /**
  * [ex_fps_camera_update handle input and rotation]
- * @param cam            [camera to update]
- * @param xrel           [x motion]
- * @param yrel           [y motion]
+ * @param cam             [camera to update]
+ * @param update_rotation [ ]
  */
-void ex_fps_camera_update(ex_fps_camera_t *cam);
+void ex_fps_camera_update(ex_fps_camera_t *cam, bool update_rotation);

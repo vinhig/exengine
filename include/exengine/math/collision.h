@@ -14,6 +14,7 @@ typedef struct {
   vec3 origin;
   vec3 normal;
   float equation[4];
+  vec3 intersection_point;
 } ex_plane_t;
 
 typedef struct {

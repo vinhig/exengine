@@ -12,11 +12,11 @@ typedef enum current_scene_e {
   MAIN_MENU,
 } current_scene_t;
 
-current_scene_t current_scene = MAIN_MENU;
+current_scene_t current_scene = WORLD_SCENE;
 bool scene_changed = false;
 
 void game_init() {
-  mainmenu_scene_init();
+  world_scene_init();
 }
 
 void game_update(double dt, double ft) {
@@ -62,19 +62,18 @@ void game_exit() {
 }
 
 void game_keypressed(uint32_t key) {
-  if (current_scene != WORLD_SCENE) {
-    current_scene = WORLD_SCENE;
-    scene_changed = true;
-  }
-
-  // switch (current_scene) {
-  // case WORLD_SCENE:
-  //   world_scene_keypressed(key);
-  //   break;
-  // case MAIN_MENU:
-  //   mainmenu_scene_keypressed(key);
-  //   break;
+  // if (current_scene != WORLD_SCENE) {
+  //   current_scene = WORLD_SCENE;
+  //   scene_changed = true;
   // }
+  switch (current_scene) {
+  case WORLD_SCENE:
+    world_scene_keypressed(key);
+    break;
+  case MAIN_MENU:
+    mainmenu_scene_keypressed(key);
+    break;
+  }
 }
 
 void game_mousepressed(uint8_t button) {

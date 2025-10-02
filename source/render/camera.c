@@ -55,32 +55,34 @@ void ex_fps_camera_resize(ex_fps_camera_t *cam) {
   }
 }
 
-void ex_fps_camera_update(ex_fps_camera_t *cam) {
+void ex_fps_camera_update(ex_fps_camera_t *cam, bool update_rotation) {
   if (!cam->update)
     return;
 
-  float x = (float)ex_mouse_x;
-  float y = (float)ex_mouse_y;
+  if (update_rotation) {
+    float x = (float)ex_mouse_x;
+    float y = (float)ex_mouse_y;
 
-  float offset_x = x;
-  float offset_y = -y;
+    float offset_x = x;
+    float offset_y = -y;
 
-  offset_x *= cam->sensitivity;
-  offset_y *= cam->sensitivity;
+    offset_x *= cam->sensitivity;
+    offset_y *= cam->sensitivity;
 
-  cam->yaw += offset_x;
-  cam->pitch += offset_y;
+    cam->yaw += offset_x;
+    cam->pitch += offset_y;
 
-  if (cam->pitch > 89.0f)
-    cam->pitch = 89.0f;
-  if (cam->pitch < -89.0f)
-    cam->pitch = -89.0f;
+    if (cam->pitch > 89.0f)
+      cam->pitch = 89.0f;
+    if (cam->pitch < -89.0f)
+      cam->pitch = -89.0f;
+  }
 
   /* update front vector */
   vec3 front;
-  front[0] = cos(rad(cam->yaw)) * cos(rad(cam->pitch));
-  front[1] = sin(rad(cam->pitch));
-  front[2] = sin(rad(cam->yaw)) * cos(rad(cam->pitch));
+  front[0] = cosf(rad(cam->yaw)) * cosf(rad(cam->pitch));
+  front[1] = sinf(rad(cam->pitch));
+  front[2] = sinf(rad(cam->yaw)) * cosf(rad(cam->pitch));
 
   vec3_norm(cam->front, front);
 

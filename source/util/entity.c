@@ -1,4 +1,5 @@
 #include <exengine/util/entity.h>
+#include <stdio.h>
 
 #include <stdlib.h>
 #include <string.h>
@@ -139,8 +140,9 @@ void ex_entity_check_collision(ex_entity_t *entity) {
   int count = 0;
   ex_octree_get_colliding_count(entity->scene->coll_tree, &r, &count);
 
-  if (count <= 0)
+  if (count <= 0) {
     return;
+  }
 
   ex_octree_data_t *data = malloc(sizeof(ex_octree_data_t) * count);
   for (int i = 0; i < count; i++) {
@@ -155,8 +157,9 @@ void ex_entity_check_collision(ex_entity_t *entity) {
   for (int i = 0; i < count; i++) {
     uint32_t *indices = (uint32_t *)data[i].data;
 
-    if (indices == NULL)
+    if (indices == NULL) {
       continue;
+    }
 
     for (int k = 0; k < data[i].len; k++) {
       vec3 a, b, c;
@@ -171,8 +174,9 @@ void ex_entity_check_collision(ex_entity_t *entity) {
 }
 
 void ex_entity_check_grounded(ex_entity_t *entity) {
-  if (!entity->packet.found_collision)
+  if (!entity->packet.found_collision) {
     return;
+  }
 
   vec3 axis = {0.0f};
   axis[DOWN_AXIS] = 1.0f;
@@ -184,8 +188,9 @@ void ex_entity_check_grounded(ex_entity_t *entity) {
   ex_plane_t plane = ex_triangle_to_plane(a, b, c);
   float f = vec3_mul_inner(plane.normal, axis);
 
-  if (f >= SLOPE_WALK_ANGLE)
+  if (f >= SLOPE_WALK_ANGLE) {
     entity->grounded = 1;
+  }
 }
 
 void ex_entity_update(ex_entity_t *entity, double dt) {
@@ -195,23 +200,25 @@ void ex_entity_update(ex_entity_t *entity, double dt) {
 
   // prevent sliding while standing still on a slope
   // change < 0.0f to > 0.0f if inverting y axis
-  if (entity->grounded && fabs(vec2_len(xz)) < 0.1f && entity->velocity[1] < 0.0f)
+  if (entity->grounded && fabs(vec2_len(xz)) < 0.1f && entity->velocity[1] < 0.0f) {
     entity->velocity[1] = 0.0f;
-  else
+  } else {
     entity->grounded = 0;
+  }
 
   dt = dt / 5.0;
 
   vec3_scale(entity->velocity, entity->velocity, dt);
 
-  for (int i = 0; i < 5; i++)
+  for (int i = 0; i < 5; i++) {
     ex_entity_collide_and_slide(entity);
+  }
 
   vec3_sub(entity->velocity, entity->position, entity->packet.r3_position);
   vec3_scale(entity->velocity, entity->velocity, 1.0 / dt);
 }
 
-float raycast(const ex_entity_t *entity, vec3 from, vec3 to, ex_plane_t *plane) {
+float ex_raycast(const ex_entity_t *entity, vec3 from, vec3 to, ex_plane_t *plane) {
   vec3 a, b;
   memcpy(a, from, sizeof(vec3));
   vec3_add(b, from, to);
@@ -223,8 +230,9 @@ float raycast(const ex_entity_t *entity, vec3 from, vec3 to, ex_plane_t *plane) 
   int count = 0;
   ex_octree_get_colliding_count(entity->scene->coll_tree, &r, &count);
 
-  if (count <= 0)
+  if (count <= 0) {
     return 0.0f;
+  }
 
   ex_octree_data_t *data = malloc(sizeof(ex_octree_data_t) * count);
   for (int i = 0; i < count; i++) {
@@ -240,14 +248,14 @@ float raycast(const ex_entity_t *entity, vec3 from, vec3 to, ex_plane_t *plane) 
   float dist = FLT_MAX;
   vec3 intersect, nearest;
   for (int i = 0; i < count; i++) {
-    uint32_t *indices = (uint32_t *)data[i].data;
+    uint32_t *indices = data[i].data;
 
-    if (indices == NULL)
+    if (indices == NULL) {
       continue;
+    }
 
     for (int k = 0; k < data[i].len; k++) {
       if (ray_in_tri(from, to, vertices[indices[k] + 0], vertices[indices[k] + 1], vertices[indices[k] + 2], intersect)) {
-
         vec3 len;
         vec3_sub(len, from, intersect);
         float d = vec3_len(len);
@@ -263,6 +271,9 @@ float raycast(const ex_entity_t *entity, vec3 from, vec3 to, ex_plane_t *plane) 
   if (dist < FLT_MAX && dist <= vec3_len(to)) {
     ex_plane_t p = ex_triangle_to_plane(vertices[tri], vertices[tri + 1], vertices[tri + 2]);
     memcpy(plane, &p, sizeof(ex_plane_t));
+    plane->intersection_point[0] = nearest[0];
+    plane->intersection_point[1] = nearest[1];
+    plane->intersection_point[2] = nearest[2];
 
     free(data);
     return dist;
