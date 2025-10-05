@@ -118,7 +118,7 @@ void ex_ssao_init() {
   ssao_blur_shader = ex_graphic_pipeline_new("ssao");
 }
 
-void ex_ssao_render(mat4x4 projection, mat4x4 view, GLuint gposition, GLuint gnormal, GLuint fbo_vao) {
+void ex_ssao_render(mat4x4* projection, mat4x4* view, GLuint gposition, GLuint gnormal, GLuint fbo_vao) {
   glBindFramebuffer(GL_FRAMEBUFFER, ssao_fbo);
   glClear(GL_COLOR_BUFFER_BIT);
 
@@ -159,8 +159,8 @@ void ex_ssao_render(mat4x4 projection, mat4x4 view, GLuint gposition, GLuint gno
 
   glUniform2fv(screensize_loc, 1, (float *)&screensize[0]);
   glUniform3fv(sample_loc, SSAO_NUM_SAMPLES, (float *)&ssao_samples[0]);
-  glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection[0]);
-  glUniformMatrix4fv(view_loc, 1, GL_FALSE, (float *)&view[0]);
+  glUniformMatrix4fv(projection_loc, 1, GL_FALSE, (float *)&projection[0][0]);
+  glUniformMatrix4fv(view_loc, 1, GL_FALSE, (float *)&view[0][0]);
   glUniform1i(gposition_loc, 0);
   glUniform1i(gnormal_loc, 1);
   glUniform1i(noise_loc, 2);

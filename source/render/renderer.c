@@ -218,7 +218,7 @@ void ex_render_forward(ex_renderable_t *renderables) {
   /* ------------ */
 
   /* INTERMEDIATE PASS : SSAO */
-  ex_ssao_render(camera->projection, camera->view, framebuffer.position_bo, framebuffer.normal_bo, framebuffer.vao);
+  ex_ssao_render(&camera->projection, &camera->view, framebuffer.position_bo, framebuffer.normal_bo, framebuffer.vao);
 
   /* THIRD PASS */
   // enable blending for second pass onwards

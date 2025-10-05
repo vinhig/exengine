@@ -18,10 +18,10 @@ void ex_ssao_init();
 
 /**
  * [ex_ssao_render set as render target]
- * @param projection [cameras projection matrix]
- * @param view       [cameras view matrix]
+ * @param projection [camera projection matrix]
+ * @param view       [camera view matrix]
  */
-void ex_ssao_render(mat4x4 projection, mat4x4 view, GLuint gposition, GLuint gnormal, GLuint fbo_vao);
+void ex_ssao_render(mat4x4* projection, mat4x4* view, GLuint gposition, GLuint gnormal, GLuint fbo_vao);
 
 /**
  * [ex_ssao_bind_texture]

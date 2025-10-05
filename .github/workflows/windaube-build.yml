@@ -1,4 +1,4 @@
-name: Linux build
+name: Windows build
 
 on:
   push:
@@ -11,32 +11,32 @@ env:
   CMAKE_GENERATOR: Ninja Multi-Config
 
 jobs:
-  linux-build:
+  windows-build:
     runs-on: ubuntu-latest
 
     steps:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: apt update && apt install -y build-essential cmake ninja-build zip nodejs && export CMAKE_C_COMPILER=gcc && export CMAKE_CXX_COMPILER=g++
+        run: apt update && apt install -y build-essential cmake ninja-build zip nodejs g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64 && export CMAKE_C_COMPILER=gcc && export CMAKE_CXX_COMPILER=g++
 
       - name: Configure CMake
-        run: cmake -B ${{github.workspace}}/build -G "${{env.CMAKE_GENERATOR}}" -DSDL_UNIX_CONSOLE_BUILD=ON
+        run: cmake -B ${{github.workspace}}/build -G "${{env.CMAKE_GENERATOR}}" -DCMAKE_TOOLCHAIN_FILE=toolchain-mingw64.cmake
 
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
       - name: Assets
-        run: cd ${{github.workspace}}/build && sh ../data.sh
+        run: cd ${{github.workspace}}/build/ && sh ../data.sh
 
       - name: Stage files for artifact
         run: |
           mkdir -p ${{github.workspace}}/artifact-staging
-          cp ${{github.workspace}}/build/${{env.BUILD_TYPE}}/exengine ${{github.workspace}}/artifact-staging/
+          cp ${{github.workspace}}/build/${{env.BUILD_TYPE}}/exengine.exe ${{github.workspace}}/artifact-staging/
           cp ${{github.workspace}}/build/data.ex ${{github.workspace}}/artifact-staging/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
-          name: exengine-linux-build
+          name: exengine-windows-build
           path: artifact-staging/

@@ -7,7 +7,7 @@
 #include <string.h>
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#include "SDL2/SDL_timer.h"
+#include <SDL3/SDL_timer.h>
 #include "log/log.h"
 
 #include <stb_truetype.h>

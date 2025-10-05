@@ -79,7 +79,12 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
       // create missing directory
       char data_path[2048];
       sprintf(&data_path[0], "%s/data", write_path);
+
+#if defined(SDL_PLATFORM_UNIX)
       mkdir(data_path, 0755);
+#else
+      mkdir(data_path);
+#endif
     }
   } else {
     log_warn("PhysFS was unable to find the write directory!");

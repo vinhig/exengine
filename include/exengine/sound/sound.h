@@ -4,7 +4,7 @@
 
   Based on OpenAL (the good one),
   still requires the ability to
-  stream sound sources.  Currently,
+  stream sound sources. Currently,
   also only supports ogg sound files.
 
   This needs a lot of work:
@@ -19,8 +19,9 @@
 
 #define EX_DEVICE_LEN 32
 
-#include "AL/al.h"
-#include "AL/alc.h"
+#include <MojoAL/AL/alc.h>
+#include <MojoAL/AL/al.h>
+
 #include <stdlib.h>
 
 typedef enum {

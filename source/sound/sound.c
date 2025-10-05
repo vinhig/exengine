@@ -49,9 +49,9 @@ void ex_sound_init() {
   }
 
   // setup default listener properties
-  ALfloat pos[] = {0.0, 0.0, 1.0};
-  ALfloat vel[] = {0.0, 0.0, 0.0};
-  ALfloat ori[] = {0.0, 0.0, -1.0, 0.0, 1.0, 0.0};
+  ALfloat pos[] = {0.0f, 0.0f, 1.0f};
+  ALfloat vel[] = {0.0f, 0.0f, 0.0f};
+  ALfloat ori[] = {0.0f, 0.0f, -1.0f, 0.0f, 1.0f, 0.0f};
   alListenerfv(AL_POSITION, pos);
   alListenerfv(AL_VELOCITY, vel);
   alListenerfv(AL_ORIENTATION, ori);
