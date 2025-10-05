@@ -27,13 +27,14 @@ set(SDL_FILESYSTEM ON)
 set(SDL_STORAGE  ON)
 set(SDL_SENSOR   OFF)
 set(SDL_CAMERA   OFF)
-
-add_subdirectory(third_party/SDL3 EXCLUDE_FROM_ALL)
+set(SDL_WAYLAND  ON)
 
 set(SDL_TEST_LIBRARY OFF)
 set(SDL_TESTS OFF)
 set(SDL_STATIC ON)
 set(SDL_SHARED OFF)
+
+add_subdirectory(third_party/SDL3 EXCLUDE_FROM_ALL)
 
 add_executable(exengine
         ${SRC_FILES}

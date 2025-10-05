@@ -16,8 +16,8 @@ extern cvar_t cvar_fullscreen;
 extern cvar_t cvar_vsync;
 
 int ex_window_init(uint32_t width, uint32_t height, const char *title) {
-  if (!SDL_Init(SDL_INIT_VIDEO)) {
-    printf("Failed to init SDL\n%s", SDL_GetError());
+  if (!SDL_Init(SDL_INIT_VIDEO | SDL_INIT_EVENTS | SDL_INIT_AUDIO)) {
+    log_error("Failed to init SDL. SDL error is -> \n%s", SDL_GetError());
     return 0;
   }
 
@@ -30,7 +30,7 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   display.window = SDL_CreateWindow(title, (int32_t)width, (int32_t)height, DEFAULT_FLAGS);
 
   if (!display.window) {
-    printf("Failed to open SDL window\n%s", SDL_GetError());
+    log_error("Failed to open SDL window\n%s", SDL_GetError());
     return 0;
   }
 
