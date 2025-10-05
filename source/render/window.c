@@ -6,7 +6,7 @@
 #include <glad/glad.h>
 #include <stdio.h>
 
-#define DEFAULT_FLAGS SDL_WINDOW_SHOWN | SDL_WINDOW_OPENGL
+#define DEFAULT_FLAGS SDL_WINDOW_OPENGL
 
 ex_window_t display;
 
@@ -16,7 +16,7 @@ extern cvar_t cvar_fullscreen;
 extern cvar_t cvar_vsync;
 
 int ex_window_init(uint32_t width, uint32_t height, const char *title) {
-  if (SDL_Init(SDL_INIT_VIDEO)) {
+  if (!SDL_Init(SDL_INIT_VIDEO)) {
     printf("Failed to init SDL\n%s", SDL_GetError());
     return 0;
   }
@@ -27,12 +27,7 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
 
   // create a window
-  display.window = SDL_CreateWindow(title,
-                                    SDL_WINDOWPOS_CENTERED,
-                                    SDL_WINDOWPOS_CENTERED,
-                                    (int32_t)width,
-                                    (int32_t)height,
-                                    DEFAULT_FLAGS);
+  display.window = SDL_CreateWindow(title, (int32_t)width, (int32_t)height, DEFAULT_FLAGS);
 
   if (!display.window) {
     printf("Failed to open SDL window\n%s", SDL_GetError());
@@ -40,7 +35,9 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   }
 
   if (cvar_fullscreen.value.boolean) {
-    SDL_SetWindowFullscreen(display.window, SDL_WINDOW_FULLSCREEN_DESKTOP);
+    SDL_SetWindowFullscreen(display.window, true);
+  } else {
+    SDL_SetWindowFullscreen(display.window, false);
   }
 
   // attempt to setup GL
@@ -52,11 +49,11 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   }
 
   if (cvar_vsync.value.boolean) {
-    if (SDL_GL_SetSwapInterval(1) != 0) {
+    if (SDL_GL_SetSwapInterval(1) == 0) {
       log_error("Failed setting vsync.\n");
     }
   } else {
-    if (SDL_GL_SetSwapInterval(0) != 0) {
+    if (SDL_GL_SetSwapInterval(0) == 0) {
       log_error("Failed setting vsync.\n");
     }
   }
@@ -74,9 +71,9 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   glEnable(GL_FRAMEBUFFER_SRGB);
 
   // lock mouse
-  // SDL_SetRelativeMouseMode(SDL_TRUE);
-  // SDL_CaptureMouse(SDL_TRUE);
-  // SDL_SetWindowGrab(display.window, SDL_TRUE);
+  // SDL_SetRelativeMouseMode(true);
+  // SDL_CaptureMouse(true);
+  // SDL_SetWindowGrab(display.window, true);
 
   display.width = width;
   display.height = height;
@@ -85,9 +82,9 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
 }
 
 void ex_window_event(SDL_Event *event) {
-  switch (event->window.event) {
-  case SDL_WINDOWEVENT_SIZE_CHANGED:
-  case SDL_WINDOWEVENT_RESIZED: {
+  switch (event->window.type) {
+  case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+  case SDL_EVENT_WINDOW_RESIZED: {
     display.width = event->window.data1;
     display.height = event->window.data2;
     if (ex_resize_ptr) {
@@ -95,12 +92,14 @@ void ex_window_event(SDL_Event *event) {
     }
     break;
   }
+  default:
+    break;
   }
 }
 
 void ex_window_destroy() {
   // bye bye
-  SDL_GL_DeleteContext(display.context);
+  SDL_GL_DestroyContext(display.context);
   SDL_DestroyWindow(display.window);
   SDL_Quit();
 }

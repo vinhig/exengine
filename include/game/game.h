@@ -2,7 +2,7 @@
 #define GAME_H
 
 #include "glad/glad.h"
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 
 #include <inttypes.h>
 #include <stdbool.h>

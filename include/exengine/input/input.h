@@ -18,13 +18,13 @@
 
 #pragma once
 
-#include <SDL2/SDL.h>
+#include <SDL3/SDL.h>
 #include <inttypes.h>
 
 #include "scancodes.h"
 
-extern int ex_mouse_x, ex_mouse_y;
-extern uint8_t ex_keys_down[SDL_NUM_SCANCODES];
+extern float ex_mouse_x, ex_mouse_y;
+extern uint8_t ex_keys_down[SDL_SCANCODE_COUNT];
 extern uint8_t ex_buttons_down[16];
 
 /**

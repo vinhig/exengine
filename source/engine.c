@@ -163,26 +163,27 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
         // default event handler
         switch (event.type) {
         // cya
-        case SDL_QUIT:
+        case SDL_EVENT_QUIT:
           running = 0;
           break;
 
         // input events
-        case SDL_KEYDOWN:
-        case SDL_KEYUP:
-        case SDL_MOUSEBUTTONDOWN:
-        case SDL_MOUSEBUTTONUP:
-        case SDL_MOUSEWHEEL:
-        case SDL_TEXTEDITING:
-        case SDL_TEXTINPUT:
-        case SDL_MOUSEMOTION:
-        case SDL_KEYMAPCHANGED: {
+        case SDL_EVENT_KEY_DOWN:
+        case SDL_EVENT_KEY_UP:
+        case SDL_EVENT_MOUSE_BUTTON_DOWN:
+        case SDL_EVENT_MOUSE_BUTTON_UP:
+        case SDL_EVENT_MOUSE_WHEEL:
+        case SDL_EVENT_TEXT_EDITING:
+        case SDL_EVENT_TEXT_INPUT:
+        case SDL_EVENT_MOUSE_MOTION:
+        case SDL_EVENT_KEYMAP_CHANGED: {
           ex_input_event(&event);
           break;
         }
 
         // window events
-        case SDL_WINDOWEVENT: {
+        case SDL_EVENT_WINDOW_PIXEL_SIZE_CHANGED:
+        case SDL_EVENT_WINDOW_RESIZED: {
           ex_window_event(&event);
           break;
         }
