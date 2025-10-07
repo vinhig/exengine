@@ -71,8 +71,8 @@ ex_font_t *ex_font_load(const char *path, const char *letters) {
   char *character = (char *)letters;
   size_t x = 1, y = 1, index = 0;
   while (*character != '\0') {
-    char c = *character++;
-    float *bitmap = ex_msdf_glyph(&font, ex_utf8(&c), SIZE, SIZE, &metrics);
+    char* c = character++;
+    float *bitmap = ex_msdf_glyph(&font, ex_utf8(c), SIZE, SIZE, &metrics);
 
     // blit msdf bitmap to atlas
     for (int i = 0; i < SIZE; i++) {
@@ -96,7 +96,7 @@ ex_font_t *ex_font_load(const char *path, const char *letters) {
         x1, y1,
         x1, y0};
     memcpy(&f->uv[index * 12], &uvs[0], sizeof(float) * 12);
-    f->indices[index] = c;
+    f->indices[index] = *c;
     index++;
 
     // advance to next tile in atlas

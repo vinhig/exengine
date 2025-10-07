@@ -246,7 +246,8 @@ float ex_raycast(const ex_entity_t *entity, vec3 from, vec3 to, ex_plane_t *plan
   size_t tri = 0;
   vec3 *vertices = entity->scene->coll_vertices;
   float dist = FLT_MAX;
-  vec3 intersect, nearest;
+  vec3 intersect = {};
+  vec3 nearest = {};
   for (int i = 0; i < count; i++) {
     uint32_t *indices = data[i].data;
 

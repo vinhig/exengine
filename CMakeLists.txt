@@ -14,7 +14,7 @@ set(SDL_RENDER   OFF)
 set(SDL_DIALOG   OFF)
 set(SDL_EVENTS   ON)
 set(SDL_JOYSTICK OFF)
-set(SDL_GAMEPAD  ON)
+set(SDL_GAMEPAD  OFF)
 set(SDL_HAPTIC   OFF)
 set(SDL_HIDAPI   OFF)
 set(SDL_POWER    OFF)
@@ -22,7 +22,7 @@ set(SDL_THREADS  ON)
 set(SDL_TIMERS   ON)
 set(SDL_FILE     ON)
 set(SDL_LOADSO   ON)
-set(SDL_CPUINFO  ON)
+set(SDL_CPUINFO  OFF)
 set(SDL_FILESYSTEM ON)
 set(SDL_STORAGE  ON)
 set(SDL_SENSOR   OFF)
@@ -36,10 +36,15 @@ set(SDL_SHARED OFF)
 
 add_subdirectory(third_party/SDL3 EXCLUDE_FROM_ALL)
 
+add_library(mojoal
+        ${PROJECT_SOURCE_DIR}/third_party/MojoAL/mojoal.c
+)
+target_include_directories(mojoal PUBLIC ${PROJECT_SOURCE_DIR}/third_party)
+target_include_directories(mojoal PUBLIC ${PROJECT_SOURCE_DIR}/third_party/SDL3/include)
+
 add_executable(exengine
         ${SRC_FILES}
         ${PHYSFS_FILES}
-        ${PROJECT_SOURCE_DIR}/third_party/MojoAL/mojoal.c
         ${PROJECT_SOURCE_DIR}/third_party/stb_vorbis.c
         ${PROJECT_SOURCE_DIR}/third_party/log/log.c
         ${PROJECT_SOURCE_DIR}/third_party/glad/glad.c
@@ -53,8 +58,9 @@ target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/third_party)
 target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/third_party/SDL3/include)
 
-target_link_libraries(exengine PRIVATE SDL3::SDL3-static m)
+target_link_libraries(exengine PRIVATE SDL3::SDL3-static m mojoal)
 #target_compile_options(exengine PUBLIC -fsanitize=undefined)
+target_compile_options(exengine PUBLIC -Wall -Werror)
 #target_compile_options(exengine PUBLIC -fsanitize=address,undefined -Wall)
 #target_link_options(exengine PUBLIC -fsanitize=address,undefined)
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)
