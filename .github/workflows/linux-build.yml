@@ -7,7 +7,7 @@ on:
     branches: [ "main" ]
 
 env:
-  BUILD_TYPE: Debug
+  BUILD_TYPE: Release
   CMAKE_GENERATOR: Ninja Multi-Config
 
 jobs:

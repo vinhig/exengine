@@ -6,8 +6,6 @@
 #include <glad/glad.h>
 #include <stdio.h>
 
-#define DEFAULT_FLAGS SDL_WINDOW_OPENGL
-
 ex_window_t display;
 
 extern cvar_t cvar_screen_width;
@@ -27,7 +25,7 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   SDL_GL_SetAttribute(SDL_GL_FRAMEBUFFER_SRGB_CAPABLE, 1);
 
   // create a window
-  display.window = SDL_CreateWindow(title, (int32_t)width, (int32_t)height, DEFAULT_FLAGS);
+  display.window = SDL_CreateWindow(title, (int32_t)width, (int32_t)height, SDL_WINDOW_OPENGL);
 
   if (!display.window) {
     log_error("Failed to open SDL window\n%s", SDL_GetError());

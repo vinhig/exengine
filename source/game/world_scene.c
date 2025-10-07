@@ -133,8 +133,6 @@ void world_scene_update(double dt, double ft) {
   float ndc_x = (2.0f * ((float)ex_mouse_x + 0.5f)) / (float)cvar_screen_width.value.i32 - 1.0f;
   float ndc_y = 1.0f - (2.0f * ((float)ex_mouse_y + 0.5f)) / (float)cvar_screen_height.value.i32;
 
-  printf("ex_mouse_y = %f, ex_mouse_y = %f\n", ex_mouse_x, ex_mouse_y);
-
   vec4 near_point = {ndc_x, ndc_y, -1.0f, 1.0f};
   vec4 far_point = {ndc_x, ndc_y, 1.0f, 1.0f};
 
