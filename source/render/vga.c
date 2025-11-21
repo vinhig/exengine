@@ -78,7 +78,7 @@ void ex_vga_init() {
   ex_vga_len *= EX_VGA_WIDTH * EX_VGA_HEIGHT;
 
   // malloc a large buffer for the pixel data
-  ex_vga_data = malloc(sizeof(uint32_t) * ex_vga_len);
+  ex_vga_data = calloc(1, sizeof(uint32_t) * ex_vga_len);
   memset(ex_vga_data, 0, sizeof(uint32_t) * ex_vga_len);
 }
 

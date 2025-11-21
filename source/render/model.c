@@ -87,7 +87,7 @@ void ex_model_init_instancing(ex_model_t *m, int count) {
     glDeleteBuffers(1, &m->instance_vbo);
   }
 
-  m->transforms = malloc(sizeof(mat4x4) * count);
+  m->transforms = calloc(1, sizeof(mat4x4) * count);
   for (int i = 0; i < count; i++)
     mat4x4_identity(m->transforms[i]);
 

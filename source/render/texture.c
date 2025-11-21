@@ -26,7 +26,7 @@ ex_texture_t *ex_texture_load(const char *file_name, int get_data) {
   size_t size = PHYSFS_fileLength(file);
 
   // read into buffer
-  char *buff = malloc(size + 1);
+  char *buff = calloc(1, size + 1);
   PHYSFS_readBytes(file, buff, size);
   buff[size] = '\0';
   PHYSFS_close(file);
@@ -40,7 +40,7 @@ ex_texture_t *ex_texture_load(const char *file_name, int get_data) {
   }
 
   // create texture obj
-  ex_texture_t *t = malloc(sizeof(ex_texture_t));
+  ex_texture_t *t = calloc(1, sizeof(ex_texture_t));
   t->width = w;
   t->height = h;
   strncpy(t->name, file_name, 32);
@@ -51,7 +51,7 @@ ex_texture_t *ex_texture_load(const char *file_name, int get_data) {
     size_t size = (w * h) * 4;
 
     // copy image data
-    t->data = malloc(size);
+    t->data = calloc(1, size);
     memcpy(t->data, data, size);
 
     // free stbi data

@@ -1,16 +1,19 @@
-#include "exengine/util/cvar.h"
 #include "log/log.h"
 
 #include <exengine/engine.h>
 
 #include <physfs/physfs.h>
-
 #include <exengine/input/input.h>
 #include <exengine/render/text.h>
 #include <exengine/render/window.h>
 #include <exengine/util/cache.h>
+#include <exengine/util/cvar.h>
 #include <exengine/util/ini.h>
 #include <sys/stat.h>
+
+#define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include <imgui/cimgui.h>
+#include <imgui/cimgui_impl.h>
 
 // user defined function callback pointers
 void (*ex_init_ptr)(void) = nullptr;
@@ -153,6 +156,8 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
     while (accumulator >= phys_delta_time) {
       SDL_Event event;
       while (SDL_PollEvent(&event)) {
+        ImGui_ImplSDL3_ProcessEvent(&event);
+
         // full event handler override
         if (ex_event_handler_full) {
           ex_event_handler_full(&event);
@@ -201,11 +206,29 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
       // user update callback
       ex_update_ptr(phys_delta_time, delta_time);
 
+
       accumulator -= phys_delta_time;
     }
 
     // user draw callback
+    ImGui_ImplOpenGL3_NewFrame();
+    ImGui_ImplSDL3_NewFrame();
+    igNewFrame();
+
+    static bool opened = true;
+    igBegin("Hello, world!", &opened, 0);
+    igText("This is some useful text");
+    igButton("hellooo", (ImVec2){32, 64});
+    char buffer[1024] = {};
+    igInputText("bonjour", &buffer[0], 1024, 0, 0, nullptr);
+    igEnd();
+
     ex_draw_ptr();
+
+    igEndFrame();
+    igRender();
+
+    ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
 
     // swap buffers
     SDL_GL_SwapWindow(display.window);
@@ -213,10 +236,9 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
   /* ------------------- */
 
   // -- CLEAN UP -- */
-  ex_cvar_destroy();
-  ex_window_destroy();
-  PHYSFS_deinit();
   ex_cache_flush();
+  ex_cvar_destroy();
+  PHYSFS_deinit();
   if (flags & EX_ENGINE_SOUND) {
     ex_sound_exit();
   }
@@ -224,4 +246,9 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
   // user exit callback
   ex_exit_ptr();
   // -------------- */
+
+
+  // destroying the windows means destroying all SDL3 subsystems, so
+  // it must be done at the very end
+  ex_window_destroy();
 }

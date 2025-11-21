@@ -9,7 +9,7 @@
 #include <string.h>
 
 ex_scene_t *ex_scene_new(uint8_t flags) {
-  ex_scene_t *s = malloc(sizeof(ex_scene_t));
+  ex_scene_t *s = calloc(1, sizeof(ex_scene_t));
 
   // init physics shiz
   memset(s->gravity, 0, sizeof(vec3));
@@ -22,11 +22,11 @@ ex_scene_t *ex_scene_new(uint8_t flags) {
   memset(s->coll_tree->region.max, 0, sizeof(vec3));
 
   // init renderables list
-  s->renderables.models.nodes = malloc(sizeof(ex_rendernode_t) * 32);
+  s->renderables.models.nodes = calloc(1, sizeof(ex_rendernode_t) * 32);
   s->renderables.models.count = 0;
   s->renderables.models.length = 0;
 
-  s->renderables.point_lights.nodes = malloc(sizeof(ex_rendernode_t) * 32);
+  s->renderables.point_lights.nodes = calloc(1, sizeof(ex_rendernode_t) * 32);
   s->renderables.point_lights.count = 0;
   s->renderables.point_lights.length = 0;
 
@@ -47,7 +47,7 @@ void ex_scene_add_collision(ex_scene_t *s, ex_model_t *model) {
         memcpy(&s->coll_vertices[s->coll_vertices_last], &model->vertices[0], sizeof(vec3) * model->num_vertices);
         s->coll_vertices_last = len;
       } else {
-        s->coll_vertices = malloc(sizeof(vec3) * model->num_vertices);
+        s->coll_vertices = calloc(1, sizeof(vec3) * model->num_vertices);
         memcpy(&s->coll_vertices[0], &model->vertices[0], sizeof(vec3) * model->num_vertices);
         s->coll_vertices_last = model->num_vertices;
       }
@@ -83,7 +83,7 @@ void ex_scene_build_collision(ex_scene_t *s) {
     vec3_max(region.max, region.max, tri[1]);
     vec3_max(region.max, region.max, tri[2]);
 
-    ex_octree_obj_t *obj = malloc(sizeof(ex_octree_obj_t));
+    ex_octree_obj_t *obj = calloc(1, sizeof(ex_octree_obj_t));
 
     obj->data_uint = i;
     obj->box = ex_rect_from_triangle(tri);

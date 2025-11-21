@@ -11,7 +11,7 @@
 #define DOWN_AXIS 1 // y
 
 ex_entity_t *ex_entity_new(ex_scene_t *scene, vec3 radius) {
-  ex_entity_t *e = malloc(sizeof(ex_entity_t));
+  ex_entity_t *e = calloc(1, sizeof(ex_entity_t));
   memcpy(e->radius, radius, sizeof(vec3));
   memset(e->position, 0, sizeof(vec3));
   memset(e->velocity, 0, sizeof(vec3));
@@ -144,7 +144,7 @@ void ex_entity_check_collision(ex_entity_t *entity) {
     return;
   }
 
-  ex_octree_data_t *data = malloc(sizeof(ex_octree_data_t) * count);
+  ex_octree_data_t *data = calloc(1, sizeof(ex_octree_data_t) * count);
   for (int i = 0; i < count; i++) {
     data[i].data = NULL;
     data[i].len = 0;
@@ -234,7 +234,7 @@ float ex_raycast(const ex_entity_t *entity, vec3 from, vec3 to, ex_plane_t *plan
     return 0.0f;
   }
 
-  ex_octree_data_t *data = malloc(sizeof(ex_octree_data_t) * count);
+  ex_octree_data_t *data = calloc(1, sizeof(ex_octree_data_t) * count);
   for (int i = 0; i < count; i++) {
     data[i].data = NULL;
     data[i].len = 0;

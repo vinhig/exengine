@@ -5,7 +5,7 @@
 #include <stdlib.h>
 
 ex_fps_camera_t *ex_fps_camera_new(float x, float y, float z, float sensitivity, float fov) {
-  ex_fps_camera_t *c = malloc(sizeof(ex_fps_camera_t));
+  ex_fps_camera_t *c = calloc(1, sizeof(ex_fps_camera_t));
 
   c->position[0] = x;
   c->position[1] = y;

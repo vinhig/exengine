@@ -42,7 +42,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   char *file_text = header.ofs_text ? (char *)&data[header.ofs_text] : "";
 
   // set the vertices
-  ex_vertex_t *vertices = malloc(sizeof(ex_vertex_t) * (header.num_vertexes));
+  ex_vertex_t *vertices = calloc(1, sizeof(ex_vertex_t) * (header.num_vertexes));
   float *position, *uv, *normal, *tangent;
   uint8_t *blend_indexes, *blend_weights, *color;
   ex_iqmvertexarray_t *vas = (ex_iqmvertexarray_t *)&data[header.ofs_vertexarrays];
@@ -108,9 +108,9 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   ex_frame_t pose = nullptr;
   ex_iqmjoint_t *joints = (ex_iqmjoint_t *)&data[header.ofs_joints];
   if (header.ofs_joints > 0) {
-    bones = malloc(sizeof(ex_bone_t) * header.num_joints);
-    bind_pose = malloc(sizeof(ex_pose_t) * header.num_joints);
-    pose = malloc(sizeof(ex_pose_t) * header.num_joints);
+    bones = calloc(1, sizeof(ex_bone_t) * header.num_joints);
+    bind_pose = calloc(1, sizeof(ex_pose_t) * header.num_joints);
+    pose = calloc(1, sizeof(ex_pose_t) * header.num_joints);
 
     // log_trace("Bones: ");
     for (int i = 0; i < header.num_joints; i++) {
@@ -131,7 +131,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   ex_anim_t *anims = nullptr;
   ex_iqmex_anim_t *animdata = (ex_iqmex_anim_t *)&data[header.ofs_anims];
   if (header.ofs_anims > 0) {
-    anims = malloc(sizeof(ex_anim_t) * header.num_anims);
+    anims = calloc(1, sizeof(ex_anim_t) * header.num_anims);
     for (int i = 0; i < header.num_anims; i++) {
       ex_iqmex_anim_t *a = &animdata[i];
 
@@ -155,11 +155,11 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   ex_frame_t *frames = nullptr;
   ex_iqmex_pose_t *posedata = (ex_iqmex_pose_t *)&data[header.ofs_poses];
   if (header.ofs_poses > 0) {
-    frames = malloc(sizeof(ex_frame_t) * header.num_frames);
+    frames = calloc(1, sizeof(ex_frame_t) * header.num_frames);
     framedata = (unsigned short *)&data[header.ofs_frames];
 
     for (int i = 0; i < header.num_frames; i++) {
-      ex_pose_t *frame = malloc(header.num_poses * sizeof(ex_pose_t));
+      ex_pose_t *frame = calloc(1, header.num_poses * sizeof(ex_pose_t));
       for (int p = 0; p < header.num_poses; p++) {
         ex_iqmex_pose_t *pose = &posedata[p];
 
@@ -183,7 +183,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   }
 
   // indices
-  GLuint *indices = malloc(sizeof(GLuint) * (header.num_triangles * 3));
+  GLuint *indices = calloc(1, sizeof(GLuint) * (header.num_triangles * 3));
   memcpy(indices, &data[header.ofs_triangles], (header.num_triangles * 3) * sizeof(GLuint));
   uint32_t a;
   for (int i = 0; i < header.num_triangles * 3; i += 3) {
@@ -214,8 +214,8 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
     }
 
     if (!i) {
-      model->inverse_base = malloc(sizeof(mat4x4) * header.num_joints);
-      model->skeleton = malloc(sizeof(mat4x4) * header.num_joints);
+      model->inverse_base = calloc(1, sizeof(mat4x4) * header.num_joints);
+      model->skeleton = calloc(1, sizeof(mat4x4) * header.num_joints);
     }
 
     ex_bone_t b = model->bones[i];
@@ -236,7 +236,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   }
 
   // backup vertices of visible meshes
-  vec3 *vis_vertices = malloc(sizeof(vec3) * header.num_triangles * 3);
+  vec3 *vis_vertices = calloc(1, sizeof(vec3) * header.num_triangles * 3);
   size_t vis_len = 0;
 
   // add the meshes to the model
@@ -298,7 +298,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
 
   // store vertices
   if (flags & EX_KEEP_VERTICES) {
-    model->vertices = malloc(vis_len * sizeof(vec3));
+    model->vertices = calloc(1, vis_len * sizeof(vec3));
     model->num_vertices = vis_len;
     memcpy(model->vertices, vis_vertices, vis_len * sizeof(vec3));
     ex_scene_add_collision(scene, model);

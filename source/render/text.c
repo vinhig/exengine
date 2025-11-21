@@ -60,12 +60,12 @@ ex_font_t *ex_font_load(const char *path, const char *letters) {
   size_t count = strlen(letters);
   size_t atlas_size = ceil(sqrt(count)) * ASIZE;
   size_t byte_count = sizeof(float) * (atlas_size * atlas_size) * 3;
-  float *atlas = malloc(byte_count);
+  float *atlas = calloc(1, byte_count);
   memset(atlas, 0.0f, byte_count);
 
-  ex_font_t *f = malloc(sizeof(ex_font_t));
-  f->uv = malloc(sizeof(float) * count * 12);
-  f->metrics = malloc(sizeof(ex_metrics_t) * count);
+  ex_font_t *f = calloc(1, sizeof(ex_font_t));
+  f->uv = calloc(1, sizeof(float) * count * 12);
+  f->metrics = calloc(1, sizeof(ex_metrics_t) * count);
 
   ex_metrics_t metrics;
   char *character = (char *)letters;

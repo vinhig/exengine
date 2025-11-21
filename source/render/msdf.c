@@ -69,7 +69,6 @@ int solve_cubic_normed(double *x, double a, double b, double c) {
   double r = (a * (2 * a2 - 9 * b) + 27 * c) / 54;
   double r2 = r * r;
   double q3 = q * q * q;
-  double A, B;
   if (r2 < q3) {
     double t = r / sqrt(q3);
     if (t < -1)
@@ -84,10 +83,10 @@ int solve_cubic_normed(double *x, double a, double b, double c) {
     x[2] = q * cos((t - 2 * M_PI) / 3) - a;
     return 3;
   } else {
-    A = -pow(fabs(r) + sqrt(r2 - q3), 1 / 3.);
+    double A = -pow(fabs(r) + sqrt(r2 - q3), 1 / 3.);
     if (r < 0)
       A = -A;
-    B = A == 0 ? 0 : q / A;
+    double B = A == 0 ? 0 : q / A;
     a /= 3;
     x[0] = (A + B) - a;
     x[1] = -0.5 * (A + B) - a;
@@ -162,19 +161,19 @@ void mix(vec2 r, vec2 a, vec2 b, double weight) {
   r[1] = (1 - weight) * a[1] + weight * b[1];
 }
 
-void linear_direction(vec2 r, edge_segment_t *e, double param) {
+void linear_direction(vec2 r, const edge_segment_t *e, double param) {
   r[0] = e->p[1][0] - e->p[0][0];
   r[1] = e->p[1][1] - e->p[0][1];
 }
 
-void quadratic_direction(vec2 r, edge_segment_t *e, double param) {
+void quadratic_direction(vec2 r, const edge_segment_t *e, double param) {
   vec2 a, b;
   vec2_sub(a, e->p[1], e->p[0]);
   vec2_sub(b, e->p[2], e->p[1]);
   mix(r, a, b, param);
 }
 
-void cubic_direction(vec2 r, edge_segment_t *e, double param) {
+void cubic_direction(vec2 r, const edge_segment_t *e, double param) {
   vec2 a, b, c, d, t;
   vec2_sub(a, e->p[1], e->p[0]);
   vec2_sub(b, e->p[2], e->p[1]);
@@ -200,7 +199,7 @@ void cubic_direction(vec2 r, edge_segment_t *e, double param) {
   r[1] = t[1];
 }
 
-void direction(vec2 r, edge_segment_t *e, double param) {
+void direction(vec2 r, const edge_segment_t *e, double param) {
   switch (e->type) {
   case STBTT_vline: {
     linear_direction(r, e, param);
@@ -259,7 +258,7 @@ void point(vec2 r, edge_segment_t *e, double param) {
 }
 
 // linear edge signed distance
-signed_distance_t linear_dist(edge_segment_t *e, vec2 origin, double *param) {
+signed_distance_t linear_dist(const edge_segment_t *e, vec2 origin, double *param) {
   vec2 aq, ab, eq;
   vec2_sub(aq, origin, e->p[0]);
   vec2_sub(ab, e->p[1], e->p[0]);
@@ -283,7 +282,7 @@ signed_distance_t linear_dist(edge_segment_t *e, vec2 origin, double *param) {
 }
 
 // quadratic edge signed distance
-signed_distance_t quadratic_dist(edge_segment_t *e, vec2 origin, double *param) {
+signed_distance_t quadratic_dist(const edge_segment_t *e, vec2 origin, double *param) {
   vec2 qa, ab, br;
   vec2_sub(qa, e->p[0], origin);
   vec2_sub(ab, e->p[1], e->p[0]);
@@ -301,31 +300,31 @@ signed_distance_t quadratic_dist(edge_segment_t *e, vec2 origin, double *param) 
   double min_distance = nonzero_sign(cross(ab, qa)) * vec2_len(qa);
   *param = -vec2_mul_inner(qa, ab) / vec2_mul_inner(ab, ab);
   {
-    vec2 a, b;
-    vec2_sub(a, e->p[2], e->p[1]);
-    vec2_sub(b, e->p[2], origin);
+    vec2 a_p, b_p;
+    vec2_sub(a_p, e->p[2], e->p[1]);
+    vec2_sub(b_p, e->p[2], origin);
 
     // distance from b
-    double distance = nonzero_sign(cross(a, b)) * vec2_len(b);
+    double distance = nonzero_sign(cross(a_p, b_p)) * vec2_len(b_p);
     if (fabs(distance) < fabs(min_distance)) {
       min_distance = distance;
 
-      vec2_sub(a, origin, e->p[1]);
-      vec2_sub(b, e->p[2], e->p[1]);
-      *param = vec2_mul_inner(a, b) / vec2_mul_inner(b, b);
+      vec2_sub(a_p, origin, e->p[1]);
+      vec2_sub(b_p, e->p[2], e->p[1]);
+      *param = vec2_mul_inner(a_p, b_p) / vec2_mul_inner(b_p, b_p);
     }
   }
 
   for (int i = 0; i < solutions; ++i) {
     if (t[i] > 0 && t[i] < 1) {
       // end_point = p[0]+2*t[i]*ab+t[i]*t[i]*br;
-      vec2 end_point, a, b;
+      vec2 end_point, a_p, b_p;
       end_point[0] = e->p[0][0] + 2 * t[i] * ab[0] + t[i] * t[i] * br[0];
       end_point[1] = e->p[0][1] + 2 * t[i] * ab[1] + t[i] * t[i] * br[1];
 
-      vec2_sub(a, e->p[2], e->p[0]);
-      vec2_sub(b, end_point, origin);
-      double distance = nonzero_sign(cross(a, b)) * vec2_len(b);
+      vec2_sub(a_p, e->p[2], e->p[0]);
+      vec2_sub(b_p, end_point, origin);
+      double distance = nonzero_sign(cross(a_p, b_p)) * vec2_len(b_p);
       if (fabs(distance) <= fabs(min_distance)) {
         min_distance = distance;
         *param = t[i];
@@ -360,7 +359,7 @@ signed_distance_t cubic_dist(edge_segment_t *e, vec2 origin, double *param) {
   as[0] = (e->p[3][0] - e->p[2][0]) - (e->p[2][0] - e->p[1][0]) - br[0];
   as[1] = (e->p[3][1] - e->p[2][1]) - (e->p[2][1] - e->p[1][1]) - br[1];
 
-  vec2 ep_dir;
+  vec2 ep_dir = {};
   direction(ep_dir, e, 0);
 
   // distance from a
@@ -386,10 +385,10 @@ signed_distance_t cubic_dist(edge_segment_t *e, vec2 origin, double *param) {
   for (int i = 0; i <= search_starts; ++i) {
     double t = (double)i / search_starts;
     for (int step = 0;; ++step) {
-      vec2 qpt;
+      vec2 qpt = {};
       point(qpt, e, t);
       vec2_sub(qpt, qpt, origin);
-      vec2 d;
+      vec2 d = {};
       direction(d, e, t);
       double distance = nonzero_sign(cross(d, qpt)) * vec2_len(qpt);
       if (fabs(distance) < fabs(min_distance)) {
@@ -399,7 +398,8 @@ signed_distance_t cubic_dist(edge_segment_t *e, vec2 origin, double *param) {
       if (step == search_starts)
         break;
 
-      vec2 d1, d2;
+      vec2 d1 = {};
+      vec2 d2 = {};
       d1[0] = 3 * as[0] * t * t + 6 * br[0] * t + 3 * ab[0];
       d1[1] = 3 * as[1] * t * t + 6 * br[1] * t + 3 * ab[1];
       d2[0] = 6 * as[0] * t + 6 * br[0];
@@ -414,7 +414,8 @@ signed_distance_t cubic_dist(edge_segment_t *e, vec2 origin, double *param) {
   if (*param >= 0 && *param <= 1)
     return (signed_distance_t){min_distance, 0};
 
-  vec2 d0, d1;
+  vec2 d0 = {};
+  vec2 d1 = {};
   direction(d0, e, 0);
   direction(d1, e, 1);
   vec2_norm(d0, d0);
@@ -432,7 +433,8 @@ signed_distance_t cubic_dist(edge_segment_t *e, vec2 origin, double *param) {
 
 void dist_to_pseudo(signed_distance_t *distance, vec2 origin, double param, edge_segment_t *e) {
   if (param < 0) {
-    vec2 dir, p;
+    vec2 dir = {};
+    vec2 p = {};
     direction(dir, e, 0);
     vec2_norm(dir, dir);
     vec2 aq = {origin[0], origin[1]};
@@ -447,7 +449,8 @@ void dist_to_pseudo(signed_distance_t *distance, vec2 origin, double param, edge
       }
     }
   } else if (param > 1) {
-    vec2 dir, p;
+    vec2 dir = {};
+    vec2 p = {};
     direction(dir, e, 1);
     vec2_norm(dir, dir);
     vec2 bq = {origin[0], origin[1]};
@@ -620,7 +623,7 @@ double shoelace(const vec2 a, const vec2 b) {
 }
 
 float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_metrics_t *metrics) {
-  float *bitmap = malloc(sizeof(float) * 3 * w * h);
+  float *bitmap = calloc(3 * w * h, sizeof(float));
   memset(bitmap, 0.0f, sizeof(float) * 3 * w * h);
 
   stbtt_vertex *verts;
@@ -643,7 +646,7 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
     size_t start, end;
   } indices_t;
 
-  indices_t *contours = malloc(sizeof(indices_t) * (contour_count + 1));
+  indices_t *contours = calloc((contour_count + 1), sizeof(indices_t));
   int j = 0;
   for (int i = 0; i <= num_verts; i++) {
     if (verts[i].type == STBTT_vmove) {
@@ -671,17 +674,17 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
 
   // process verts into series of contour-specific edge lists
   vec2 initial = {0, 0}; // fix this?
-  contour_t *contour_data = malloc(sizeof(contour_t) * contour_count);
+  contour_t *contour_data = calloc(contour_count, sizeof(contour_t));
   for (int i = 0; i < contour_count; i++) {
     size_t count = contours[i].end - contours[i].start;
-    contour_data[i].edges = malloc(sizeof(edge_segment_t) * count);
+    contour_data[i].edges = calloc(count, sizeof(edge_segment_t));
     contour_data[i].edge_count = 0;
 
     size_t k = 0;
-    for (int j = contours[i].start; j < contours[i].end; j++) {
+    for (int kk = contours[i].start; kk < contours[i].end; kk++) {
 
       edge_segment_t *e = &contour_data[i].edges[k];
-      stbtt_vertex *v = &verts[j];
+      stbtt_vertex *v = &verts[kk];
       e->type = v->type;
       e->color = WHITE;
 
@@ -704,9 +707,9 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
 
       case STBTT_vcurve: {
         vec2 p = {v->x / 64.0, v->y / 64.0};
-        vec2 c = {v->cx / 64.0, v->cy / 64.0};
+        vec2 c_p = {v->cx / 64.0, v->cy / 64.0};
         memcpy(&e->p[0], initial, sizeof(vec2));
-        memcpy(&e->p[1], c, sizeof(vec2));
+        memcpy(&e->p[1], c_p, sizeof(vec2));
         memcpy(&e->p[2], p, sizeof(vec2));
 
         if ((e->p[0][0] == e->p[1][0] && e->p[0][1] == e->p[1][1]) ||
@@ -723,10 +726,10 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
 
       case STBTT_vcubic: {
         vec2 p = {v->x / 64.0, v->y / 64.0};
-        vec2 c = {v->cx / 64.0, v->cy / 64.0};
+        vec2 c_p = {v->cx / 64.0, v->cy / 64.0};
         vec2 c1 = {v->cx1 / 64.0, v->cy1 / 64.0};
         memcpy(&e->p[0], initial, sizeof(vec2));
-        memcpy(&e->p[1], c, sizeof(vec2));
+        memcpy(&e->p[1], c_p, sizeof(vec2));
         memcpy(&e->p[2], c1, sizeof(vec2));
         memcpy(&e->p[3], p, sizeof(vec2));
         memcpy(&initial, p, sizeof(vec2));
@@ -744,7 +747,7 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
   double crossthreshold = sin(anglethreshold);
   size_t corner_count = 0;
   for (int i = 0; i < contour_count; ++i)
-    for (int j = 0; j < contour_data[i].edge_count; ++j)
+    for (int ec = 0; ec < contour_data[i].edge_count; ++ec)
       corner_count++;
 
   int corners[corner_count];
@@ -756,8 +759,8 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       direction(prev_dir, &contour_data[i].edges[contour_data[i].edge_count - 1], 1);
 
       int index = 0;
-      for (int j = 0; j < contour_data[i].edge_count; ++j, ++index) {
-        edge_segment_t *e = &contour_data[i].edges[j];
+      for (int ec = 0; ec < contour_data[i].edge_count; ++ec, ++index) {
+        edge_segment_t *e = &contour_data[i].edges[ec];
         direction(dir, e, 0);
         vec2_norm(dir, dir);
         vec2_norm(prev_dir, prev_dir);
@@ -768,8 +771,8 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
     }
 
     if (corner_index == 0) {
-      for (int j = 0; j < contour_data[i].edge_count; ++j)
-        contour_data[i].edges[j].color = WHITE;
+      for (int ec = 0; ec < contour_data[i].edge_count; ++ec)
+        contour_data[i].edges[ec].color = WHITE;
     } else if (corner_index == 1) {
       edge_color_t colors[3] = {WHITE, WHITE};
       switch_color(&colors[0], &seed, BLACK);
@@ -779,8 +782,8 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       int corner = corners[0];
       if (contour_data[i].edge_count >= 3) {
         int m = contour_data[i].edge_count;
-        for (int j = 0; j < m; ++j)
-          contour_data[i].edges[(corner + j) % m].color = (colors + 1)[(int)(3 + 2.875 * i / (m - 1) - 1.4375 + .5) - 3];
+        for (int ec = 0; ec < m; ++ec)
+          contour_data[i].edges[(corner + ec) % m].color = (colors + 1)[(int)(3 + 2.875 * i / (m - 1) - 1.4375 + .5) - 3];
       } else if (contour_data[i].edge_count >= 1) {
         edge_segment_t *parts[7] = {};
         edge_split(&contour_data[i].edges[0], parts[0 + 3 * corner], parts[1 + 3 * corner], parts[2 + 3 * corner]);
@@ -795,11 +798,11 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
           parts[2]->color = colors[2];
         }
         free(contour_data[i].edges);
-        contour_data[i].edges = malloc(sizeof(edge_segment_t) * 7);
+        contour_data[i].edges = calloc(1, sizeof(edge_segment_t) * 7);
         contour_data[i].edge_count = 0;
         int index = 0;
-        for (int j = 0; parts[j]; ++j) {
-          memcpy(&contour_data[i].edges[index++], &parts[j], sizeof(edge_segment_t));
+        for (int pc = 0; parts[pc]; ++pc) {
+          memcpy(&contour_data[i].edges[index++], &parts[pc], sizeof(edge_segment_t));
           contour_data[i].edge_count++;
         }
       }
@@ -810,8 +813,8 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       edge_color_t color = WHITE;
       switch_color(&color, &seed, BLACK);
       edge_color_t initial_color = color;
-      for (int j = 0; j < m; ++j) {
-        int index = (start + j) % m;
+      for (int ec = 0; ec < m; ++ec) {
+        int index = (start + ec) % m;
         if (spline + 1 < corner_count && corners[spline + 1] == index) {
           ++spline;
 
@@ -829,15 +832,15 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       edge_segment_t *parts[3] = {};
       edge_split(&contour_data[i].edges[0], parts[0], parts[1], parts[2]);
       free(contour_data[i].edges);
-      contour_data[i].edges = malloc(sizeof(edge_segment_t) * 3);
+      contour_data[i].edges = calloc(1, sizeof(edge_segment_t) * 3);
       contour_data[i].edge_count = 3;
-      for (int j = 0; j < 3; j++)
-        memcpy(&contour_data[i].edges[j], &parts[j], sizeof(edge_segment_t*));
+      for (int ec = 0; ec < 3; ec++)
+        memcpy(&contour_data[i].edges[ec], &parts[ec], sizeof(edge_segment_t));
     }
   }
 
   // calculate windings
-  int *windings = malloc(sizeof(int) * contour_count);
+  int *windings = calloc(contour_count, sizeof(int));
   for (int i = 0; i < contour_count; i++) {
     size_t edge_count = contour_data[i].edge_count;
     if (edge_count == 0) {
@@ -848,29 +851,29 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
     double total = 0;
 
     if (edge_count == 1) {
-      vec2 a, b, c;
+      vec2 a, b, c_p;
       point(a, &contour_data[i].edges[0], 0);
       point(b, &contour_data[i].edges[0], 1 / 3.0);
-      point(c, &contour_data[i].edges[0], 2 / 3.0);
+      point(c_p, &contour_data[i].edges[0], 2 / 3.0);
       total += shoelace(a, b);
-      total += shoelace(b, c);
-      total += shoelace(c, a);
+      total += shoelace(b, c_p);
+      total += shoelace(c_p, a);
     } else if (edge_count == 2) {
-      vec2 a, b, c, d;
+      vec2 a, b, c_p, d;
       point(a, &contour_data[i].edges[0], 0);
       point(b, &contour_data[i].edges[0], 0.5);
-      point(c, &contour_data[i].edges[1], 0);
+      point(c_p, &contour_data[i].edges[1], 0);
       point(d, &contour_data[i].edges[1], 0.5);
       total += shoelace(a, b);
-      total += shoelace(b, c);
-      total += shoelace(c, d);
+      total += shoelace(b, c_p);
+      total += shoelace(c_p, d);
       total += shoelace(d, a);
     } else {
       vec2 prev;
       point(prev, &contour_data[i].edges[edge_count - 1], 0);
-      for (int j = 0; j < edge_count; j++) {
+      for (int ec = 0; ec < edge_count; ec++) {
         vec2 cur;
-        point(cur, &contour_data[i].edges[j], 0);
+        point(cur, &contour_data[i].edges[ec], 0);
         total += shoelace(prev, cur);
         memcpy(prev, cur, sizeof(vec2));
       }
@@ -885,7 +888,7 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
   } multi_distance_t;
 
   multi_distance_t *contour_sd;
-  contour_sd = malloc(sizeof(multi_distance_t) * contour_count);
+  contour_sd = calloc(contour_count, sizeof(multi_distance_t));
 
   // Funit to pixel scale
   float scale = stbtt_ScaleForMappingEmToPixels(font, h);
@@ -927,7 +930,7 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       vec2 p = {(x + .5 - translate_x) / (scale * 64.0), (y + .5 - translate_y) / (scale * 64.0)};
 
       edge_point_t sr, sg, sb;
-      sr.near_edge = sg.near_edge = sb.near_edge = NULL;
+      sr.near_edge = sg.near_edge = sb.near_edge = nullptr;
       sr.near_param = sg.near_param = sb.near_param = 0;
       sr.min_distance.dist = sg.min_distance.dist = sb.min_distance.dist = INF;
       sr.min_distance.d = sg.min_distance.d = sb.min_distance.d = 1;
@@ -936,15 +939,15 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       double pos_dist = INF;
       int winding = 0;
 
-      for (int j = 0; j < contour_count; ++j) {
+      for (int cc = 0; cc < contour_count; ++cc) {
         edge_point_t r, g, b;
-        r.near_edge = g.near_edge = b.near_edge = NULL;
+        r.near_edge = g.near_edge = b.near_edge = nullptr;
         r.near_param = g.near_param = b.near_param = 0;
         r.min_distance.dist = g.min_distance.dist = b.min_distance.dist = INF;
         r.min_distance.d = g.min_distance.d = b.min_distance.d = 1;
 
-        for (int k = 0; k < contour_data[j].edge_count; ++k) {
-          edge_segment_t *e = &contour_data[j].edges[k];
+        for (int k = 0; k < contour_data[cc].edge_count; ++k) {
+          edge_segment_t *e = &contour_data[cc].edges[k];
           double param;
           signed_distance_t distance;
           distance.dist = INF;
@@ -994,7 +997,7 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
 
         if (med_min_dist < d) {
           d = med_min_dist;
-          winding = -windings[j];
+          winding = -windings[cc];
         }
 
         if (r.near_edge)
@@ -1005,14 +1008,14 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
           dist_to_pseudo(&b.min_distance, p, b.near_param, b.near_edge);
 
         med_min_dist = median(r.min_distance.dist, g.min_distance.dist, b.min_distance.dist);
-        contour_sd[j].r = r.min_distance.dist;
-        contour_sd[j].g = g.min_distance.dist;
-        contour_sd[j].b = b.min_distance.dist;
-        contour_sd[j].med = med_min_dist;
+        contour_sd[cc].r = r.min_distance.dist;
+        contour_sd[cc].g = g.min_distance.dist;
+        contour_sd[cc].b = b.min_distance.dist;
+        contour_sd[cc].med = med_min_dist;
 
-        if (windings[j] > 0 && med_min_dist >= 0 && fabs(med_min_dist) < fabs(pos_dist))
+        if (windings[cc] > 0 && med_min_dist >= 0 && fabs(med_min_dist) < fabs(pos_dist))
           pos_dist = med_min_dist;
-        if (windings[j] < 0 && med_min_dist <= 0 && fabs(med_min_dist) < fabs(neg_dist))
+        if (windings[cc] < 0 && med_min_dist <= 0 && fabs(med_min_dist) < fabs(neg_dist))
           neg_dist = med_min_dist;
       }
 
@@ -1067,7 +1070,7 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
   typedef struct {
     int x, y;
   } clashes_t;
-  clashes_t *clashes = malloc(sizeof(clashes_t) * w * h);
+  clashes_t *clashes = calloc(w * h, sizeof(clashes_t));
   size_t cindex = 0;
 
   double tx = EDGE_THRESHOLD / (scale * RANGE);

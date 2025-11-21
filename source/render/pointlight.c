@@ -8,7 +8,7 @@
 #include <string.h>
 
 ex_point_light_t *ex_point_light_new(vec3 pos, vec3 color, int dynamic) {
-  ex_point_light_t *l = malloc(sizeof(ex_point_light_t));
+  ex_point_light_t *l = calloc(1, sizeof(ex_point_light_t));
 
   // set light properties
   memcpy(l->position, pos, sizeof(vec3));

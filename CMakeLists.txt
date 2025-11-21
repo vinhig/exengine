@@ -28,11 +28,27 @@ set(SDL_STORAGE  ON)
 set(SDL_SENSOR   OFF)
 set(SDL_CAMERA   OFF)
 set(SDL_WAYLAND  ON)
+set(SDL_VULKAN   OFF)
 
 set(SDL_TEST_LIBRARY OFF)
 set(SDL_TESTS OFF)
 set(SDL_STATIC ON)
 set(SDL_SHARED OFF)
+
+add_library(imgui
+        third_party/imgui/cimgui.cpp
+        third_party/imgui/cimgui_impl.cpp
+        third_party/imgui/imgui.cpp
+        third_party/imgui/imgui_demo.cpp
+        third_party/imgui/imgui_draw.cpp
+        third_party/imgui/imgui_tables.cpp
+        third_party/imgui/imgui_widgets.cpp
+        third_party/imgui/imgui_impl_sdl3.cpp
+        third_party/imgui/imgui_impl_opengl3.cpp
+)
+target_include_directories(imgui PUBLIC third_party/imgui/ third_party/cimgui/ third_party/ third_party/SDL3/include)
+target_compile_definitions(imgui PUBLIC "-DIMGUI_IMPL_API=extern \"C\" ")
+target_compile_definitions(imgui PUBLIC -DCIMGUI_USE_OPENGL3 -DCIMGUI_USE_SDL3)
 
 add_subdirectory(third_party/SDL3 EXCLUDE_FROM_ALL)
 
@@ -58,9 +74,10 @@ target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/include)
 target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/third_party)
 target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/third_party/SDL3/include)
 
-target_link_libraries(exengine PRIVATE SDL3::SDL3-static m mojoal)
+target_link_libraries(exengine PRIVATE SDL3::SDL3-static m mojoal imgui)
 #target_compile_options(exengine PUBLIC -fsanitize=undefined)
 target_compile_options(exengine PUBLIC -Wall -Werror)
+target_compile_definitions(exengine PUBLIC -DCIMGUI_USE_OPENGL3 -DCIMGUI_USE_SDL3)
 #target_compile_options(exengine PUBLIC -fsanitize=address,undefined -Wall)
 #target_link_options(exengine PUBLIC -fsanitize=address,undefined)
 if (CMAKE_SYSTEM_NAME STREQUAL Windows)

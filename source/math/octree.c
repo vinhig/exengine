@@ -7,7 +7,7 @@
 int ex_octree_min_size = EX_OCTREE_DEFAULT_MIN_SIZE;
 
 ex_octree_t *ex_octree_new(uint8_t type) {
-  ex_octree_t *o = malloc(sizeof(ex_octree_t));
+  ex_octree_t *o = calloc(1, sizeof(ex_octree_t));
 
   for (int i = 0; i < 8; i++) {
     o->children[i] = NULL;
@@ -131,7 +131,7 @@ void ex_octree_build(ex_octree_t *o) {
   // create children
   for (int i = 0; i < 8; i++) {
     if (obj_lists[i]->data != NULL) {
-      o->children[i] = malloc(sizeof(ex_octree_t));
+      o->children[i] = calloc(1, sizeof(ex_octree_t));
       ex_octree_init(o->children[i], octants[i], obj_lists[i]);
       o->children[i]->data_len = obj_lenghts[i];
       o->children[i]->data_type = o->data_type;
@@ -155,27 +155,27 @@ void ex_octree_finalize(ex_octree_t *o) {
     switch (o->data_type) {
     case OBJ_TYPE_UINT:
       if (i == 0)
-        o->data_uint = malloc(o->data_len * sizeof(uint32_t));
+        o->data_uint = calloc(1, o->data_len * sizeof(uint32_t));
       memcpy(&o->data_uint[i], &data->data_uint, sizeof(uint32_t));
       break;
     case OBJ_TYPE_INT:
       if (i == 0)
-        o->data_int = malloc(o->data_len * sizeof(int32_t));
+        o->data_int = calloc(1, o->data_len * sizeof(int32_t));
       memcpy(&o->data_int[i], &data->data_int, sizeof(int32_t));
       break;
     case OBJ_TYPE_BYTE:
       if (i == 0)
-        o->data_byte = malloc(o->data_len * sizeof(uint8_t));
+        o->data_byte = calloc(1, o->data_len * sizeof(uint8_t));
       memcpy(&o->data_byte[i], &data->data_byte, sizeof(uint8_t));
       break;
     case OBJ_TYPE_FLOAT:
       if (i == 0)
-        o->data_float = malloc(o->data_len * sizeof(float));
+        o->data_float = calloc(1, o->data_len * sizeof(float));
       memcpy(&o->data_float[i], &data->data_float, sizeof(float));
       break;
     case OBJ_TYPE_DOUBLE:
       if (i == 0)
-        o->data_double = malloc(o->data_len * sizeof(double));
+        o->data_double = calloc(1, o->data_len * sizeof(double));
       memcpy(&o->data_double[i], &data->data_double, sizeof(double));
       break;
     }

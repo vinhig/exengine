@@ -24,8 +24,8 @@ void ex_sound_init() {
   alGetError();
 
   // get a list of available devices
-  ex_sound_outputs = malloc(sizeof(ex_sound_devices_t));
-  ex_sound_inputs = malloc(sizeof(ex_sound_devices_t));
+  ex_sound_outputs = calloc(1, sizeof(ex_sound_devices_t));
+  ex_sound_inputs = calloc(1, sizeof(ex_sound_devices_t));
   ex_sound_list_devices(ex_sound_outputs, ALC_DEVICE_SPECIFIER);
   ex_sound_list_devices(ex_sound_inputs, ALC_CAPTURE_DEVICE_SPECIFIER);
 
@@ -144,7 +144,7 @@ ex_source_t *ex_sound_load(const char *path, int type, int looping) {
   }
 
   // create the source container
-  ex_source_t *s = malloc(sizeof(ex_source_t));
+  ex_source_t *s = calloc(1, sizeof(ex_source_t));
   s->channels = channels;
   s->rate = rate / 2;
   s->streaming = type;
@@ -191,7 +191,7 @@ ex_source_t *ex_sound_load(const char *path, int type, int looping) {
     // malloc a buffer for decoding
     s->decode_buffer_shorts = 0x4000;
     s->decode_buffer_bytes = s->decode_buffer_shorts * sizeof(short);
-    s->decode_buffer = malloc(s->decode_buffer_bytes);
+    s->decode_buffer = calloc(1, s->decode_buffer_bytes);
   } else {
     // single buffer
     uint32_t length = decode_len * channels * (sizeof(int16_t) / sizeof(uint8_t));

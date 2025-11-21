@@ -3,7 +3,7 @@
 #include <stdlib.h>
 
 ex_list_node_t *ex_list_new() {
-  ex_list_node_t *n = malloc(sizeof(ex_list_node_t));
+  ex_list_node_t *n = calloc(1, sizeof(ex_list_node_t));
   n->prev = nullptr;
   n->next = nullptr;
   n->data = nullptr;
@@ -23,7 +23,7 @@ void ex_list_add(ex_list_node_t *n, void *data) {
 
   // set data and add new node
   n->data = data;
-  n->next = malloc(sizeof(ex_list_node_t));
+  n->next = calloc(1, sizeof(ex_list_node_t));
   n->next->prev = n;
   n->next->next = nullptr;
   n->next->data = nullptr;

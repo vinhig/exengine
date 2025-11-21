@@ -6,7 +6,7 @@
 #include <string.h>
 
 ex_mesh_t *ex_mesh_new(ex_vertex_t *vertices, size_t vcount, GLuint *indices, size_t icount, GLuint texture) {
-  ex_mesh_t *m = malloc(sizeof(ex_mesh_t));
+  ex_mesh_t *m = calloc(1, sizeof(ex_mesh_t));
 
   m->texture = texture;
   m->texture_spec = 0;
@@ -62,7 +62,7 @@ ex_mesh_t *ex_mesh_new(ex_vertex_t *vertices, size_t vcount, GLuint *indices, si
 }
 
 ex_mesh_t *ex_mesh_copy(ex_mesh_t *mesh) {
-  ex_mesh_t *m = malloc(sizeof(ex_mesh_t));
+  ex_mesh_t *m = calloc(1, sizeof(ex_mesh_t));
 
   m->VBO = mesh->VBO;
   m->EBO = mesh->EBO;
