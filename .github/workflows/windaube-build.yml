@@ -15,7 +15,9 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
+        with:
+          submodules: recursive
 
       - name: Install dependencies
         run: sudo apt update && sudo apt install -y build-essential cmake ninja-build zip nodejs g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64 && export CMAKE_C_COMPILER=gcc && export CMAKE_CXX_COMPILER=g++
