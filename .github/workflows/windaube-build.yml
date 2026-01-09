@@ -18,7 +18,7 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: Install dependencies
-        run: apt update && apt install -y build-essential cmake ninja-build zip nodejs g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64 && export CMAKE_C_COMPILER=gcc && export CMAKE_CXX_COMPILER=g++
+        run: sudo apt update && apt install -y build-essential cmake ninja-build zip nodejs g++-mingw-w64-x86-64 gcc-mingw-w64-x86-64 && export CMAKE_C_COMPILER=gcc && export CMAKE_CXX_COMPILER=g++
 
       - name: Echo GCC version
         run: echo $(x86_64-w64-mingw32-gcc --version)
