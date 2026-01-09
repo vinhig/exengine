@@ -32,7 +32,7 @@ void world_scene_init() {
   camera->yaw = 60.0f;
   camera->pitch -= 45.0f;
 
-  level = ex_iqm_load_model(scene, "data/level_3.iqm", EX_KEEP_VERTICES);
+  level = ex_iqm_load_model(scene, "data/level_2.iqm", EX_KEEP_VERTICES);
   level->cast_shadow = 1;
   ex_scene_add_model(scene, level);
 

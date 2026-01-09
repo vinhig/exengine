@@ -755,7 +755,8 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
   for (int i = 0; i < contour_count; ++i) {
 
     if (contour_data[i].edge_count > 0) {
-      vec2 prev_dir, dir;
+      vec2 prev_dir = {};
+      vec2 dir = {};
       direction(prev_dir, &contour_data[i].edges[contour_data[i].edge_count - 1], 1);
 
       int index = 0;
@@ -829,13 +830,15 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
   // normalize shape
   for (int i = 0; i < contour_count; i++) {
     if (contour_data[i].edge_count == 1) {
-      edge_segment_t *parts[3] = {};
-      edge_split(&contour_data[i].edges[0], parts[0], parts[1], parts[2]);
+      edge_segment_t parts[3] = {};
+      edge_split(&contour_data[i].edges[0], &parts[0], &parts[1], &parts[2]);
       free(contour_data[i].edges);
-      contour_data[i].edges = calloc(1, sizeof(edge_segment_t) * 3);
-      contour_data[i].edge_count = 3;
-      for (int ec = 0; ec < 3; ec++)
-        memcpy(&contour_data[i].edges[ec], &parts[ec], sizeof(edge_segment_t));
+      contour_data[i].edges = calloc(3, sizeof(edge_segment_t));
+      if (contour_data[i].edges) {
+        contour_data[i].edge_count = 3;
+        for (int ec = 0; ec < 3; ec++)
+          memcpy(&contour_data[i].edges[ec], &parts[ec], sizeof(edge_segment_t));
+      }
     }
   }
 
