@@ -1,7 +1,3 @@
-bye
-
-
--------
 # exengine, a C 3D game engine.
 
 [Discuss](https://webchat.freenode.net/##oodnet) | [Website](https://exez.in/exengine) | [TODO](https://github.com/exezin/exengine/projects/1)
@@ -13,7 +9,7 @@ This approach allows easy and direct access to the engine back-end should you wa
 
 Assuming you don't want to set up your own build system (I can't blame you), you can clone the repo and use the existing build system and file structure as a starting template.  It compiles on Linux, BSD, and Windows. It *might* compile and run on MacOS, but this isn't [directly supported any more.](https://news.ycombinator.com/item?id=17231593)
 
-**The contents of main.c/game.c are only supplied as examples to showcase how one might use the engine.**
+**The contents of source/main.c and source/game.c are only supplied as examples to showcase how one might use the engine.**
 
 ### What are the features?
 * *Simple* and small
@@ -30,7 +26,6 @@ Assuming you don't want to set up your own build system (I can't blame you), you
 * Polygon soup collision detection
 * Smooth collision response
 * Various cameras
-* [More to come..](https://github.com/exezin/exengine/projects/1)
 
 ### (External) Depends
 * A C99 compiler, preferably gcc. Clang and others should also work
