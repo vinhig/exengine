@@ -12,7 +12,8 @@
 
 ex_fps_camera_t *camera;
 ex_scene_t *scene;
-ex_model_t *level, *d, *erebus_model;
+ex_model_t* tiles[500];
+ex_model_t *d; //, *erebus_model;
 ex_entity_t *camera_entity;
 ex_point_light_t *l, *pl;
 ex_source_t *sound;
@@ -28,13 +29,39 @@ void world_scene_init() {
   memcpy(scene->gravity, (vec3){0.0f, 0.0f, 0.0f}, sizeof(vec3));
 
   // init the camera
-  camera = ex_fps_camera_new(5.0f, 5.0f, 0.0f, 0.1f, 70.0f);
-  camera->yaw = 60.0f;
-  camera->pitch -= 45.0f;
+  camera = ex_fps_camera_new(50.0f, 50.0f, 50.0f, 0.1f, 70.0f);
+  camera->yaw = 90.0f;
+  camera->pitch -= 60.0f;
 
-  level = ex_iqm_load_model(scene, "data/level_2.iqm", EX_KEEP_VERTICES);
-  level->cast_shadow = 1;
-  ex_scene_add_model(scene, level);
+  float hex_radius = (32.0f / 2.0f) * 0.2f;
+  float width = sqrtf(3) * hex_radius;
+  float height = 2.0f * hex_radius;
+
+  size_t idx = 0;
+  for (int32_t row = -10; row < 10; row++) {
+    for (int32_t col = -10; col < 10; col++) {
+      if ((row + col) % 2)
+        tiles[idx] = ex_iqm_load_model(scene, "data/tiles/farm.iqm", EX_KEEP_VERTICES);
+      else
+        tiles[idx] = ex_iqm_load_model(scene, "data/tiles/nothing_land.iqm", EX_KEEP_VERTICES);
+
+      tiles[idx]->cast_shadow = 1;
+
+      tiles[idx]->position[2] = width * (float)col;
+      tiles[idx]->position[0] = 0.75f * height * (float)row;
+
+      if (row % 2) {
+        tiles[idx]->position[2] += width / 2.0f;
+      }
+
+      tiles[idx]->rotation[0] = -90.0f;
+      tiles[idx]->rotation[1] = roundf(((double)rand() / (double)RAND_MAX) * 6.0) * 60.0f;
+
+      ex_scene_add_model(scene, tiles[idx]);
+
+      idx++;
+    }
+  }
 
   camera_entity = ex_entity_new(scene, (vec3){0.5f, 1.0f, 0.5f});
   camera_entity->position[1] = 10.0f;
@@ -53,16 +80,16 @@ void world_scene_init() {
   ex_scene_add_pointlight(scene, pl);
   pl->cast_shadow = 1;
 
-  erebus_model = ex_iqm_load_model(scene, "data/erebus.iqm", 0);
-  erebus_model->cast_shadow = 1;
-  erebus_model->scale = 0.025f;
-  erebus_model->rotation[0] = -90.0f;
-  erebus_model->position[0] = 5.0f;
-  erebus_model->position[1] = 5.0f;
-  erebus_model->position[2] = 5.0f;
-  ex_scene_add_model(scene, erebus_model);
+  // erebus_model = ex_iqm_load_model(scene, "data/erebus.iqm", 0);
+  // erebus_model->cast_shadow = 1;
+  // erebus_model->scale = 0.025f;
+  // erebus_model->rotation[0] = -90.0f;
+  // erebus_model->position[0] = 5.0f;
+  // erebus_model->position[1] = 5.0f;
+  // erebus_model->position[2] = 5.0f;
+  // ex_scene_add_model(scene, erebus_model);
 
-  ex_model_set_anim(erebus_model, "run");
+  // ex_model_set_anim(erebus_model, "run");
 
   // this ain't it
   font = ex_font_load("data/fonts/OpenSans-Regular.ttf", "abcdefghijklmnopqrstuvwxyzHW!_");
@@ -160,17 +187,17 @@ void world_scene_update(double dt, double ft) {
 
   vec3_norm(ray_direction, ray_direction);
 
-  ex_plane_t plane = {};
+  // ex_plane_t plane = {};
   vec3 infinite_vector;
   vec3_mul(infinite_vector, ray_direction, (vec3){9999.0f, 9999.0f, 9999.0f});
   // vec3_add(infinite_vector, camera->position, infinite_vector);
-  float dist = ex_raycast(camera_entity, camera_entity->position, infinite_vector, &plane);
+  // float dist = ex_raycast(camera_entity, camera_entity->position, infinite_vector, &plane);
 
-  if (dist > 0.0f) {
-    erebus_model->position[0] = plane.intersection_point[0];
-    erebus_model->position[1] = plane.intersection_point[1];
-    erebus_model->position[2] = plane.intersection_point[2];
-  }
+  // if (dist > 0.0f) {
+  //   erebus_model->position[0] = plane.intersection_point[0];
+  //   erebus_model->position[1] = plane.intersection_point[1];
+  //   erebus_model->position[2] = plane.intersection_point[2];
+  // }
 }
 
 void world_scene_draw() {
