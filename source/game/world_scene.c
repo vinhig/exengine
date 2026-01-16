@@ -47,15 +47,15 @@ void world_scene_init() {
 
       tiles[idx]->cast_shadow = 1;
 
-      tiles[idx]->position[2] = width * (float)col;
-      tiles[idx]->position[0] = 0.75f * height * (float)row;
+      tiles[idx]->transform.position[2] = width * (float)col;
+      tiles[idx]->transform.position[0] = 0.75f * height * (float)row;
 
       if (row % 2) {
-        tiles[idx]->position[2] += width / 2.0f;
+        tiles[idx]->transform.position[2] += width / 2.0f;
       }
 
-      tiles[idx]->rotation[0] = -90.0f;
-      tiles[idx]->rotation[1] = roundf(((double)rand() / (double)RAND_MAX) * 6.0) * 60.0f;
+      tiles[idx]->transform.rotation[0] = -90.0f;
+      tiles[idx]->transform.rotation[1] = roundf(((double)rand() / (double)RAND_MAX) * 6.0) * 60.0f;
 
       ex_scene_add_model(scene, tiles[idx]);
 

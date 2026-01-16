@@ -39,10 +39,14 @@ typedef struct {
 typedef ex_pose_t *ex_frame_t;
 
 typedef struct {
-  ex_mesh_t *meshes[EX_MODEL_MAX_MESHES];
-
   vec3 position, rotation;
   float scale;
+} ex_transform_t;
+
+typedef struct {
+  ex_mesh_t *meshes[EX_MODEL_MAX_MESHES];
+
+  ex_transform_t transform;
   uint8_t is_lit, cast_shadow;
 
   ex_anim_t *current_anim;
@@ -61,7 +65,8 @@ typedef struct {
 
   ex_octree_t *octree_data;
 
-  mat4x4 *transforms;
+  ex_transform_t* transform_fulls;
+  mat4x4 *transform_matrices;
   GLuint instance_vbo;
   size_t instance_count;
   int is_static;
@@ -90,7 +95,7 @@ ex_model_t *ex_model_copy(ex_model_t *model);
 void ex_model_add_mesh(ex_model_t *m, ex_mesh_t *mesh);
 
 /**
- * [ex_model_init_instancing init the intancing transform arrays]
+ * [ex_model_init_instancing init the instancing transform arrays]
  * @param m     [the model to instance]
  * @param count [how many instances you want]
  */

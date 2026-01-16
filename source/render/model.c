@@ -9,18 +9,19 @@ ex_model_t *ex_model_new() {
   ex_model_t *m = calloc(1, sizeof(ex_model_t));
 
   // init attributes
-  memset(m->position, 0, sizeof(vec3));
-  memset(m->rotation, 0, sizeof(vec3));
-  m->scale = 1.0f;
+  memset(m->transform.position, 0, sizeof(vec3));
+  memset(m->transform.rotation, 0, sizeof(vec3));
+  m->transform.scale = 1.0f;
   m->cast_shadow = 1;
   m->is_lit = 1;
   m->use_transform = 0;
 
   m->current_anim = nullptr;
-  m->current_time = 0.0;
+  m->current_time = 0.0f;
   m->current_frame = 0;
 
-  m->transforms = nullptr;
+  m->transform_fulls = nullptr;
+  m->transform_matrices = nullptr;
   m->instance_count = 0;
   m->is_static = 0;
 
@@ -80,22 +81,24 @@ void ex_model_add_mesh(ex_model_t *m, ex_mesh_t *mesh) {
 
 void ex_model_init_instancing(ex_model_t *m, int count) {
   // cleanup old if it exists
-  if (m->transforms != nullptr) {
-    free(m->transforms);
-    m->transforms = nullptr;
+  if (m->transform_fulls != nullptr) {
+    free(m->transform_fulls);
+    free(m->transform_matrices);
+    m->transform_fulls = nullptr;
+    m->transform_matrices = nullptr;
 
     glDeleteBuffers(1, &m->instance_vbo);
   }
 
-  m->transforms = calloc(1, sizeof(mat4x4) * count);
+  m->transform_matrices = calloc(1, sizeof(mat4x4) * count);
   for (int i = 0; i < count; i++)
-    mat4x4_identity(m->transforms[i]);
+    mat4x4_identity(m->transform_matrices[i]);
 
   m->instance_count = count;
 
   glGenBuffers(1, &m->instance_vbo);
   glBindBuffer(GL_ARRAY_BUFFER, m->instance_vbo);
-  glBufferData(GL_ARRAY_BUFFER, count * sizeof(mat4x4), &m->transforms[0], GL_DYNAMIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, count * sizeof(mat4x4), &m->transform_matrices[0], GL_DYNAMIC_DRAW);
 
   for (int i = 0; i < EX_MODEL_MAX_MESHES; i++) {
     ex_mesh_t *mesh = m->meshes[i];

@@ -270,12 +270,12 @@ void ex_render_forward(ex_renderable_t *renderables) {
 void ex_render_model(ex_model_t *model, GLuint shader) {
   // handle transformations
   if (!model->use_transform && model->instance_count < 2) {
-    mat4x4_identity(model->transforms[0]);
-    mat4x4_translate_in_place(model->transforms[0], model->position[0], model->position[1], model->position[2]);
-    mat4x4_rotate_Y(model->transforms[0], model->transforms[0], rad(model->rotation[1]));
-    mat4x4_rotate_X(model->transforms[0], model->transforms[0], rad(model->rotation[0]));
-    mat4x4_rotate_Z(model->transforms[0], model->transforms[0], rad(model->rotation[2]));
-    mat4x4_scale_aniso(model->transforms[0], model->transforms[0], model->scale, model->scale, model->scale);
+    mat4x4_identity(model->transform_matrices[0]);
+    mat4x4_translate_in_place(model->transform_matrices[0], model->transform.position[0], model->transform.position[1], model->transform.position[2]);
+    mat4x4_rotate_Y(model->transform_matrices[0], model->transform_matrices[0], rad(model->transform.rotation[1]));
+    mat4x4_rotate_X(model->transform_matrices[0], model->transform_matrices[0], rad(model->transform.rotation[0]));
+    mat4x4_rotate_Z(model->transform_matrices[0], model->transform_matrices[0], rad(model->transform.rotation[2]));
+    mat4x4_scale_aniso(model->transform_matrices[0], model->transform_matrices[0], model->transform.scale, model->transform.scale, model->transform.scale);
   }
 
   // pass bone data
@@ -291,7 +291,7 @@ void ex_render_model(ex_model_t *model, GLuint shader) {
   if (!model->is_static || model->is_static == 1) {
     glBindBuffer(GL_ARRAY_BUFFER, model->instance_vbo);
     GLvoid *ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    memcpy(ptr, &model->transforms[0], model->instance_count * sizeof(mat4x4));
+    memcpy(ptr, &model->transform_matrices[0], model->instance_count * sizeof(mat4x4));
     glUnmapBuffer(GL_ARRAY_BUFFER);
 
     if (model->is_static) {
