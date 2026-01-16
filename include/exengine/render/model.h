@@ -43,6 +43,15 @@ typedef struct {
   float scale;
 } ex_transform_t;
 
+typedef enum {
+  // means its transforms will be uploaded to the instance_vbo each fram
+  NOT_STATIC,
+  // means its transforms will be uploaded to the instance_vbo just once
+  STATIC_WAITING,
+  // means its transforms will be uploaded to the instance_vbo just once and it has already been done
+  STATIC_READY,
+} ex_static_e;
+
 typedef struct {
   ex_mesh_t *meshes[EX_MODEL_MAX_MESHES];
 
@@ -69,7 +78,7 @@ typedef struct {
   mat4x4 *transform_matrices;
   GLuint instance_vbo;
   size_t instance_count;
-  int is_static;
+  ex_static_e static_state;
 
   char path[512];
 } ex_model_t;

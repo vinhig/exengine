@@ -10,7 +10,7 @@
 
 char *ex_io_read(const char *path, const char *mode, size_t *len) {
   if (!PHYSFS_exists(path)) {
-    printf("[IO] Could not load file %s\n", path);
+    log_error("[IO] Could not load file %s\n", path);
     return nullptr;
   }
 

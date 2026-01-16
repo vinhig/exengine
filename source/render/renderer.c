@@ -276,6 +276,17 @@ void ex_render_model(ex_model_t *model, GLuint shader) {
     mat4x4_rotate_X(model->transform_matrices[0], model->transform_matrices[0], rad(model->transform.rotation[0]));
     mat4x4_rotate_Z(model->transform_matrices[0], model->transform_matrices[0], rad(model->transform.rotation[2]));
     mat4x4_scale_aniso(model->transform_matrices[0], model->transform_matrices[0], model->transform.scale, model->transform.scale, model->transform.scale);
+  } else {
+    if (model->static_state == STATIC_WAITING || model->static_state == NOT_STATIC ) {
+      for (size_t i = 0; i < model->instance_count; i++) {
+        mat4x4_identity(model->transform_matrices[i]);
+        mat4x4_translate_in_place(model->transform_matrices[i], model->transform_fulls[i].position[0], model->transform_fulls[i].position[1], model->transform_fulls[i].position[2]);
+        mat4x4_rotate_Y(model->transform_matrices[i], model->transform_matrices[i], rad(model->transform_fulls[i].rotation[1]));
+        mat4x4_rotate_X(model->transform_matrices[i], model->transform_matrices[i], rad(model->transform_fulls[i].rotation[0]));
+        mat4x4_rotate_Z(model->transform_matrices[i], model->transform_matrices[i], rad(model->transform_fulls[i].rotation[2]));
+        mat4x4_scale_aniso(model->transform_matrices[i], model->transform_matrices[i], model->transform_fulls[i].scale, model->transform_fulls[i].scale, model->transform_fulls[i].scale);
+      }
+    }
   }
 
   // pass bone data
@@ -288,14 +299,12 @@ void ex_render_model(ex_model_t *model, GLuint shader) {
   }
 
   // update instancing matrix vbo
-  if (!model->is_static || model->is_static == 1) {
+  if (model->static_state == STATIC_WAITING || model->static_state == NOT_STATIC ) {
     glBindBuffer(GL_ARRAY_BUFFER, model->instance_vbo);
-    GLvoid *ptr = glMapBuffer(GL_ARRAY_BUFFER, GL_WRITE_ONLY);
-    memcpy(ptr, &model->transform_matrices[0], model->instance_count * sizeof(mat4x4));
-    glUnmapBuffer(GL_ARRAY_BUFFER);
+    glBufferData(GL_ARRAY_BUFFER, model->instance_count * sizeof(mat4x4), &model->transform_matrices[0], GL_DYNAMIC_DRAW);
 
-    if (model->is_static) {
-      model->is_static = 2;
+    if (model->static_state == STATIC_WAITING) {
+      model->static_state = STATIC_READY;
     }
   }
 

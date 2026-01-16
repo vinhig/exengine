@@ -10,10 +10,17 @@
 #include <game/game.h>
 #include <game/world_scene.h>
 
+#define INSTANCING
+
 ex_fps_camera_t *camera;
 ex_scene_t *scene;
-ex_model_t* tiles[500];
-ex_model_t *d; //, *erebus_model;
+#ifdef INSTANCING
+ex_model_t *tile_farm;
+ex_model_t *tile_nothing_land;
+#else
+ex_model_t *tiles[500];
+#endif
+ex_model_t *d;
 ex_entity_t *camera_entity;
 ex_point_light_t *l, *pl;
 ex_source_t *sound;
@@ -37,13 +44,58 @@ void world_scene_init() {
   float width = sqrtf(3) * hex_radius;
   float height = 2.0f * hex_radius;
 
+#ifdef INSTANCING
+  tile_farm = ex_iqm_load_model(scene, "data/tiles/farm.iqm", EX_KEEP_VERTICES);
+  tile_nothing_land = ex_iqm_load_model(scene, "data/tiles/nothing_land.iqm", EX_KEEP_VERTICES);
+
+  ex_scene_add_model(scene, tile_farm);
+  ex_scene_add_model(scene, tile_nothing_land);
+
+  tile_farm->cast_shadow = 1;
+  tile_farm->static_state = STATIC_WAITING;
+  tile_nothing_land->cast_shadow = 1;
+  tile_nothing_land->static_state = STATIC_WAITING;
+
+  ex_model_init_instancing(tile_farm, 20 * 20 / 2);
+  ex_model_init_instancing(tile_nothing_land, 20 * 20 / 2);
+
+#endif
+
   size_t idx = 0;
   for (int32_t row = -10; row < 10; row++) {
     for (int32_t col = -10; col < 10; col++) {
-      if ((row + col) % 2)
+#ifdef INSTANCING
+      if (idx % 2) {
+        tile_farm->transform_fulls[idx / 2].position[2] = width * (float)col;
+        tile_farm->transform_fulls[idx / 2].position[0] = 0.75f * height * (float)row;
+
+        if (row % 2) {
+          tile_farm->transform_fulls[idx / 2].position[2] += width / 2.0f;
+        }
+
+        tile_farm->transform_fulls[idx / 2].rotation[0] = -90.0f;
+        tile_farm->transform_fulls[idx / 2].rotation[1] = roundf(((double)rand() / (double)RAND_MAX) * 6.0) * 60.0f;
+
+        tile_farm->transform_fulls[idx / 2].scale = 1.0f;
+      } else {
+        tile_nothing_land->transform_fulls[idx / 2].position[2] = width * (float)col;
+        tile_nothing_land->transform_fulls[idx / 2].position[0] = 0.75f * height * (float)row;
+
+        if (row % 2) {
+          tile_nothing_land->transform_fulls[idx / 2].position[2] += width / 2.0f;
+        }
+
+        tile_nothing_land->transform_fulls[idx / 2].rotation[0] = -90.0f;
+        tile_nothing_land->transform_fulls[idx / 2].rotation[1] = roundf(((double)rand() / (double)RAND_MAX) * 6.0) * 60.0f;
+
+        tile_nothing_land->transform_fulls[idx / 2].scale = 1.0f;
+      }
+#else
+      if ((row + col) % 2) {
         tiles[idx] = ex_iqm_load_model(scene, "data/tiles/farm.iqm", EX_KEEP_VERTICES);
-      else
+      } else {
         tiles[idx] = ex_iqm_load_model(scene, "data/tiles/nothing_land.iqm", EX_KEEP_VERTICES);
+      }
 
       tiles[idx]->cast_shadow = 1;
 
@@ -58,10 +110,12 @@ void world_scene_init() {
       tiles[idx]->transform.rotation[1] = roundf(((double)rand() / (double)RAND_MAX) * 6.0) * 60.0f;
 
       ex_scene_add_model(scene, tiles[idx]);
-
+#endif
       idx++;
     }
   }
+
+  printf("%lu instances.\n", idx);
 
   camera_entity = ex_entity_new(scene, (vec3){0.5f, 1.0f, 0.5f});
   camera_entity->position[1] = 10.0f;
@@ -204,7 +258,7 @@ void world_scene_draw() {
   ex_scene_draw(scene, 0, 0, 0, 0, &camera->matrices);
   ex_fps_camera_resize(camera);
 
-  ex_font_dbg(font);
+  // ex_font_dbg(font);
 
   ex_vga_render();
 }

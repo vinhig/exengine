@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.22)
-project(HelloWorld)
+project(exengine)
 
 file(GLOB_RECURSE SRC_FILES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/source/**.c)
 file(GLOB_RECURSE PHYSFS_FILES CONFIGURE_DEPENDS ${PROJECT_SOURCE_DIR}/third_party/physfs/**.c)

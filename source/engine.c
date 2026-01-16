@@ -11,9 +11,11 @@
 #include <exengine/util/ini.h>
 #include <sys/stat.h>
 
+#ifdef USING_IMGUI
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
 #include <imgui/cimgui.h>
 #include <imgui/cimgui_impl.h>
+#endif
 
 // user defined function callback pointers
 void (*ex_init_ptr)(void) = nullptr;
@@ -68,7 +70,7 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
   // init physfs filesystem
   PHYSFS_init(argv[0]);
 
-  log_set_level(LOG_WARN);
+  log_set_level(LOG_INFO);
 
   // set the safe writing dir
   // most often these directories will be..
@@ -156,7 +158,9 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
     while (accumulator >= phys_delta_time) {
       SDL_Event event;
       while (SDL_PollEvent(&event)) {
+#ifdef USING_IMGUI
         ImGui_ImplSDL3_ProcessEvent(&event);
+#endif
 
         // full event handler override
         if (ex_event_handler_full) {
@@ -211,6 +215,7 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
     }
 
     // user draw callback
+#ifdef USING_IMGUI
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     igNewFrame();
@@ -223,12 +228,15 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
     igInputText("bonjour", &buffer[0], 1024, 0, 0, nullptr);
     igEnd();
 
+#endif
     ex_draw_ptr();
 
+#ifdef USING_IMGUI
     igEndFrame();
     igRender();
 
     ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
+#endif
 
     // swap buffers
     SDL_GL_SwapWindow(display.window);

@@ -23,7 +23,7 @@ ex_model_t *ex_model_new() {
   m->transform_fulls = nullptr;
   m->transform_matrices = nullptr;
   m->instance_count = 0;
-  m->is_static = 0;
+  m->static_state = 0;
 
   m->bones = nullptr;
   m->current_anim = nullptr;
@@ -91,6 +91,7 @@ void ex_model_init_instancing(ex_model_t *m, int count) {
   }
 
   m->transform_matrices = calloc(1, sizeof(mat4x4) * count);
+  m->transform_fulls = calloc(1, sizeof(ex_transform_t) * count);
   for (int i = 0; i < count; i++)
     mat4x4_identity(m->transform_matrices[i]);
 
