@@ -115,8 +115,6 @@ void world_scene_init() {
     }
   }
 
-  printf("%lu instances.\n", idx);
-
   camera_entity = ex_entity_new(scene, (vec3){0.5f, 1.0f, 0.5f});
   camera_entity->position[1] = 10.0f;
   camera_entity->position[0] = 5.0f;

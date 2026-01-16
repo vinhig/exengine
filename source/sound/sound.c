@@ -79,7 +79,7 @@ void ex_sound_list_devices(ex_sound_devices_t *list, const ALenum param) {
 void ex_sound_set_output(const ALCchar *device) {
   // set default device
   if (!device) {
-    log_info("Output device set as default\n");
+    log_info("Output device set as default.");
     ex_sound.output = alcOpenDevice(NULL);
     return;
   }

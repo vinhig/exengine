@@ -1,3 +1,5 @@
+#include "log/log.h"
+
 #include <exengine/render/shader.h>
 #include <exengine/util/io.h>
 
@@ -53,7 +55,7 @@ bool ex_gl_check_compilation(GLuint shader, const char* label) {
   glGetShaderiv(shader, GL_COMPILE_STATUS, &success);
   if (!success) {
     glGetShaderInfoLog(shader, 512, NULL, compile_log);
-    printf("Failed to compile %s shader\n%s\n", label, compile_log);
+    log_error("Failed to compile %s shader\n%s\n", label, compile_log);
     return false;
   }
 
@@ -73,7 +75,7 @@ GLuint ex_graphic_pipeline_new(const char *path) {
   bool gs_exists = ex_io_exist(gs_path);
 
   if (!vs_exists || !fs_exists) {
-    printf("All graphic pipelines must have a vertex and a fragment shader.\n");
+    log_error("All graphic pipelines must have a vertex and a fragment shader.\n");
     return 0;
   }
 

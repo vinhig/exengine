@@ -1,3 +1,5 @@
+#include "log/log.h"
+
 #include <exengine/render/model.h>
 
 #include <stdio.h>
@@ -76,7 +78,7 @@ void ex_model_add_mesh(ex_model_t *m, ex_mesh_t *mesh) {
     }
   }
 
-  printf("Maximum mesh count exceeded for model %s!\n", m->path);
+  log_error("Maximum mesh count exceeded for model %s!\n", m->path);
 }
 
 void ex_model_init_instancing(ex_model_t *m, int count) {

@@ -492,7 +492,7 @@ void ex_render_resize(size_t width, size_t height) {
 
   // test framebuffer
   if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-    printf("Error! Framebuffer is not complete\n");
+    log_error("Error! Framebuffer is not complete\n");
   }
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
   /* ----------------- */

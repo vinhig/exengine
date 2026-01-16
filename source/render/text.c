@@ -49,7 +49,7 @@ ex_font_t *ex_font_load(const char *path, const char *letters) {
   size_t length;
   uint8_t *data = (uint8_t *)ex_io_read(path, "rb", &length);
   if (!data) {
-    printf("[TEXT] Failed generating font %s\n", path);
+    log_error("[TEXT] Failed generating font %s\n", path);
     return NULL;
   }
 

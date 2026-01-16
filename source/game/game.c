@@ -1,3 +1,5 @@
+#include "log/log.h"
+
 #include <exengine/engine.h>
 #include <exengine/input/input.h>
 #include <exengine/render/camera.h>
@@ -58,7 +60,7 @@ void game_exit() {
     break;
   }
   ex_vga_destroy();
-  printf("Good bye!\n");
+  log_info("Good bye!");
 }
 
 void game_keypressed(uint32_t key) {
