@@ -16,7 +16,6 @@ ex_model_t *ex_model_new() {
   m->transform.scale = 1.0f;
   m->cast_shadow = 1;
   m->is_lit = 1;
-  m->use_transform = 0;
 
   m->current_anim = nullptr;
   m->current_time = 0.0f;
@@ -25,7 +24,6 @@ ex_model_t *ex_model_new() {
   m->transform_fulls = nullptr;
   m->transform_matrices = nullptr;
   m->instance_count = 0;
-  m->static_state = 0;
 
   m->bones = nullptr;
   m->current_anim = nullptr;
@@ -62,7 +60,6 @@ ex_model_t *ex_model_copy(ex_model_t *model) {
   m->bones_len = model->bones_len;
   m->anims_len = model->anims_len;
   m->frames_len = model->frames_len;
-  m->use_transform = model->use_transform;
 
   // init instancing matrix vbos etc
   ex_model_init_instancing(m, 1);

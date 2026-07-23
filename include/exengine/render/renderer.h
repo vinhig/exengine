@@ -139,7 +139,7 @@ void ex_render_forward(ex_renderable_t *renderables);
  * @param model  [model to render]
  * @param shader [shader to use]
  */
-void ex_render_model(ex_model_t *model, GLuint shader);
+void ex_render_model(ex_model_t *model, const ex_camera_matrices_t* camera, GLuint shader);
 
 /**
  * [ex_render_mesh renders a single mesh or instanced meshes]

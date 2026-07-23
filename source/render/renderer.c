@@ -35,8 +35,9 @@ typedef struct {
 ex_framebuffer_t framebuffer;
 
 void opengl_debug(GLenum source, GLenum type, GLuint id, GLenum severity, GLsizei length, const GLchar *message, void *userParam) {
-  if (type == GL_DEBUG_TYPE_ERROR)
+  if (type == GL_DEBUG_TYPE_ERROR) {
     log_error("%s", message);
+  }
 }
 
 // some default textures
@@ -141,7 +142,7 @@ void ex_render(ex_renderer_e renderer, ex_renderable_t *renderables) {
         ex_model_t *model = (ex_model_t *)models->nodes[j].obj;
 
         if (model->cast_shadow) {
-          ex_render_model(model, pointfbo_shader);
+          ex_render_model(model, renderables->camera, pointfbo_shader);
         }
       }
     }
@@ -211,7 +212,7 @@ void ex_render_forward(ex_renderable_t *renderables) {
   glUniform1i(ex_uniform(forward_shader, "u_ambient_pass"), 1);
   for (int i = 0; i < models->count; i++) {
     ex_model_t *model = (ex_model_t *)models->nodes[i].obj;
-    ex_render_model(model, forward_shader);
+    ex_render_model(model, renderables->camera, forward_shader);
   }
   glUniform1i(ex_uniform(forward_shader, "u_ambient_pass"), 0);
   glUniform1i(ex_uniform(forward_shader, "u_point_count"), 0);
@@ -240,7 +241,7 @@ void ex_render_forward(ex_renderable_t *renderables) {
     ex_render_point_light(light, forward_shader, NULL);
     for (size_t j = 0; j < models->count; j++) {
       ex_model_t *model = models->nodes[j].obj;
-      ex_render_model(model, forward_shader);
+      ex_render_model(model, renderables->camera, forward_shader);
     }
   }
 
@@ -267,60 +268,54 @@ void ex_render_forward(ex_renderable_t *renderables) {
   /* ---------------- */
 }
 
-void ex_render_model(ex_model_t *model, GLuint shader) {
-  // handle transformations
-  if (!model->use_transform && model->instance_count < 2) {
-    mat4x4_identity(model->transform_matrices[0]);
-    mat4x4_translate_in_place(model->transform_matrices[0], model->transform.position[0], model->transform.position[1], model->transform.position[2]);
-    mat4x4_rotate_Y(model->transform_matrices[0], model->transform_matrices[0], rad(model->transform.rotation[1]));
-    mat4x4_rotate_X(model->transform_matrices[0], model->transform_matrices[0], rad(model->transform.rotation[0]));
-    mat4x4_rotate_Z(model->transform_matrices[0], model->transform_matrices[0], rad(model->transform.rotation[2]));
-    mat4x4_scale_aniso(model->transform_matrices[0], model->transform_matrices[0], model->transform.scale, model->transform.scale, model->transform.scale);
-  } else {
-    if (model->static_state == STATIC_WAITING || model->static_state == NOT_STATIC ) {
-      for (size_t i = 0; i < model->instance_count; i++) {
-        mat4x4_identity(model->transform_matrices[i]);
-        mat4x4_translate_in_place(model->transform_matrices[i], model->transform_fulls[i].position[0], model->transform_fulls[i].position[1], model->transform_fulls[i].position[2]);
-        mat4x4_rotate_Y(model->transform_matrices[i], model->transform_matrices[i], rad(model->transform_fulls[i].rotation[1]));
-        mat4x4_rotate_X(model->transform_matrices[i], model->transform_matrices[i], rad(model->transform_fulls[i].rotation[0]));
-        mat4x4_rotate_Z(model->transform_matrices[i], model->transform_matrices[i], rad(model->transform_fulls[i].rotation[2]));
-        mat4x4_scale_aniso(model->transform_matrices[i], model->transform_matrices[i], model->transform_fulls[i].scale, model->transform_fulls[i].scale, model->transform_fulls[i].scale);
-      }
+void ex_render_model(ex_model_t *model, const ex_camera_matrices_t* camera, GLuint shader) {
+  // Handle transformations and frustum culling each corner of the bbox of
+  // the given model is tested against the current camera. If at least one
+  // corner is not on screen, visible_instance_count is not incremented and
+  // the model is not drawn.
+
+  model->visible_instance_count = 0;
+  for (size_t i = 0; i < model->instance_count; i++) {
+    size_t i_idx = model->visible_instance_count;
+    mat4x4_identity(model->transform_matrices[i_idx]);
+    mat4x4_translate_in_place(model->transform_matrices[i_idx], model->transform_fulls[i].position[0], model->transform_fulls[i].position[1], model->transform_fulls[i].position[2]);
+    mat4x4_rotate_Y(model->transform_matrices[i_idx], model->transform_matrices[i_idx], rad(model->transform_fulls[i].rotation[1]));
+    mat4x4_rotate_X(model->transform_matrices[i_idx], model->transform_matrices[i_idx], rad(model->transform_fulls[i].rotation[0]));
+    mat4x4_rotate_Z(model->transform_matrices[i_idx], model->transform_matrices[i_idx], rad(model->transform_fulls[i].rotation[2]));
+    mat4x4_scale_aniso(model->transform_matrices[i_idx], model->transform_matrices[i_idx], model->transform_fulls[i].scale, model->transform_fulls[i].scale, model->transform_fulls[i].scale);
+
+    model->visible_instance_count++;
+  }
+
+  // frustum culling has been applied, draw only if there is something to draw
+  if (model->visible_instance_count) {
+    // pass bone data
+    GLuint has_skeleton_loc = ex_uniform(shader, "u_has_skeleton");
+    glUniform1i(has_skeleton_loc, 0);
+
+    if (model->bones != NULL && model->current_anim != NULL) {
+      glUniform1i(has_skeleton_loc, 1);
+      glUniformMatrix4fv(ex_uniform(shader, "u_bone_matrix"), model->bones_len, GL_TRUE, &model->skeleton[0][0][0]);
     }
-  }
 
-  // pass bone data
-  GLuint has_skeleton_loc = ex_uniform(shader, "u_has_skeleton");
-  glUniform1i(has_skeleton_loc, 0);
-
-  if (model->bones != NULL && model->current_anim != NULL) {
-    glUniform1i(has_skeleton_loc, 1);
-    glUniformMatrix4fv(ex_uniform(shader, "u_bone_matrix"), model->bones_len, GL_TRUE, &model->skeleton[0][0][0]);
-  }
-
-  // update instancing matrix vbo
-  if (model->static_state == STATIC_WAITING || model->static_state == NOT_STATIC ) {
+    // update instancing matrix vbo
     glBindBuffer(GL_ARRAY_BUFFER, model->instance_vbo);
-    glBufferData(GL_ARRAY_BUFFER, model->instance_count * sizeof(mat4x4), &model->transform_matrices[0], GL_DYNAMIC_DRAW);
+    glBufferData(GL_ARRAY_BUFFER, model->visible_instance_count * sizeof(mat4x4), &model->transform_matrices[0], GL_DYNAMIC_DRAW);
 
-    if (model->static_state == STATIC_WAITING) {
-      model->static_state = STATIC_READY;
+    // these remain the same for each mesh
+    glUniform1i(ex_uniform(shader, "u_texture"), 4);
+    glUniform1i(ex_uniform(shader, "u_spec"), 5);
+    glUniform1i(ex_uniform(shader, "u_norm"), 6);
+
+    // render meshes
+    for (int i = 0; i < EX_MODEL_MAX_MESHES; i++) {
+      if (model->meshes[i] == NULL) {
+        continue;
+      }
+
+      glUniform1i(ex_uniform(shader, "u_is_lit"), model->is_lit);
+      ex_render_mesh(model->meshes[i], shader, model->visible_instance_count);
     }
-  }
-
-  // these remain the same for each mesh
-  glUniform1i(ex_uniform(shader, "u_texture"), 4);
-  glUniform1i(ex_uniform(shader, "u_spec"), 5);
-  glUniform1i(ex_uniform(shader, "u_norm"), 6);
-
-  // render meshes
-  for (int i = 0; i < EX_MODEL_MAX_MESHES; i++) {
-    if (model->meshes[i] == NULL) {
-      continue;
-    }
-
-    glUniform1i(ex_uniform(shader, "u_is_lit"), model->is_lit);
-    ex_render_mesh(model->meshes[i], shader, model->instance_count);
   }
 }
 

@@ -52,9 +52,7 @@ void world_scene_init() {
   ex_scene_add_model(scene, tile_nothing_land);
 
   tile_farm->cast_shadow = 1;
-  tile_farm->static_state = STATIC_WAITING;
   tile_nothing_land->cast_shadow = 1;
-  tile_nothing_land->static_state = STATIC_WAITING;
 
   ex_model_init_instancing(tile_farm, 20 * 20 / 2);
   ex_model_init_instancing(tile_nothing_land, 20 * 20 / 2);
@@ -253,7 +251,7 @@ void world_scene_update(double dt, double ft) {
 }
 
 void world_scene_draw() {
-  ex_scene_draw(scene, 0, 0, 0, 0, &camera->matrices);
+  ex_scene_draw(scene, &camera->matrices);
   ex_fps_camera_resize(camera);
 
   // ex_font_dbg(font);

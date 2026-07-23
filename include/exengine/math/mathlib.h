@@ -395,7 +395,7 @@ static inline void mat4x4_frustum(mat4x4 M, float l, float r, float b, float t, 
   M[0][0] = 2.f * n / (r - l);
   M[0][1] = M[0][2] = M[0][3] = 0.f;
 
-  M[1][1] = 2. * n / (t - b);
+  M[1][1] = 2.f * n / (t - b);
   M[1][0] = M[1][2] = M[1][3] = 0.f;
 
   M[2][0] = (r + l) / (r - l);
@@ -406,6 +406,7 @@ static inline void mat4x4_frustum(mat4x4 M, float l, float r, float b, float t, 
   M[3][2] = -2.f * (f * n) / (f - n);
   M[3][0] = M[3][1] = M[3][3] = 0.f;
 }
+
 static inline void mat4x4_ortho(mat4x4 M, float l, float r, float b, float t, float n, float f) {
   M[0][0] = 2.f / (r - l);
   M[0][1] = M[0][2] = M[0][3] = 0.f;

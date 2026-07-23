@@ -43,15 +43,6 @@ typedef struct {
   float scale;
 } ex_transform_t;
 
-typedef enum {
-  // means its transforms will be uploaded to the instance_vbo each fram
-  NOT_STATIC,
-  // means its transforms will be uploaded to the instance_vbo just once
-  STATIC_WAITING,
-  // means its transforms will be uploaded to the instance_vbo just once and it has already been done
-  STATIC_READY,
-} ex_static_e;
-
 typedef struct {
   ex_mesh_t *meshes[EX_MODEL_MAX_MESHES];
 
@@ -67,18 +58,23 @@ typedef struct {
   ex_anim_t *anims;
   ex_frame_t *frames, bind_pose, pose;
   size_t bones_len, anims_len, frames_len;
-  int use_transform;
 
   vec3 *vertices;
   size_t num_vertices;
 
   ex_octree_t *octree_data;
 
-  ex_transform_t* transform_fulls;
+  /**
+   * All transforms for all possible instances of this model.
+   * `transform_matrices` will contain the model matrix for each model
+   * that is actually visible. Therefore, `instance_count` is always equal
+   * or greater to `visible_instance_count`.
+   */
+  ex_transform_t * transform_fulls;
   mat4x4 *transform_matrices;
   GLuint instance_vbo;
   size_t instance_count;
-  ex_static_e static_state;
+  size_t visible_instance_count;
 
   char path[512];
 } ex_model_t;

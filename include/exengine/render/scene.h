@@ -95,13 +95,9 @@ void ex_scene_update(ex_scene_t *s, float delta_time);
 /**
  * [ex_scene_draw render the scene]
  * @param s        [the scene to use]
- * @param x        [x offset]
- * @param y        [y offset]
- * @param width    [render width]
- * @param height   [render height]
  * @param matrices [the camera matrices]
  */
-void ex_scene_draw(ex_scene_t *s, int x, int y, int width, int height, ex_camera_matrices_t *matrices);
+void ex_scene_draw(ex_scene_t *s, ex_camera_matrices_t *matrices);
 
 /**
  * [ex_scene_resize resize internal frambuffers]

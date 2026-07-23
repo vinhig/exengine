@@ -121,7 +121,7 @@ void ex_scene_update(ex_scene_t *s, float delta_time) {
   }
 }
 
-void ex_scene_draw(ex_scene_t *s, int view_x, int view_y, int view_width, int view_height, ex_camera_matrices_t *matrices) {
+void ex_scene_draw(ex_scene_t *s, ex_camera_matrices_t *matrices) {
   s->renderables.camera = matrices;
 
   ex_render(EX_RENDERER_FORWARD, &s->renderables);
