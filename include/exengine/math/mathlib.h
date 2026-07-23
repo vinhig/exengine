@@ -609,6 +609,54 @@ static inline void quat_slerp(quat q, quat a, quat b, float weight) {
 }
 
 #include <float.h>
+
+static inline void mat4x4_extract_frustum_planes(vec4 planes[6], mat4x4 m) {
+  vec4 row0, row1, row2, row3;
+  mat4x4_row(row0, m, 0);
+  mat4x4_row(row1, m, 1);
+  mat4x4_row(row2, m, 2);
+  mat4x4_row(row3, m, 3);
+
+  vec4_add(planes[0], row3, row0);
+  vec4_sub(planes[1], row3, row0);
+  vec4_add(planes[2], row3, row1);
+  vec4_sub(planes[3], row3, row1);
+  vec4_add(planes[4], row3, row2);
+  vec4_sub(planes[5], row3, row2);
+}
+
+static inline int ex_frustum_test_aabb(vec4 planes[6], vec3 aabb_min, vec3 aabb_max) {
+  for (int i = 0; i < 6; i++) {
+    float nx = planes[i][0], ny = planes[i][1], nz = planes[i][2];
+    float px = nx >= 0 ? aabb_max[0] : aabb_min[0];
+    float py = ny >= 0 ? aabb_max[1] : aabb_min[1];
+    float pz = nz >= 0 ? aabb_max[2] : aabb_min[2];
+    float d = nx * px + ny * py + nz * pz + planes[i][3];
+    if (d < 0) {
+      return 0;
+    }
+  }
+  return 1;
+}
+
+static inline void mat4x4_transform_aabb(vec3 world_min, vec3 world_max, mat4x4 model, vec3 local_min, vec3 local_max) {
+  vec4 corners[8];
+  vec4 c;
+  for (int i = 0; i < 8; i++) {
+    c[0] = i & 1 ? local_max[0] : local_min[0];
+    c[1] = i & 2 ? local_max[1] : local_min[1];
+    c[2] = i & 4 ? local_max[2] : local_min[2];
+    c[3] = 1.0f;
+    mat4x4_mul_vec4(corners[i], model, c);
+  }
+  world_min[0] = world_min[1] = world_min[2] = INFINITY;
+  world_max[0] = world_max[1] = world_max[2] = -INFINITY;
+  for (int i = 0; i < 8; i++) {
+    vec3_min(world_min, world_min, corners[i]);
+    vec3_max(world_max, world_max, corners[i]);
+  }
+}
+
 static inline void mat4x4_rotate_quat(mat4x4 mat, quat q) {
   float qxx = q[0] * q[0];
   float qyy = q[1] * q[1];

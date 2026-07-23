@@ -50,8 +50,10 @@ void ex_fps_camera_resize(ex_fps_camera_t *cam) {
 
   if (cam->width != width || cam->height != height) {
     mat4x4_perspective(cam->matrices.projection, rad(cam->fov), (float)width / (float)height, 0.01f, 1000.0f);
+    mat4x4_perspective(cam->matrices.projection_frustum, rad(cam->fov) * 1.5f, (float)width / (float)height, 0.01f, 1000.0f);
     cam->width = width;
     cam->height = height;
+    mat4x4_mul(cam->matrices.frustum, cam->matrices.projection, cam->matrices.view);
   }
 }
 
@@ -90,4 +92,5 @@ void ex_fps_camera_update(ex_fps_camera_t *cam, bool update_rotation) {
   vec3_add(center, cam->position, cam->front);
   mat4x4_look_at(cam->matrices.view, cam->position, center, cam->up);
   mat4x4_invert(cam->matrices.inverse_view, cam->matrices.view);
+  mat4x4_mul(cam->matrices.frustum, cam->matrices.projection_frustum, cam->matrices.view);
 }

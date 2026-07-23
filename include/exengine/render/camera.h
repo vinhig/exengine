@@ -9,7 +9,7 @@
 #include <exengine/render/model.h>
 
 typedef struct {
-  mat4x4 view, projection, inverse_view, frustum;
+  mat4x4 view, projection, inverse_view, frustum, projection_frustum /* projection frustum is slightly larger to avoid pop-in effect */;
 } ex_camera_matrices_t;
 
 typedef struct {

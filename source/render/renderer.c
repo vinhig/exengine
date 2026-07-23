@@ -275,6 +275,14 @@ void ex_render_model(ex_model_t *model, const ex_camera_matrices_t* camera, GLui
   // the model is not drawn.
 
   model->visible_instance_count = 0;
+
+  vec4 frustum_planes[6];
+  {
+    mat4x4 vp;
+    memcpy(vp, camera->frustum, sizeof(mat4x4));
+    mat4x4_extract_frustum_planes(frustum_planes, vp);
+  }
+
   for (size_t i = 0; i < model->instance_count; i++) {
     size_t i_idx = model->visible_instance_count;
     mat4x4_identity(model->transform_matrices[i_idx]);
@@ -284,7 +292,13 @@ void ex_render_model(ex_model_t *model, const ex_camera_matrices_t* camera, GLui
     mat4x4_rotate_Z(model->transform_matrices[i_idx], model->transform_matrices[i_idx], rad(model->transform_fulls[i].rotation[2]));
     mat4x4_scale_aniso(model->transform_matrices[i_idx], model->transform_matrices[i_idx], model->transform_fulls[i].scale, model->transform_fulls[i].scale, model->transform_fulls[i].scale);
 
-    model->visible_instance_count++;
+    // transform AABB from model space to world space
+    vec3 world_min, world_max;
+    mat4x4_transform_aabb(world_min, world_max, model->transform_matrices[i_idx], model->aabb_min, model->aabb_max);
+
+    if (ex_frustum_test_aabb(frustum_planes, world_min, world_max)) {
+      model->visible_instance_count++;
+    }
   }
 
   // frustum culling has been applied, draw only if there is something to draw

@@ -296,6 +296,14 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
     ex_model_add_mesh(model, m);
   }
 
+  // compute model-space AABB from all vertices
+  model->aabb_min[0] = model->aabb_min[1] = model->aabb_min[2] = INFINITY;
+  model->aabb_max[0] = model->aabb_max[1] = model->aabb_max[2] = -INFINITY;
+  for (size_t i = 0; i < vis_len; i++) {
+    vec3_min(model->aabb_min, model->aabb_min, vis_vertices[i]);
+    vec3_max(model->aabb_max, model->aabb_max, vis_vertices[i]);
+  }
+
   // store vertices
   if (flags & EX_KEEP_VERTICES) {
     model->vertices = calloc(1, vis_len * sizeof(vec3));

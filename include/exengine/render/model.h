@@ -62,6 +62,8 @@ typedef struct {
   vec3 *vertices;
   size_t num_vertices;
 
+  vec3 aabb_min, aabb_max;
+
   ex_octree_t *octree_data;
 
   /**

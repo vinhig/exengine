@@ -36,7 +36,7 @@ void world_scene_init() {
   memcpy(scene->gravity, (vec3){0.0f, 0.0f, 0.0f}, sizeof(vec3));
 
   // init the camera
-  camera = ex_fps_camera_new(50.0f, 50.0f, 50.0f, 0.1f, 70.0f);
+  camera = ex_fps_camera_new(100.0f, 100.0f, 100.0f, 0.1f, 70.0f);
   camera->yaw = 90.0f;
   camera->pitch -= 60.0f;
 
@@ -114,8 +114,8 @@ void world_scene_init() {
   }
 
   camera_entity = ex_entity_new(scene, (vec3){0.5f, 1.0f, 0.5f});
-  camera_entity->position[1] = 10.0f;
-  camera_entity->position[0] = 5.0f;
+  camera_entity->position[1] = 15.0f;
+  camera_entity->position[0] = 7.0f;
   camera_entity->position[2] = 0.0f;
 
   // load a sound
