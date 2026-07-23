@@ -34,25 +34,25 @@ typedef struct {
 } ex_mesh_t;
 
 /**
- * [ex_mesh_new generate a mesh with the given vertices, indices, and texture]
- * @param  vertices [pointer to vertices]
- * @param  vcount   [length of vertices]
- * @param  indices  [pointer to indces]
- * @param  icount   [length of indices]
- * @param  texture  [the texture's uint]
- * @return          [ex_mesh_t pointer]
+ * @brief Generate a mesh with the given vertices, indices, and texture.
+ * @param vertices pointer to vertices
+ * @param vcount   length of vertices
+ * @param indices  pointer to indices
+ * @param icount   length of indices
+ * @param texture  the texture GLuint
+ * @return pointer to the new mesh
  */
 ex_mesh_t *ex_mesh_new(ex_vertex_t *vertices, size_t vcount, GLuint *indices, size_t icount, GLuint texture);
 
 /**
- * [ex_mesh_copy duplicates a mesh]
- * @param  mesh [the mesh to copy]
- * @return      [the new copy]
+ * @brief Duplicate a mesh.
+ * @param mesh the mesh to copy
+ * @return pointer to the new copy
  */
 ex_mesh_t *ex_mesh_copy(ex_mesh_t *mesh);
 
 /**
- * [ex_mesh_destroy free any malloc'd data]
- * @param m [ex_mesh_t pointer]
+ * @brief Free any allocated mesh data.
+ * @param m pointer to the mesh to destroy
  */
 void ex_mesh_destroy(ex_mesh_t *m);

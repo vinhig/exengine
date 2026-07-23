@@ -28,12 +28,12 @@ extern uint8_t ex_keys_down[SDL_SCANCODE_COUNT];
 extern uint8_t ex_buttons_down[16];
 
 /**
- * [ex_input_event handles input events]
- * @param event [SDL_Event pointer]
+ * @brief Handle input events.
+ * @param event SDL_Event pointer
  */
 void ex_input_event(SDL_Event *event);
 
 /**
- * [ex_input_update handles more frequent input updates]
+ * @brief Handle per-frame input updates.
  */
 void ex_input_update();

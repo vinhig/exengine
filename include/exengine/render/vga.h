@@ -12,47 +12,47 @@ extern uint32_t ex_vga_fg;
 extern uint32_t ex_vga_bg;
 
 /**
- * [ex_vga_init init vga systems]
+ * @brief Initialize VGA systems.
  */
 void ex_vga_init();
 
 /**
- * [ex_vga_print blit some text to the vga]
- * @param x   [x index]
- * @param y   [y index]
- * @param str [ascii string]
+ * @brief Blit text to the VGA buffer.
+ * @param x   x character index
+ * @param y   y character index
+ * @param str ASCII string
  */
 void ex_vga_print(size_t x, size_t y, const char *str);
 
 /**
- * [ex_vga_render render vga to the screen]
+ * @brief Render VGA to the screen.
  */
 void ex_vga_render();
 
 /**
- * [ex_vga_clear clear the vga pixel data]
+ * @brief Clear the VGA pixel data.
  */
 void ex_vga_clear();
 
 /**
- * [ex_vga_setfg set the foreground color]
- * @param r [red]
- * @param g [green]
- * @param b [blue]
- * @param a [alpha]
+ * @brief Set the foreground color.
+ * @param r red component
+ * @param g green component
+ * @param b blue component
+ * @param a alpha component
  */
 void ex_vga_setfg(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 /**
- * [ex_vga_setbg set the background color]
- * @param r [red]
- * @param g [green]
- * @param b [blue]
- * @param a [alpha]
+ * @brief Set the background color.
+ * @param r red component
+ * @param g green component
+ * @param b blue component
+ * @param a alpha component
  */
 void ex_vga_setbg(uint8_t r, uint8_t g, uint8_t b, uint8_t a);
 
 /**
- * [ex_vga_destroy clean up vga systems]
+ * @brief Clean up VGA systems.
  */
 void ex_vga_destroy();

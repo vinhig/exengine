@@ -29,16 +29,21 @@ typedef struct {
 } ex_metrics_t;
 
 /**
- * [ex_msdf_glyph Generates a MSDF bitmap from the specified character]
- * @param  font    [font file, ttf or otf]
- * @param  c       [utf8 glyph to use]
- * @param  w       [bitmap width]
- * @param  h       [bitmap height]
- * @param  metrics [the metrics for the specified glyph (c)]
- * @return         [3-channel float array, remember to free this]
+ * @brief Generate an MSDF bitmap from a specified character.
+ * @param font    loaded TrueType font
+ * @param c       Unicode codepoint to render
+ * @param w       bitmap width
+ * @param h       bitmap height
+ * @param metrics output metrics for the glyph
+ * @return 3-channel float array (caller must free)
  */
 float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_metrics_t *metrics);
 
+/**
+ * @brief Decode a UTF-8 character to a Unicode codepoint.
+ * @param c pointer to UTF-8 encoded character
+ * @return Unicode codepoint
+ */
 static inline uint32_t ex_utf8(const char *c) {
   uint32_t val = 0;
 

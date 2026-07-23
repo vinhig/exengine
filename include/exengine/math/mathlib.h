@@ -1,3 +1,9 @@
+/* mathlib
+  Vector, matrix, and quaternion math library.
+  Based on linmath.h, adapted for exengine.
+  All functions are static inline for performance.
+ */
+
 #pragma once
 
 #include <math.h>

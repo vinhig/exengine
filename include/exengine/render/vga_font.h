@@ -1,3 +1,8 @@
+/* vga_font
+  Embedded VGA font bitmap data (8x16 characters).
+  Used by the VGA debug text renderer.
+ */
+
 #pragma once
 
 #include <inttypes.h>

@@ -1,3 +1,9 @@
+/* scancodes
+  Keyboard scancode enum mapping SDL scancodes
+  to the engine's ex_scancode_e type.
+  Works for every keyboard layout.
+ */
+
 #pragma once
 
 #include <SDL3/SDL_scancode.h>

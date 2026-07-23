@@ -22,8 +22,9 @@ typedef struct {
 } ex_texture_t;
 
 /**
- * [ex_texture_load load a texture from file]
- * @param  file [file path string]
- * @return      [texture var]
+ * @brief Load a texture from file.
+ * @param file    file path string
+ * @param get_data if non-zero, also store pixel data in the struct
+ * @return pointer to the loaded texture
  */
 ex_texture_t *ex_texture_load(const char *file, int get_data);

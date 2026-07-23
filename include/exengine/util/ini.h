@@ -48,88 +48,91 @@ typedef struct {
 } ex_ini_t;
 
 /**
- * [ex_ini_load load or update from an ini file]
- * @param  ini  [ini instance to use]
- * @param  path [file path]
- * @return      [non-zero upon success]
+ * @brief Load or update from an ini file.
+ * @deprecated This function is broken and should not be used. The name
+ *             explicitly indicates it is deprecated. Use the other ini
+ *             accessor functions (ex_ini_get_*) instead.
+ * @param ini  ini instance to use
+ * @param path file path
+ * @return non-zero upon success
  */
 int ex_ini_load_dont_use(ex_ini_t *ini, const char *path);
 
 /**
- * [ex_ini_save saves the ini structure to a file]
- * @param ini  [ini to save]
- * @param path [file path]
+ * @brief Save the ini structure to a file.
+ * @param ini  ini to save
+ * @param path file path
  */
 void ex_ini_save(ex_ini_t *ini, const char *path);
 
 /**
- * [ex_ini_exists returns true if variable exists in given section]
- * @param  ini [ini instance to use]
- * @param  sec [variable section]
- * @param  key [variable key]
- * @return     [true if variable exists, false otherwise]
+ * @brief Check if a variable exists in a given section.
+ * @param ini ini instance to use
+ * @param sec variable section
+ * @param key variable key
+ * @return true if variable exists, false otherwise
  */
 bool ex_ini_exists(ex_ini_t *ini, const char *sec, const char *key);
 
 /**
- * [ex_ini_get_var get a key-value variable]
- * @param  ini [ini instance to use]
- * @param  sec [variable section]
- * @param  key [variable key]
- * @return     [variable struct]
+ * @brief Get a key-value variable.
+ * @param ini ini instance to use
+ * @param sec variable section
+ * @param key variable key
+ * @return pointer to the variable struct
  */
 ex_ini_var_t *ex_ini_get_var(ex_ini_t *ini, const char *sec, const char *key);
 
 /**
- * [ex_ini_get_string get a string variable]
- * @param  ini [ini instance to use]
- * @param  sec [variable section]
- * @param  key [variable key]
- * @return     [string pointer]
+ * @brief Get a string variable.
+ * @param ini ini instance to use
+ * @param sec variable section
+ * @param key variable key
+ * @return string pointer
  */
 char *ex_ini_get_string(ex_ini_t *ini, const char *sec, const char *key);
 
 /**
- * [ex_ini_get_bool get a boolean variable]
- * @param  ini [ini instance to use]
- * @param  sec [variable section]
- * @param  key [variable key]
- * @return     [boolean value]
+ * @brief Get a boolean variable.
+ * @param ini ini instance to use
+ * @param sec variable section
+ * @param key variable key
+ * @return boolean value
  */
 bool ex_ini_get_bool(ex_ini_t *ini, const char *sec, const char *key);
 
 /**
- * [ex_ini_get_float get a float variable]
- * @param  ini [ini instance to use]
- * @param  sec [variable section]
- * @param  key [variable key]
- * @return     [float value]
+ * @brief Get a float variable.
+ * @param ini ini instance to use
+ * @param sec variable section
+ * @param key variable key
+ * @return float value
  */
 float ex_ini_get_float(ex_ini_t *ini, const char *sec, const char *key);
 
 /**
- * [ex_ini_set_string set a string variable]
- * @param ini   [ini instance to use]
- * @param sec   [variable section]
- * @param key   [variable key]
- * @param value [string value]
+ * @brief Set a string variable.
+ * @param ini   ini instance to use
+ * @param sec   variable section
+ * @param key   variable key
+ * @param value string value
  */
 void ex_ini_set_string(ex_ini_t *ini, const char *sec, const char *key, const char *value);
 
 /**
- * [ex_ini_set_float set a float variable]
- * @param ini   [ini instance to use]
- * @param sec   [variable section]
- * @param key   [variable key]
- * @param value [float value]
+ * @brief Set a float variable.
+ * @param ini   ini instance to use
+ * @param sec   variable section
+ * @param key   variable key
+ * @param value float value
  */
 void ex_ini_set_float(ex_ini_t *ini, const char *sec, const char *key, float value);
 
 /**
- * [ex_ini_set_bool set a bool variable]
- * @param ini   [ini instance to use]
- * @param sec   [variable section]
- * @param key   [variable key]
- * @param value [bool value]
+ * @brief Set a bool variable.
+ * @param ini   ini instance to use
+ * @param sec   variable section
+ * @param key   variable key
+ * @param value bool value
  */
 void ex_ini_set_bool(ex_ini_t *ini, const char *sec, const char *key, bool value);

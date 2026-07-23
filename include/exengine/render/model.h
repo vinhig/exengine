@@ -82,79 +82,79 @@ typedef struct {
 } ex_model_t;
 
 /**
- * [ex_model_new define a new model]
- * @return [a new, empty model]
+ * @brief Create a new, empty model.
+ * @return pointer to the new model
  */
 ex_model_t *ex_model_new();
 
 /**
- * [ex_model_copy create a copy that uses on the same data]
- * @param  model [the model to copy]
- * @return       [the new instance of the given model]
+ * @brief Create a copy that shares the same underlying data.
+ * @param model the model to copy
+ * @return pointer to the new model instance
  */
 ex_model_t *ex_model_copy(ex_model_t *model);
 
 /**
- * [ex_model_add_mesh add a mesh to the render list]
- * @param m    [the model]
- * @param mesh [mesh to add]
+ * @brief Add a mesh to the model's render list.
+ * @param m    the model
+ * @param mesh mesh to add
  */
 void ex_model_add_mesh(ex_model_t *m, ex_mesh_t *mesh);
 
 /**
- * [ex_model_init_instancing init the instancing transform arrays]
- * @param m     [the model to instance]
- * @param count [how many instances you want]
+ * @brief Initialize the instancing transform arrays.
+ * @param m     the model to instance
+ * @param count how many instances to allocate
  */
 void ex_model_init_instancing(ex_model_t *m, int count);
 
 /**
- * [ex_model_update update the model animations, transforms etc]
- * @param m          [the model to update]
- * @param delta_time []
+ * @brief Update the model's animations, transforms, etc.
+ * @param m          the model to update
+ * @param delta_time time since last update in seconds
  */
 void ex_model_update(ex_model_t *m, float delta_time);
 
 /**
- * [ex_model_destroy cleanup model data]
- * @param m [the model to destroy]
+ * @brief Clean up model data.
+ * @param m the model to destroy
  */
 void ex_model_destroy(ex_model_t *m);
 
 /**
- * [ex_model_update_matrices updates bone matrices]
- * @param m [ex_model_t pointer]
+ * @brief Update bone matrices.
+ * @param m pointer to the model
  */
 void ex_model_update_matrices(ex_model_t *m);
 
 /**
- * [ex_model_set_pose sets skeleton pose]
- * @param m     [ex_model_t pointer]
- * @param frame [frame data to set as]
+ * @brief Set the skeleton pose.
+ * @param m     pointer to the model
+ * @param frame frame data to use as the pose
  */
 void ex_model_set_pose(ex_model_t *m, ex_frame_t frame);
 
 /**
- * [ex_model_set_anim sets anim for given index]
- * @param m     [ex_model_t pointer]
- * @param id [animation id]
+ * @brief Set the active animation by name.
+ * @param m  pointer to the model
+ * @param id animation name
  */
 void ex_model_set_anim(ex_model_t *m, char *id);
 
 /**
- * [ex_calc_bone_matrix gets bone matrix based on given input]
- * @param m     [ex_model_t pointer]
- * @param pos   [vec3 position]
- * @param rot   [quat rotation]
- * @param scale [vec3 scale]
+ * @brief Compute a bone matrix from position, rotation, and scale.
+ * @param m     output bone matrix
+ * @param pos   position vector
+ * @param rot   rotation quaternion
+ * @param scale scale vector
  */
 void ex_calc_bone_matrix(mat4x4 m, vec3 pos, quat rot, vec3 scale);
 
 /**
- * [ex_mix_pose transposes between two frames]
- * @param m      [ex_model_t pointer]
- * @param a      [frame a]
- * @param b      [frame b]
- * @param weight [how much to transpose (0 to 1.0)]
+ * @brief Interpolate between two animation frames.
+ * @param m      pointer to the model
+ * @param a      source frame
+ * @param b      target frame
+ * @param weight blend weight (0.0 to 1.0)
  */
 void ex_mix_pose(ex_model_t *m, ex_frame_t a, ex_frame_t b, float weight);

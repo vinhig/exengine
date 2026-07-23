@@ -111,14 +111,24 @@ typedef struct {
 } ex_iqmex_mesh_t;
 
 /**
- * [ex_iqm_load_model loads a given iqm model file]
- * @param  scene [required if keep vertices is specified in flags]
- * @param  path  [path to the model file]
- * @param  flags [see flag defines above]
- * @return       [an instance of the requested iqm model]
+ * @brief Load an IQM model file.
+ * @param scene required if EX_KEEP_VERTICES is set in flags
+ * @param path  path to the model file
+ * @param flags bitmask of loader flags (see EX_KEEP_VERTICES)
+ * @return an instance of the requested IQM model
  */
 ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags);
 
+/**
+ * @brief Read a 32-bit unsigned integer from raw data (little-endian).
+ * @param data pointer to raw byte data
+ * @return the decoded uint32_t
+ */
 uint ex_get_uint(const uint8_t *data);
 
+/**
+ * @brief Parse up to 4 float arguments from a string.
+ * @param str  input string
+ * @param args output vec4 of parsed values
+ */
 void ex_iqm_get_args(const char *str, vec4 args);

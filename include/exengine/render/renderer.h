@@ -56,9 +56,9 @@ typedef struct {
 } ex_renderable_t;
 
 /**
- * [ex_rendernode_push push a new render node to a list]
- * @param  list [list that will be added to]
- * @return      [pointer to new node added]
+ * @brief Push a new render node to a list.
+ * @param list list that will be added to
+ * @return pointer to the new node added
  */
 static inline ex_rendernode_t *ex_rendernode_push(ex_renderlist_t *list) {
   if (list->count == list->length) {
@@ -78,11 +78,11 @@ static inline ex_rendernode_t *ex_rendernode_push(ex_renderlist_t *list) {
 }
 
 /**
- * [ex_rendernode_pop pop a render node from a list]
- * @param list [list to pop from]
- * @param obj  [object pointer to pop]
+ * @brief Pop a render node from a list.
+ * @param list list to pop from
+ * @param obj  object pointer to pop
  *
- * you still need to free the object yourself after!
+ * You still need to free the object yourself after.
  */
 static inline void ex_rendernode_pop(ex_renderlist_t *list, void *obj) {
   ex_rendernode_t *node = NULL;
@@ -117,61 +117,62 @@ static inline void ex_rendernode_pop(ex_renderlist_t *list, void *obj) {
 }
 
 /**
- * [ex_render_init sets up internal rendering stuffs]
+ * @brief Set up internal rendering resources.
  */
 void ex_render_init();
 
 /**
- * [ex_render runs a single render pass]
- * @param renderer    [renderer instance to use]
- * @param renderables [list of renderables and nodes]
+ * @brief Run a single render pass.
+ * @param renderer    renderer instance to use
+ * @param renderables list of renderables and nodes
  */
 void ex_render(ex_renderer_e renderer, ex_renderable_t *renderables);
 
 /**
- * [ex_render_forward forward renderer pass]
- * @param renderables [list of renderables and nodes]
+ * @brief Forward renderer pass.
+ * @param renderables list of renderables and nodes
  */
 void ex_render_forward(ex_renderable_t *renderables);
 
 /**
- * [ex_render_model renders a single model]
- * @param model  [model to render]
- * @param shader [shader to use]
+ * @brief Render a single model.
+ * @param model  model to render
+ * @param camera camera matrices to use
+ * @param shader shader to use
  */
 void ex_render_model(ex_model_t *model, const ex_camera_matrices_t* camera, GLuint shader);
 
 /**
- * [ex_render_mesh renders a single mesh or instanced meshes]
- * @param mesh   [mesh to render]
- * @param shader [shader to use]
- * @param count  [instances to render]
+ * @brief Render a single mesh or instanced meshes.
+ * @param mesh   mesh to render
+ * @param shader shader to use
+ * @param count  number of instances to render
  */
 void ex_render_mesh(ex_mesh_t *mesh, GLuint shader, size_t count);
 
 /**
- * [ex_render_point_light_begin bind a pointlight]
- * @param light  [pointlight to use]
- * @param shader [shader to use]
+ * @brief Bind a point light for rendering.
+ * @param light  point light to use
+ * @param shader shader to use
  */
 void ex_render_point_light_begin(ex_point_light_t *light, GLuint shader);
 
 /**
- * [ex_render_point_light renders a single pointlight]
- * @param light  [pointlight to use]
- * @param shader [shader to use]
- * @param prefix [prefix to use for shader uniform]
+ * @brief Render a single point light.
+ * @param light  point light to use
+ * @param shader shader to use
+ * @param prefix prefix to use for shader uniform
  */
 void ex_render_point_light(ex_point_light_t *light, GLuint shader, const char *prefix);
 
 /**
- * [ex_render_resize resizes internal framebuffers etc]
- * @param width  [the new width]
- * @param height [the new height]
+ * @brief Resize internal framebuffers etc.
+ * @param width  the new width
+ * @param height the new height
  */
 void ex_render_resize(size_t width, size_t height);
 
 /**
- * [ex_render_destroy cleans up data]
+ * @brief Clean up renderer data.
  */
 void ex_render_destroy();

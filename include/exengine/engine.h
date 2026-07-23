@@ -1,20 +1,18 @@
-/* engine
-  The core of exengine, inits all internal
-  modules, runs the main game loop, and
-  handles all user callbacks.
-
-  It implements a fixed timestep for physics
-  to keep things consistent regardless of
-  performance and frame rates, while rendering
-  at an uncapped framerate assuming vsync is
-  not present.
-
-  Feel free to tweak 'phys_delta_time' in engine.c
-  to your liking.  Be warned however, physics can
-  act up at certain tick rates.  Best to leave
-  it at the default if you don't know what you are
-  doing.
-*/
+/**
+ * @file engine.h
+ * @brief The core of exengine.
+ *
+ * Initializes all internal modules, runs the main game loop, and
+ * handles all user callbacks.
+ *
+ * It implements a fixed timestep for physics to keep things consistent
+ * regardless of performance and frame rates, while rendering at an
+ * uncapped framerate assuming vsync is not present.
+ *
+ * Feel free to tweak phys_delta_time in engine.c to your liking.
+ * Be warned however, physics can act up at certain tick rates.
+ * Best to leave it at the default if you don't know what you are doing.
+ */
 
 #pragma once
 
@@ -53,9 +51,9 @@ extern void (*ex_event_handler)(SDL_Event *);
 extern void (*ex_event_handler_full)(SDL_Event *);
 
 /**
- * [exengine starts the internal engine loop]
- * @param argv  []
- * @param appname [custom application name]
- * @param flags [defines what modules to enable]
+ * @brief Start the internal engine loop.
+ * @param argv    command line arguments (passed to SDL)
+ * @param appname custom application name
+ * @param flags   bitmask of module flags to enable (e.g. EX_ENGINE_SOUND)
  */
 void exengine(char **argv, const char *appname, uint8_t flags);

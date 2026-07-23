@@ -1,3 +1,8 @@
+/* vertices
+  Static vertex and index data for common
+  geometric primitives (e.g. a unit cube).
+ */
+
 #pragma once
 
 #define EX_VERTICES_CUBE_LEN 24

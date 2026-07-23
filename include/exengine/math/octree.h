@@ -68,65 +68,65 @@ struct ex_octree_t {
 };
 
 /**
- * [ex_octree_new defines a new octree]
- * @param  type [the data type to store]
- * @return      [the new octree]
+ * @brief Create a new octree.
+ * @param type the data type to store (ex_octree_obj_type)
+ * @return pointer to the new octree
  */
 ex_octree_t *ex_octree_new(uint8_t type);
 
 /**
- * [ex_octree_init init the tree via the given object list]
- * @param o       [the octree to init]
- * @param region  [the max region]
- * @param objects [list of objects to add]
+ * @brief Initialize the tree from a list of objects.
+ * @param o       the octree to init
+ * @param region  the bounding region
+ * @param objects list of objects to add
  */
 void ex_octree_init(ex_octree_t *o, rect_t region, ex_list_t *objects);
 
 /**
- * [ex_octree_build]
- * @param o [the octree to rebuild]
+ * @brief Rebuild the octree.
+ * @param o the octree to rebuild
  */
 void ex_octree_build(ex_octree_t *o);
 
 /**
- * [ex_octree_finalize migrates the data to flat arrays for speed]
- * @param o [the octree to finalize]
+ * @brief Migrate data to flat arrays for faster access.
+ * @param o the octree to finalize
  */
 void ex_octree_finalize(ex_octree_t *o);
 
 /**
- * [ex_octree_reset cleans up the octree and sets it to its default state]
- * @param  o [the octree to clean]
- * @return   [the empty octree]
+ * @brief Clean up the octree and reset it to its default state.
+ * @param  o the octree to clean
+ * @return   pointer to the empty octree
  */
 ex_octree_t *ex_octree_reset(ex_octree_t *o);
 
 /**
- * [ex_octree_get_colliding_count]
- * @param o      [the octree to check]
- * @param bounds [the bounds to check]
- * @param count  [the amount of colliding entries]
+ * @brief Count the number of colliding entries in the octree.
+ * @param o      the octree to check
+ * @param bounds the bounds to test against
+ * @param count  output: number of colliding entries
  */
 void ex_octree_get_colliding_count(ex_octree_t *o, rect_t *bounds, int *count);
 
 /**
- * [ex_octree_get_colliding get all colliding entry data]
- * @param o         [the octree to check]
- * @param bounds    [the bounds to check]
- * @param data_list [the output data]
- * @param index     [should be 0]
+ * @brief Get all colliding entry data.
+ * @param o         the octree to check
+ * @param bounds    the bounds to test against
+ * @param data_list output array for colliding data
+ * @param index     running index (should be 0 on first call)
  */
 void ex_octree_get_colliding(ex_octree_t *o, rect_t *bounds, ex_octree_data_t *data_list, int *index);
 
 /**
- * [ex_octree_render debug render]
- * @param o [the octree to render]
+ * @brief Debug-render the octree.
+ * @param o the octree to render
  */
 void ex_octree_render(ex_octree_t *o);
 
 /**
- * [ex_octree_data_ptr]
- * @param o []
+ * @brief Get a pointer to the octree's data array.
+ * @param o the octree to query
  */
 static inline void *ex_octree_data_ptr(ex_octree_t *o) {
   switch (o->data_type) {
@@ -159,10 +159,10 @@ static inline void *ex_octree_data_ptr(ex_octree_t *o) {
 }
 
 /**
- * [ex_rect_new defines a new 3d rect]
- * @param  min [the min position]
- * @param  max [the max position]
- * @return     [the new rect]
+ * @brief Create a new 3D axis-aligned bounding box.
+ * @param min minimum corner
+ * @param max maximum corner
+ * @return the new rect
  */
 static inline rect_t ex_rect_new(vec3 min, vec3 max) {
   rect_t r;
@@ -171,7 +171,20 @@ static inline rect_t ex_rect_new(vec3 min, vec3 max) {
   return r;
 };
 
+/**
+ * @brief Compute the square of a value.
+ * @param v input value
+ * @return v * v
+ */
 static inline float ex_squared(float v) { return v * v; };
+
+/**
+ * @brief Test intersection between an AABB and a sphere.
+ * @param r      the AABB
+ * @param pos    sphere center
+ * @param radius sphere radius
+ * @return 1 if intersecting
+ */
 static inline int ex_rect_intersect_sphere(rect_t r, vec3 pos, float radius) {
   float dist = radius * radius;
   if (pos[0] < r.min[0])
@@ -189,6 +202,12 @@ static inline int ex_rect_intersect_sphere(rect_t r, vec3 pos, float radius) {
   return dist > 0;
 };
 
+/**
+ * @brief Test AABB vs AABB intersection.
+ * @param a first AABB
+ * @param b second AABB
+ * @return 1 if the boxes overlap
+ */
 static inline int ex_aabb_aabb(rect_t a, rect_t b) {
   return (a.min[0] <= b.max[0] &&
           a.max[0] >= b.min[0] &&
@@ -198,6 +217,12 @@ static inline int ex_aabb_aabb(rect_t a, rect_t b) {
           a.max[2] >= b.min[2]);
 };
 
+/**
+ * @brief Test if one AABB is fully inside another.
+ * @param outer the outer AABB
+ * @param inner the inner AABB
+ * @return 1 if inner is fully inside outer
+ */
 static inline int ex_aabb_inside(rect_t outer, rect_t inner) {
   return (outer.min[0] <= inner.min[0] &&
           outer.max[0] >= inner.max[0] &&
@@ -207,6 +232,11 @@ static inline int ex_aabb_inside(rect_t outer, rect_t inner) {
           outer.max[2] >= inner.max[2]);
 };
 
+/**
+ * @brief Create an AABB from a triangle.
+ * @param tri array of 3 vertices forming the triangle
+ * @return the bounding rect
+ */
 static inline rect_t ex_rect_from_triangle(vec3 tri[3]) {
   rect_t box;
 

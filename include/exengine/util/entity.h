@@ -27,44 +27,52 @@ typedef struct {
 } ex_entity_t;
 
 /**
- * [ex_entity_new defines a new entity]
- * @param  scene  [the scene the entity will reside in]
- * @param  radius [the radius of the ellipsoid]
- * @return        [the new entity]
+ * @brief Create a new entity (ellipsoid) in a scene.
+ * @param scene  the scene the entity will reside in
+ * @param radius the radius of the ellipsoid
+ * @return pointer to the new entity
  */
 ex_entity_t *ex_entity_new(ex_scene_t *scene, vec3 radius);
 
 /**
- * [ex_entity_collide_and_slide]
- * @param entity [entity to update]
+ * @brief Perform collision detection and sliding response.
+ * @param entity entity to update
  */
 void ex_entity_collide_and_slide(ex_entity_t *entity);
 
 /**
- * [ex_entity_collide_with_world]
- * @param entity     [entity to update]
- * @param e_position [initial position]
- * @param e_velocity [initial velocity]
+ * @brief Check collision between an entity and the world.
+ * @param entity     entity to update
+ * @param e_position initial position in ellipsoid space
+ * @param e_velocity initial velocity in ellipsoid space
  */
 void ex_entity_collide_with_world(ex_entity_t *entity, vec3 e_position, vec3 e_velocity);
 
 /**
- * [ex_entity_check_collision check collision against scene quadtree]
- * @param entity [entity to check against]
+ * @brief Check collision against the scene octree.
+ * @param entity entity to check
  */
 void ex_entity_check_collision(ex_entity_t *entity);
 
 /**
- * [ex_entity_check_grounded checks if entity is on a ground]
- * @param entity [entity to check]
+ * @brief Check if the entity is standing on the ground.
+ * @param entity entity to check
  */
 void ex_entity_check_grounded(ex_entity_t *entity);
 
 /**
- * [ex_entity_update updates an entity, calling the above functions]
- * @param entity [entity to update]
- * @param dt     [delta time]
+ * @brief Update an entity, calling collision functions.
+ * @param entity entity to update
+ * @param dt     delta time
  */
 void ex_entity_update(ex_entity_t *entity, double dt);
 
+/**
+ * @brief Cast a ray from one point to another and find the nearest intersection.
+ * @param entity entity to use for collision parameters
+ * @param from   ray origin
+ * @param to     ray destination
+ * @param plane  output intersection plane
+ * @return the fraction of the ray traveled before intersection
+ */
 float ex_raycast(const ex_entity_t *entity, vec3 from, vec3 to, ex_plane_t *plane);

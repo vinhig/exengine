@@ -62,66 +62,67 @@ typedef struct {
 } ex_sound_devices_t;
 
 /**
- * [ex_sound_init init the sound module]
+ * @brief Initialize the sound module.
  */
 void ex_sound_init();
 
 /**
- * [ex_sound_list_devices description]
- * @param list  [description]
- * @param param [description]
+ * @brief List available audio devices.
+ * @param list  output device list
+ * @param param ALenum parameter to query
  */
 void ex_sound_list_devices(ex_sound_devices_t *list, const ALenum param);
 
 /**
- * [ex_sound_set_output description]
- * @param device [description]
+ * @brief Set the audio output device.
+ * @param device device name string
  */
 void ex_sound_set_output(const ALCchar *device);
 
 /**
- * [ex_sound_load_source load and decode a source into memory]
- * @param  path   [the sound file to load]
- * @param  loop   [1 if the sound is looping]
- * @return        [the new sound]
+ * @brief Load and decode a sound source into memory.
+ * @param path    the sound file to load
+ * @param type    source type (EX_SOURCE_STATIC or EX_SOURCE_STREAMING)
+ * @param looping 1 if the sound should loop
+ * @return pointer to the new source
  */
 ex_source_t *ex_sound_load(const char *path, int type, int looping);
 
 /**
- * [ex_sound_restart restart a sound]
- * @param s [sound to restart]
+ * @brief Restart a sound source.
+ * @param s sound source to restart
  */
 void ex_sound_restart(ex_source_t *s);
 
 /**
- * [ex_sound_play play a sound source]
- * @param s [source to play]
+ * @brief Play a sound source.
+ * @param s source to play
  */
 void ex_sound_play(ex_source_t *s);
 
 /**
- * [ex_sound_destroy cleanup a sound source]
- * @param s [the source to destroy]
+ * @brief Clean up a sound source.
+ * @param s the source to destroy
  */
 void ex_sound_destroy(ex_source_t *s);
 
 /**
- * [ex_sound_exit cleanup the sound module]
+ * @brief Clean up the sound module.
  */
 void ex_sound_exit();
 
 /**
- * [ex_sound_master_volume set the master volume]
- * @param vol [0.0 to 1.0]
+ * @brief Set the master volume.
+ * @param vol volume from 0.0 to 1.0
  */
 static inline void ex_sound_master_volume(float vol) {
   alListenerf(AL_GAIN, vol);
 };
 
 /**
- * [ex_sound_playing check if a source is playing]
- * @param  s [the source to check]
- * @return   [1 if playing]
+ * @brief Check if a source is currently playing.
+ * @param s the source to check
+ * @return 1 if playing, 0 otherwise
  */
 static inline int ex_sound_playing(ex_source_t *s) {
   ALenum state;

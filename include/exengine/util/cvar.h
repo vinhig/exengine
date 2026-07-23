@@ -45,14 +45,32 @@ typedef struct cvar_s {
   void (*callback)(struct cvar_s* var);
 } cvar_t;
 
+/**
+ * @brief Initialize the cvar module.
+ */
 void ex_cvar_init();
 
 /**
- * [ex_cvar_register]
- * @param cvar [cvar to register, must have the same lifetime as the game itself]
+ * @brief Register a cvar for access and persistence.
+ * @param cvar cvar to register (must have the same lifetime as the game itself)
  */
 void ex_cvar_register(cvar_t* cvar);
 
+/**
+ * @brief Look up a cvar by its enum ID.
+ * @param id the cvar ID
+ * @return pointer to the cvar, or NULL
+ */
 const cvar_t* ex_cvar_get_by_id(cvar_id_t id);
+
+/**
+ * @brief Look up a cvar by its name string.
+ * @param name the cvar name
+ * @return pointer to the cvar, or NULL
+ */
 const cvar_t* ex_cvar_get_by_name(const char* name);
+
+/**
+ * @brief Clean up all cvars.
+ */
 void ex_cvar_destroy();

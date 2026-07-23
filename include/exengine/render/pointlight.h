@@ -33,21 +33,21 @@ typedef struct {
 } ex_point_light_t;
 
 /**
- * [ex_point_light_init init the point-light module]
+ * @brief Initialize the point light module.
  */
 void ex_point_light_init();
 
 /**
- * [ex_point_light_new defines a new point-light]
- * @param  pos     [the initial position]
- * @param  color   [the initial color]
- * @param  dynamic [1 if the shadows are dynamic]
- * @return         [the new pointlight]
+ * @brief Create a new point light.
+ * @param pos     the initial position
+ * @param color   the initial color
+ * @param dynamic 1 if shadows are dynamic
+ * @return pointer to the new point light
  */
 ex_point_light_t *ex_point_light_new(vec3 pos, vec3 color, int dynamic);
 
 /**
- * [ex_point_light_destroy cleanup a point-light data]
- * @param l [the point-light to destroy]
+ * @brief Clean up point light data.
+ * @param l the point light to destroy
  */
 void ex_point_light_destroy(ex_point_light_t *l);

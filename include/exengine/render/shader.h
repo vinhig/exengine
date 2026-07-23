@@ -18,29 +18,29 @@ typedef struct {
 } ex_shader_t;
 
 /**
- * [ex_uniform cache and return shader uniform locations]
- * @param  shader [shader to be used]
- * @param  str    [uniform string]
- * @return        [uniform location]
+ * @brief Cache and return shader uniform locations.
+ * @param shader shader to be used
+ * @param str    uniform name string
+ * @return uniform location
  *
- * hashes a string key using djb2
+ * Hashes the string key using djb2.
  * www.cse.yorku.ca/~oz/hash.html
  */
 GLint ex_uniform(GLuint shader, const char *str);
 
 /**
- * [ex_shader (lazy) loads, attaches and links shaders into a shader program]
- * @param  path   [shader file path]
- * @return        [the shader program GLuint]
+ * @brief Load, attach, and link shaders into a shader program.
+ * @param path shader file path
+ * @return the shader program GLuint
  *
- * Move this to a .c file, it shouldn't be
- * in the header.
+ * Requires at minimum a vertex and fragment shader file.
+ * Move this to a .c file, it should not be in the header.
  */
 
 GLuint ex_graphic_pipeline_new(const char *path);
 
 /**
- * [ex_shader_use bind a shader for use assuming it is not already in use]
- * @param shader [shader to use]
+ * @brief Bind a shader for use, assuming it is not already in use.
+ * @param shader shader to use
  */
 void ex_graphic_pipeline_use(GLuint shader);

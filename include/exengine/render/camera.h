@@ -21,16 +21,19 @@ typedef struct {
 } ex_fps_camera_t;
 
 /**
- * [ex_fps_camera_new create a first person camera]
- * @param  x [x position]
- * @param  y [y position]
- * @param  z [z position]
+ * @brief Create a first person camera.
+ * @param x           x position
+ * @param y           y position
+ * @param z           z position
+ * @param sensitivity mouse sensitivity
+ * @param fov         field of view in radians
+ * @return pointer to the new camera
  */
 ex_fps_camera_t *ex_fps_camera_new(float x, float y, float z, float sensitivity, float fov);
 
 /**
- * [ex_fps_camera_resize adjust the projection matrices]
- * @param cam [camera to resize]
+ * @brief Adjust the projection matrices.
+ * @param cam camera to resize
  *
  * To be called right after scene_draw, but only if
  * the specified scene width and height where 0x0.
@@ -38,8 +41,8 @@ ex_fps_camera_t *ex_fps_camera_new(float x, float y, float z, float sensitivity,
 void ex_fps_camera_resize(ex_fps_camera_t *cam);
 
 /**
- * [ex_fps_camera_update handle input and rotation]
- * @param cam             [camera to update]
- * @param update_rotation [ ]
+ * @brief Handle input and rotation.
+ * @param cam             camera to update
+ * @param update_rotation whether to update rotation from mouse input
  */
 void ex_fps_camera_update(ex_fps_camera_t *cam, bool update_rotation);
