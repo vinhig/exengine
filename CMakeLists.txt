@@ -76,7 +76,7 @@ target_include_directories(exengine PUBLIC ${PROJECT_SOURCE_DIR}/third_party/SDL
 
 target_link_libraries(exengine PRIVATE SDL3::SDL3-static m mojoal imgui)
 #target_compile_options(exengine PUBLIC -fsanitize=undefined)
-#target_compile_options(exengine PUBLIC -Wall -Werror)
+target_compile_options(exengine PUBLIC -Wall -Werror)
 target_compile_definitions(exengine PUBLIC -DCIMGUI_USE_OPENGL3 -DCIMGUI_USE_SDL3)
 #target_compile_options(exengine PUBLIC -fsanitize=address,undefined -Wall)
 #target_link_options(exengine PUBLIC -fsanitize=address,undefined)

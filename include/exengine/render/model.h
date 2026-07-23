@@ -142,16 +142,6 @@ void ex_model_set_pose(ex_model_t *m, ex_frame_t frame);
 void ex_model_set_anim(ex_model_t *m, char *id);
 
 /**
- * [ex_model_get_ex_bone_transform get a bones transform for bone attachments]
- * @param m         [the model]
- * @param name      [the bone name]
- * @param transform [the transform to return]
- *
- * This is currently broken, don't use this.
- */
-void ex_model_get_ex_bone_transform(ex_model_t *m, const char *name, mat4x4 transform);
-
-/**
  * [ex_calc_bone_matrix gets bone matrix based on given input]
  * @param m     [ex_model_t pointer]
  * @param pos   [vec3 position]

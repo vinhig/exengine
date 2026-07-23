@@ -56,7 +56,7 @@ void ex_io_get_extension(char *dest, const char *src) {
     return;
   }
 
-  char *extension = strrchr(src, '.');
+  const char *extension = strrchr(src, '.');
   if (extension != NULL) {
     strcpy(dest, extension);
   }

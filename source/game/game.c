@@ -6,19 +6,31 @@
 #include <exengine/render/text.h>
 #include <exengine/render/vga.h>
 #include <game/game.h>
+#include <game/fps_scene.h>
 #include <game/mainmenu_scene.h>
 #include <game/world_scene.h>
 
 typedef enum current_scene_e {
+  FPS_SCENE,
   WORLD_SCENE,
   MAIN_MENU,
 } current_scene_t;
 
-current_scene_t current_scene = WORLD_SCENE;
+current_scene_t current_scene = FPS_SCENE;
 bool scene_changed = false;
 
 void game_init() {
-  world_scene_init();
+  switch (current_scene) {
+  case FPS_SCENE:
+    fps_scene_init();
+    break;
+  case WORLD_SCENE:
+    world_scene_init();
+    break;
+  case MAIN_MENU:
+    mainmenu_scene_init();
+    break;
+  }
 }
 
 void game_update(double dt, double ft) {
@@ -30,6 +42,9 @@ void game_update(double dt, double ft) {
   }
 
   switch (current_scene) {
+  case FPS_SCENE:
+    fps_scene_update(dt, ft);
+    break;
   case WORLD_SCENE:
     world_scene_update(dt, ft);
     break;
@@ -41,6 +56,9 @@ void game_update(double dt, double ft) {
 
 void game_draw() {
   switch (current_scene) {
+  case FPS_SCENE:
+    fps_scene_draw();
+    break;
   case WORLD_SCENE:
     world_scene_draw();
     break;
@@ -52,6 +70,9 @@ void game_draw() {
 
 void game_exit() {
   switch (current_scene) {
+  case FPS_SCENE:
+    fps_scene_exit();
+    break;
   case WORLD_SCENE:
     world_scene_exit();
     break;
@@ -69,6 +90,9 @@ void game_keypressed(uint32_t key) {
   //   scene_changed = true;
   // }
   switch (current_scene) {
+  case FPS_SCENE:
+    fps_scene_keypressed(key);
+    break;
   case WORLD_SCENE:
     world_scene_keypressed(key);
     break;
@@ -80,6 +104,9 @@ void game_keypressed(uint32_t key) {
 
 void game_mousepressed(uint8_t button) {
   switch (current_scene) {
+  case FPS_SCENE:
+    fps_scene_mousepressed(button);
+    break;
   case WORLD_SCENE:
     world_scene_mousepressed(button);
     break;
@@ -90,6 +117,9 @@ void game_mousepressed(uint8_t button) {
 
 void game_mousemoition(int xrel, int yrel) {
   switch (current_scene) {
+  case FPS_SCENE:
+    fps_scene_mousemoition(xrel, yrel);
+    break;
   case WORLD_SCENE:
     world_scene_mousemoition(xrel, yrel);
     break;
@@ -101,6 +131,9 @@ void game_mousemoition(int xrel, int yrel) {
 
 void game_mousewheel(int32_t x, int32_t y) {
   switch (current_scene) {
+  case FPS_SCENE:
+    fps_scene_mousewheel(x, y);
+    break;
   case WORLD_SCENE:
     world_scene_mousewheel(x, y);
     break;
@@ -112,6 +145,9 @@ void game_mousewheel(int32_t x, int32_t y) {
 
 void game_resize(uint32_t width, uint32_t height) {
   switch (current_scene) {
+  case FPS_SCENE:
+    fps_scene_resize(width, height);
+    break;
   case WORLD_SCENE:
     world_scene_resize(width, height);
     break;

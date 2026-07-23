@@ -296,9 +296,9 @@ void ex_render_model(ex_model_t *model, const ex_camera_matrices_t* camera, GLui
     vec3 world_min, world_max;
     mat4x4_transform_aabb(world_min, world_max, model->transform_matrices[i_idx], model->aabb_min, model->aabb_max);
 
-    if (ex_frustum_test_aabb(frustum_planes, world_min, world_max)) {
+    // if (ex_frustum_test_aabb(frustum_planes, world_min, world_max)) {
       model->visible_instance_count++;
-    }
+    // }
   }
 
   // frustum culling has been applied, draw only if there is something to draw

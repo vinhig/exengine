@@ -3,6 +3,8 @@
 #include <exengine/engine.h>
 #include <exengine/input/input.h>
 
+#include <stdio.h>
+
 float ex_mouse_x = 0.0f, ex_mouse_y = 0;
 uint8_t ex_keys_down[EX_NUM_SCANCODES];
 uint8_t ex_buttons_down[16];
