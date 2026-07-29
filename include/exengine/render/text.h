@@ -36,3 +36,9 @@ ex_font_t *ex_font_load(const char *path, const char *letters);
  * @param f the font to print
  */
 void ex_font_dbg(ex_font_t *f);
+
+/**
+ * @brief Clean up font data.
+ * @param f the font to destroy
+ */
+void ex_font_destroy(ex_font_t *f);

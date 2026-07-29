@@ -513,7 +513,14 @@ void ex_render_destroy() {
   glDeleteTextures(1, &framebuffer.color_bo);
   glDeleteTextures(1, &framebuffer.normal_bo);
   glDeleteTextures(1, &framebuffer.position_bo);
+  glDeleteTextures(1, &framebuffer.ssao_bo);
 
   glDeleteBuffers(1, &screenquad_vbo);
   glDeleteVertexArrays(1, &screenquad_vao);
+
+  glDeleteTextures(1, &default_texture_diffuse);
+  glDeleteTextures(1, &default_texture_normal);
+  glDeleteTextures(1, &default_texture_specular);
+
+  ex_ssao_destroy();
 }

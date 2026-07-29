@@ -31,6 +31,7 @@ typedef struct {
   GLuint VAO, VBO, EBO, vcount, icount;
   GLuint texture, texture_spec, texture_norm;
   uint32_t current_frame;
+  uint8_t is_copy;
 } ex_mesh_t;
 
 /**

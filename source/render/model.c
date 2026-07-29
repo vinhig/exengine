@@ -61,6 +61,15 @@ ex_model_t *ex_model_copy(ex_model_t *model) {
   m->anims_len = model->anims_len;
   m->frames_len = model->frames_len;
 
+  // deep copy collision vertices
+  if (model->vertices != nullptr && model->num_vertices > 0) {
+    m->num_vertices = model->num_vertices;
+    m->vertices = calloc(1, model->num_vertices * sizeof(vec3));
+    memcpy(m->vertices, model->vertices, model->num_vertices * sizeof(vec3));
+  }
+
+  m->is_copy = 1;
+
   // init instancing matrix vbos etc
   ex_model_init_instancing(m, 1);
 
@@ -178,6 +187,22 @@ void ex_model_destroy(ex_model_t *m) {
     }
   }
 
+  // clean up instancing data
+  if (m->transform_fulls != nullptr)
+    free(m->transform_fulls);
+
+  if (m->transform_matrices != nullptr)
+    free(m->transform_matrices);
+
+  if (m->instance_count > 0)
+    glDeleteBuffers(1, &m->instance_vbo);
+
+  if (m->vertices != nullptr)
+    free(m->vertices);
+
+  if (m->is_copy)
+    goto free_model;
+
   // clean up anim data
   if (m->bones != nullptr)
     free(m->bones);
@@ -204,9 +229,7 @@ void ex_model_destroy(ex_model_t *m) {
   if (m->skeleton != nullptr)
     free(m->skeleton);
 
-  if (m->vertices != nullptr)
-    free(m->vertices);
-
+free_model:
   // free model
   free(m);
 }

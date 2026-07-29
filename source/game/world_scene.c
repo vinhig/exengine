@@ -261,10 +261,17 @@ void world_scene_draw() {
 }
 
 void world_scene_exit() {
+  ex_sound_destroy(sound);
+  ex_fps_camera_destroy(camera);
+  ex_font_destroy(font);
+  free(camera_entity);
+
   ex_scene_destroy(scene);
 }
 
 void world_scene_keypressed(uint32_t key) {
+  if (key == SDL_SCANCODE_ESCAPE)
+    game_change_scene(FPS_SCENE);
 }
 
 void world_scene_mousepressed(uint8_t button) {

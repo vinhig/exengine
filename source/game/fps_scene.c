@@ -6,6 +6,7 @@
 #include <exengine/util/entity.h>
 #include <exengine/util/iqm.h>
 #include <game/fps_scene.h>
+#include <game/game.h>
 
 static ex_fps_camera_t *camera;
 static ex_scene_t *scene;
@@ -205,11 +206,19 @@ void fps_scene_draw()
 
 void fps_scene_exit()
 {
+  ex_sound_destroy(sound);
+  ex_fps_camera_destroy(camera);
+  ex_font_destroy(font);
+  free(e);
+  free(cube);
+
   ex_scene_destroy(scene);
 }
 
 void fps_scene_keypressed(uint32_t key)
 {
+  if (key == SDL_SCANCODE_ESCAPE)
+    game_change_scene(WORLD_SCENE);
 }
 
 void fps_scene_mousepressed(uint8_t button)

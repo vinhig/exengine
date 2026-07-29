@@ -46,3 +46,9 @@ void ex_fps_camera_resize(ex_fps_camera_t *cam);
  * @param update_rotation whether to update rotation from mouse input
  */
 void ex_fps_camera_update(ex_fps_camera_t *cam, bool update_rotation);
+
+/**
+ * @brief Clean up camera data.
+ * @param cam camera to destroy
+ */
+void ex_fps_camera_destroy(ex_fps_camera_t *cam);

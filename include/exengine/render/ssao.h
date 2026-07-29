@@ -37,3 +37,8 @@ void ex_ssao_bind_texture(GLuint shader);
  * @param shader shader to use
  */
 void ex_ssao_bind_default(GLuint shader);
+
+/**
+ * @brief Clean up SSAO resources.
+ */
+void ex_ssao_destroy();

@@ -102,6 +102,12 @@ void ex_octree_finalize(ex_octree_t *o);
 ex_octree_t *ex_octree_reset(ex_octree_t *o);
 
 /**
+ * @brief Destroy the octree and all its allocated resources.
+ * @param o the octree to destroy
+ */
+void ex_octree_destroy(ex_octree_t *o);
+
+/**
  * @brief Count the number of colliding entries in the octree.
  * @param o      the octree to check
  * @param bounds the bounds to test against

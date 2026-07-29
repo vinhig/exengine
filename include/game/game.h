@@ -7,6 +7,12 @@
 #include <inttypes.h>
 #include <stdbool.h>
 
+typedef enum current_scene_e {
+  FPS_SCENE,
+  WORLD_SCENE,
+  MAIN_MENU,
+} current_scene_t;
+
 /**
  * [game_init init everything]
  */
@@ -36,5 +42,7 @@ void game_mousemoition(int xrel, int yrel);
 void game_mousewheel(int32_t x, int32_t y);
 
 void game_resize(uint32_t width, uint32_t height);
+
+void game_change_scene(current_scene_t new_scene);
 
 #endif // GAME_H

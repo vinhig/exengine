@@ -1,158 +1,101 @@
 #include "log/log.h"
 
-#include <exengine/engine.h>
-#include <exengine/input/input.h>
-#include <exengine/render/camera.h>
-#include <exengine/render/text.h>
 #include <exengine/render/vga.h>
 #include <game/game.h>
 #include <game/fps_scene.h>
 #include <game/mainmenu_scene.h>
 #include <game/world_scene.h>
 
-typedef enum current_scene_e {
-  FPS_SCENE,
-  WORLD_SCENE,
-  MAIN_MENU,
-} current_scene_t;
+typedef struct scene_vtable {
+    void (*init)(void);
+    void (*update)(double dt, double ft);
+    void (*draw)(void);
+    void (*exit)(void);
+    void (*keypressed)(uint32_t key);
+    void (*mousepressed)(uint8_t button);
+    void (*mousemoition)(int xrel, int yrel);
+    void (*mousewheel)(int32_t x, int32_t y);
+    void (*resize)(uint32_t width, uint32_t height);
+} scene_vtable_t;
+
+static const scene_vtable_t scene_vtables[] = {
+    [FPS_SCENE]   = {
+        .init          = fps_scene_init,
+        .update        = fps_scene_update,
+        .draw          = fps_scene_draw,
+        .exit          = fps_scene_exit,
+        .keypressed    = fps_scene_keypressed,
+        .mousepressed  = fps_scene_mousepressed,
+        .mousemoition  = fps_scene_mousemoition,
+        .mousewheel    = fps_scene_mousewheel,
+        .resize        = fps_scene_resize,
+    },
+    [WORLD_SCENE] = {
+        .init          = world_scene_init,
+        .update        = world_scene_update,
+        .draw          = world_scene_draw,
+        .exit          = world_scene_exit,
+        .keypressed    = world_scene_keypressed,
+        .mousepressed  = world_scene_mousepressed,
+        .mousemoition  = world_scene_mousemoition,
+        .mousewheel    = world_scene_mousewheel,
+        .resize        = world_scene_resize,
+    },
+    [MAIN_MENU]   = {
+        .init          = mainmenu_scene_init,
+        .update        = mainmenu_scene_update,
+        .draw          = mainmenu_scene_draw,
+        .exit          = mainmenu_scene_exit,
+        .keypressed    = mainmenu_scene_keypressed,
+        .mousepressed  = mainmenu_scene_mousepressed,
+        .mousemoition  = mainmenu_scene_mousemoition,
+        .mousewheel    = mainmenu_scene_mousewheel,
+        .resize        = mainmenu_scene_resize,
+    },
+};
 
 current_scene_t current_scene = FPS_SCENE;
-bool scene_changed = false;
+
+void game_change_scene(const current_scene_t new_scene) {
+    scene_vtables[current_scene].exit();
+    current_scene = new_scene;
+    scene_vtables[current_scene].init();
+}
 
 void game_init() {
-  switch (current_scene) {
-  case FPS_SCENE:
-    fps_scene_init();
-    break;
-  case WORLD_SCENE:
-    world_scene_init();
-    break;
-  case MAIN_MENU:
-    mainmenu_scene_init();
-    break;
-  }
+    scene_vtables[current_scene].init();
 }
 
 void game_update(double dt, double ft) {
-  if (scene_changed) {
-    mainmenu_scene_exit();
-    world_scene_init();
-    current_scene = WORLD_SCENE;
-    scene_changed = false;
-  }
-
-  switch (current_scene) {
-  case FPS_SCENE:
-    fps_scene_update(dt, ft);
-    break;
-  case WORLD_SCENE:
-    world_scene_update(dt, ft);
-    break;
-  case MAIN_MENU:
-    mainmenu_scene_update(dt, ft);
-    break;
-  }
+    scene_vtables[current_scene].update(dt, ft);
 }
 
 void game_draw() {
-  switch (current_scene) {
-  case FPS_SCENE:
-    fps_scene_draw();
-    break;
-  case WORLD_SCENE:
-    world_scene_draw();
-    break;
-  case MAIN_MENU:
-    mainmenu_scene_draw();
-    break;
-  }
+    scene_vtables[current_scene].draw();
 }
 
 void game_exit() {
-  switch (current_scene) {
-  case FPS_SCENE:
-    fps_scene_exit();
-    break;
-  case WORLD_SCENE:
-    world_scene_exit();
-    break;
-  case MAIN_MENU:
-    mainmenu_scene_exit();
-    break;
-  }
-  ex_vga_destroy();
-  log_info("Good bye!");
+    scene_vtables[current_scene].exit();
+    ex_vga_destroy();
+    log_info("Good bye!");
 }
 
 void game_keypressed(uint32_t key) {
-  // if (current_scene != WORLD_SCENE) {
-  //   current_scene = WORLD_SCENE;
-  //   scene_changed = true;
-  // }
-  switch (current_scene) {
-  case FPS_SCENE:
-    fps_scene_keypressed(key);
-    break;
-  case WORLD_SCENE:
-    world_scene_keypressed(key);
-    break;
-  case MAIN_MENU:
-    mainmenu_scene_keypressed(key);
-    break;
-  }
+    scene_vtables[current_scene].keypressed(key);
 }
 
 void game_mousepressed(uint8_t button) {
-  switch (current_scene) {
-  case FPS_SCENE:
-    fps_scene_mousepressed(button);
-    break;
-  case WORLD_SCENE:
-    world_scene_mousepressed(button);
-    break;
-  case MAIN_MENU:
-    break;
-  }
+    scene_vtables[current_scene].mousepressed(button);
 }
 
 void game_mousemoition(int xrel, int yrel) {
-  switch (current_scene) {
-  case FPS_SCENE:
-    fps_scene_mousemoition(xrel, yrel);
-    break;
-  case WORLD_SCENE:
-    world_scene_mousemoition(xrel, yrel);
-    break;
-  case MAIN_MENU:
-    mainmenu_scene_mousemoition(xrel, yrel);
-    break;
-  }
+    scene_vtables[current_scene].mousemoition(xrel, yrel);
 }
 
 void game_mousewheel(int32_t x, int32_t y) {
-  switch (current_scene) {
-  case FPS_SCENE:
-    fps_scene_mousewheel(x, y);
-    break;
-  case WORLD_SCENE:
-    world_scene_mousewheel(x, y);
-    break;
-  case MAIN_MENU:
-    mainmenu_scene_mousewheel(x, y);
-    break;
-  }
+    scene_vtables[current_scene].mousewheel(x, y);
 }
 
 void game_resize(uint32_t width, uint32_t height) {
-  switch (current_scene) {
-  case FPS_SCENE:
-    fps_scene_resize(width, height);
-    break;
-  case WORLD_SCENE:
-    world_scene_resize(width, height);
-    break;
-  case MAIN_MENU:
-    mainmenu_scene_resize(width, height);
-    break;
-  }
+    scene_vtables[current_scene].resize(width, height);
 }

@@ -199,3 +199,13 @@ void ex_font_dbg(ex_font_t *f) {
   glBindVertexArray(0);
   glBindTexture(GL_TEXTURE_2D, 0);
 }
+
+void ex_font_destroy(ex_font_t *f) {
+  if (f == NULL)
+    return;
+
+  glDeleteTextures(1, &f->texture);
+  free(f->metrics);
+  free(f->uv);
+  free(f);
+}

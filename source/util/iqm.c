@@ -10,6 +10,8 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   // check if its already in the cache
   ex_model_t *m_cache = ex_cache_get_model(path);
   if (m_cache != nullptr) {
+    if (flags & EX_KEEP_VERTICES)
+      ex_scene_add_collision(scene, m_cache);
     return m_cache;
   }
 
@@ -310,7 +312,6 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
     model->num_vertices = vis_len;
     memcpy(model->vertices, vis_vertices, vis_len * sizeof(vec3));
     ex_scene_add_collision(scene, model);
-    free(model->vertices);
   }
 
   // store the path for caching purposes

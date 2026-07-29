@@ -181,3 +181,12 @@ void ex_ssao_bind_default(GLuint shader) {
   glUniform1i(ex_uniform(shader, "u_ssao"), 3);
   glBindTexture(GL_TEXTURE_2D, default_texture_ssao);
 }
+
+void ex_ssao_destroy() {
+  glDeleteTextures(1, &ssao_noise_texture);
+  glDeleteTextures(1, &ssao_color_buffer);
+  glDeleteTextures(1, &ssao_color_blur_buffer);
+  glDeleteTextures(1, &default_texture_ssao);
+  glDeleteFramebuffers(1, &ssao_fbo);
+  glDeleteFramebuffers(1, &ssao_blur_fbo);
+}

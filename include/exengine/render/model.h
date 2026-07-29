@@ -79,6 +79,8 @@ typedef struct {
   size_t visible_instance_count;
 
   char path[512];
+
+  uint8_t is_copy;
 } ex_model_t;
 
 /**

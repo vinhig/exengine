@@ -253,6 +253,53 @@ ex_octree_t *ex_octree_reset(ex_octree_t *o) {
   return NULL;
 }
 
+void ex_octree_destroy(ex_octree_t *o) {
+  if (o == NULL)
+    return;
+
+  for (int i = 0; i < 8; i++)
+    if (o->children[i] != NULL)
+      ex_octree_destroy(o->children[i]);
+
+  if (o->obj_list != NULL) {
+    ex_list_destroy(o->obj_list);
+    o->obj_list = NULL;
+  }
+
+  if (o->data_len > 0 && o->data_type != OBJ_TYPE_NULL) {
+    switch (o->data_type) {
+    case OBJ_TYPE_UINT:
+      if (o->data_uint != NULL)
+        free(o->data_uint);
+      break;
+    case OBJ_TYPE_INT:
+      if (o->data_int != NULL)
+        free(o->data_int);
+      break;
+    case OBJ_TYPE_BYTE:
+      if (o->data_byte != NULL)
+        free(o->data_byte);
+      break;
+    case OBJ_TYPE_FLOAT:
+      if (o->data_float != NULL)
+        free(o->data_float);
+      break;
+    case OBJ_TYPE_DOUBLE:
+      if (o->data_double != NULL)
+        free(o->data_double);
+      break;
+    }
+  }
+
+  if (o->rendered) {
+    glDeleteVertexArrays(1, &o->vao);
+    glDeleteBuffers(1, &o->vbo);
+    glDeleteBuffers(1, &o->ebo);
+  }
+
+  free(o);
+}
+
 void ex_octree_get_colliding_count(ex_octree_t *o, rect_t *bounds, int *count) {
   if (o == NULL)
     return;

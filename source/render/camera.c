@@ -94,3 +94,7 @@ void ex_fps_camera_update(ex_fps_camera_t *cam, bool update_rotation) {
   mat4x4_invert(cam->matrices.inverse_view, cam->matrices.view);
   mat4x4_mul(cam->matrices.frustum, cam->matrices.projection_frustum, cam->matrices.view);
 }
+
+void ex_fps_camera_destroy(ex_fps_camera_t *cam) {
+  free(cam);
+}

@@ -52,9 +52,6 @@ void ex_scene_add_collision(ex_scene_t *s, ex_model_t *model) {
         s->coll_vertices_last = model->num_vertices;
       }
 
-      free(model->vertices);
-      model->vertices = NULL;
-      model->num_vertices = 0;
       s->collision_built = 0;
     }
   }
@@ -134,6 +131,11 @@ void ex_scene_resize(ex_scene_t *s, int width, int height) {
 void ex_scene_destroy(ex_scene_t *s) {
   log_trace("Cleaning up scene.");
 
+  for (int i = 0; i < s->renderables.models.count; i++) {
+    ex_model_t *model = (ex_model_t *)s->renderables.models.nodes[i].obj;
+    ex_model_destroy(model);
+  }
+
   for (int i = 0; i < s->renderables.point_lights.count; i++) {
     ex_point_light_t *light = (ex_point_light_t *)s->renderables.point_lights.nodes[i].obj;
     ex_point_light_destroy(light);
@@ -142,5 +144,15 @@ void ex_scene_destroy(ex_scene_t *s) {
   free(s->renderables.models.nodes);
   free(s->renderables.point_lights.nodes);
 
+  ex_octree_destroy(s->coll_tree);
+
+  if (s->coll_list != NULL)
+    ex_list_destroy(s->coll_list);
+
+  if (s->coll_vertices != NULL)
+    free(s->coll_vertices);
+
   ex_render_destroy();
+
+  free(s);
 }

@@ -71,6 +71,7 @@ ex_mesh_t *ex_mesh_copy(ex_mesh_t *mesh) {
   m->icount = mesh->icount;
   m->texture_spec = mesh->texture_spec;
   m->texture_norm = mesh->texture_norm;
+  m->is_copy = 1;
 
   glGenVertexArrays(1, &m->VAO);
   glBindVertexArray(m->VAO);
@@ -112,8 +113,11 @@ ex_mesh_t *ex_mesh_copy(ex_mesh_t *mesh) {
 
 void ex_mesh_destroy(ex_mesh_t *m) {
   glDeleteVertexArrays(1, &m->VAO);
-  glDeleteBuffers(1, &m->VBO);
-  glDeleteBuffers(1, &m->EBO);
+
+  if (!m->is_copy) {
+    glDeleteBuffers(1, &m->VBO);
+    glDeleteBuffers(1, &m->EBO);
+  }
 
   free(m);
   m = NULL;
