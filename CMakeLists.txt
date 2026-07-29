@@ -84,3 +84,10 @@ if (CMAKE_SYSTEM_NAME STREQUAL Windows)
  add_compile_options(-static)
  add_link_options(-static -static-libgcc -static-libstdc++)
 endif ()
+
+add_custom_command(
+    TARGET exengine POST_BUILD
+    COMMAND zip -r "$<TARGET_FILE_DIR:exengine>/data.ex" data/
+    WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/source"
+    COMMENT "Packing game assets into data.ex"
+)

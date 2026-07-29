@@ -77,7 +77,6 @@ git clone --recursive https://github.com/exezin/exengine
 cd exengine
 cmake -B build -G "Ninja Multi-Config"
 cmake --build build --config Release
-cd build && sh ../data.sh
 ```
 
 The resulting binary will be in `build/Release/`.
@@ -96,7 +95,6 @@ git clone --recursive https://github.com/exezin/exengine
 cd exengine
 cmake -B build -G "Ninja Multi-Config" -DCMAKE_TOOLCHAIN_FILE=toolchain-mingw64.cmake
 cmake --build build --config Release
-cd build && sh ../data.sh
 ```
 
 The resulting `.exe` will be in `build/Release/`.

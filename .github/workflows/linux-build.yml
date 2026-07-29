@@ -31,14 +31,11 @@ jobs:
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
-      - name: Assets
-        run: cd ${{github.workspace}}/build && sh ../data.sh
-
       - name: Stage files for artifact
         run: |
           mkdir -p ${{github.workspace}}/artifact-staging
           cp ${{github.workspace}}/build/${{env.BUILD_TYPE}}/exengine ${{github.workspace}}/artifact-staging/
-          cp ${{github.workspace}}/build/data.ex ${{github.workspace}}/artifact-staging/
+          cp ${{github.workspace}}/build/${{env.BUILD_TYPE}}/data.ex ${{github.workspace}}/artifact-staging/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4
