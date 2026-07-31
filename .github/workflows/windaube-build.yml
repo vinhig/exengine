@@ -31,6 +31,9 @@ jobs:
       - name: Build
         run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+      - name: Test
+        run: ctest --test-dir ${{github.workspace}}/build --build-config ${{env.BUILD_TYPE}}
+
       - name: Stage files for artifact
         run: |
           mkdir -p ${{github.workspace}}/artifact-staging
