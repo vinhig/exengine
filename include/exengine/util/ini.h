@@ -48,10 +48,19 @@ typedef struct {
 } ex_ini_t;
 
 /**
+ * @brief Parse INI content from an in-memory buffer.
+ * @param ini  ini instance to use (should be zero-initialized)
+ * @param buff null-terminated INI content string
+ * @return non-zero upon success
+ */
+int ex_ini_parse(ex_ini_t *ini, const char *buff);
+
+/**
  * @brief Load or update from an ini file.
  * @deprecated This function is broken and should not be used. The name
  *             explicitly indicates it is deprecated. Use the other ini
- *             accessor functions (ex_ini_get_*) instead.
+ *             accessor functions (ex_ini_get_*) instead. Consider using
+ *             ex_ini_parse() on a manually-read buffer instead.
  * @param ini  ini instance to use
  * @param path file path
  * @return non-zero upon success

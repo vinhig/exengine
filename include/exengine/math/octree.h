@@ -205,7 +205,7 @@ static inline int ex_rect_intersect_sphere(rect_t r, vec3 pos, float radius) {
     dist -= ex_squared(pos[2] - r.min[2]);
   else if (pos[2] > r.max[2])
     dist -= ex_squared(pos[2] - r.max[2]);
-  return dist > 0;
+  return dist >= 0;
 };
 
 /**

@@ -129,9 +129,14 @@ static inline void vec3_mul(vec3 v, vec3 a, vec3 b) {
 }
 
 static inline void vec3_trim(vec3 v, vec3 a, float len) {
-  // vec3_scale(v, v, len);
-  // vec3_norm(v, v);
-  vec3_scale(v, a, MIN(vec3_len(a), len));
+  float cur_len = vec3_len(a);
+  if (cur_len > len)
+    vec3_scale(v, a, len / cur_len);
+  else {
+    int i;
+    for (i = 0; i < 3; i++)
+      v[i] = a[i];
+  }
 }
 
 static inline void vec3_clamp(vec3 v, vec3 a, float low, float high) {
@@ -251,9 +256,9 @@ static inline void mat4x4_mul_vec4(vec4 r, mat4x4 M, vec4 v) {
 }
 static inline void mat4x4_translate(mat4x4 T, vec3 const t) {
   mat4x4_identity(T);
-  T[0][3] = t[0];
-  T[1][3] = t[1];
-  T[2][3] = t[2];
+  T[3][0] = t[0];
+  T[3][1] = t[1];
+  T[3][2] = t[2];
 }
 static inline void mat4x4_translate_in_place(mat4x4 M, float x, float y, float z) {
   vec4 t = {x, y, z, 0};
@@ -466,6 +471,19 @@ static inline void mat4x4_look_at(mat4x4 m, vec3 eye, vec3 center, vec3 up) {
 
   vec3 s;
   vec3_mul_cross(s, f, up);
+  if (vec3_len2(s) < 1e-6f) {
+    vec3 alt_up;
+    if (fabsf(f[0]) < 0.9f) {
+      alt_up[0] = 1.0f;
+      alt_up[1] = 0.0f;
+      alt_up[2] = 0.0f;
+    } else {
+      alt_up[0] = 0.0f;
+      alt_up[1] = 1.0f;
+      alt_up[2] = 0.0f;
+    }
+    vec3_mul_cross(s, f, alt_up);
+  }
   vec3_norm(s, s);
 
   vec3 t;
@@ -726,31 +744,31 @@ static inline void mat4x4o_mul_quat(mat4x4 R, mat4x4 M, quat q) {
   R[3][3] = 1.f;
 }
 static inline void quat_from_mat4x4(quat q, mat4x4 M) {
-  float r = 0.f;
-  int i;
+  float t = M[0][0] + M[1][1] + M[2][2];
 
-  int perm[] = {0, 1, 2, 0, 1};
-  int *p = perm;
-
-  for (i = 0; i < 3; i++) {
-    float m = M[i][i];
-    if (m < r) {
-      continue;
-    }
-    m = r;
-    p = &perm[i];
+  if (t > 0.0f) {
+    float s = sqrtf(t + 1.0f) * 2.0f; /* s = 4*w */
+    q[3] = 0.25f * s;
+    q[0] = (M[1][2] - M[2][1]) / s;
+    q[1] = (M[2][0] - M[0][2]) / s;
+    q[2] = (M[0][1] - M[1][0]) / s;
+  } else if (M[0][0] > M[1][1] && M[0][0] > M[2][2]) {
+    float s = sqrtf(M[0][0] - M[1][1] - M[2][2] + 1.0f) * 2.0f; /* s = 4*x */
+    q[0] = 0.25f * s;
+    q[1] = (M[0][1] + M[1][0]) / s;
+    q[2] = (M[0][2] + M[2][0]) / s;
+    q[3] = (M[1][2] - M[2][1]) / s;
+  } else if (M[1][1] > M[2][2]) {
+    float s = sqrtf(M[1][1] - M[0][0] - M[2][2] + 1.0f) * 2.0f; /* s = 4*y */
+    q[0] = (M[0][1] + M[1][0]) / s;
+    q[1] = 0.25f * s;
+    q[2] = (M[1][2] + M[2][1]) / s;
+    q[3] = (M[2][0] - M[0][2]) / s;
+  } else {
+    float s = sqrtf(M[2][2] - M[0][0] - M[1][1] + 1.0f) * 2.0f; /* s = 4*z */
+    q[0] = (M[0][2] + M[2][0]) / s;
+    q[1] = (M[1][2] + M[2][1]) / s;
+    q[2] = 0.25f * s;
+    q[3] = (M[0][1] - M[1][0]) / s;
   }
-
-  r = sqrtf(1.f + M[p[0]][p[0]] - M[p[1]][p[1]] - M[p[2]][p[2]]);
-
-  if (r < 1e-6) {
-    q[0] = 1.f;
-    q[1] = q[2] = q[3] = 0.f;
-    return;
-  }
-
-  q[0] = r / 2.f;
-  q[1] = (M[p[0]][p[1]] - M[p[1]][p[0]]) / (2.f * r);
-  q[2] = (M[p[2]][p[0]] - M[p[0]][p[2]]) / (2.f * r);
-  q[3] = (M[p[2]][p[1]] - M[p[1]][p[2]]) / (2.f * r);
 }

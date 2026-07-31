@@ -6,27 +6,33 @@
 #include <stdlib.h>
 #include <string.h>
 
-int ex_ini_load_dont_use(ex_ini_t *ini, const char *path) {
-  log_info("Loading config file %s", path);
-
-  // read config file contents
-  char *buff = ex_io_read(path, "r", nullptr);
+int ex_ini_parse(ex_ini_t *ini, const char *buff) {
   if (buff == NULL) {
     return 0;
   }
 
-  // strip white-space
+  /* work on a mutable copy so strtok can modify it */
+  size_t buff_len = strlen(buff);
+  char *copy = malloc(buff_len + 1);
+  if (copy == NULL) {
+    return 0;
+  }
+
+  /* strip white-space into copy */
   int j = 0;
-  for (int i = 0; i < strlen(buff); i++) {
+  for (int i = 0; i < (int)buff_len; i++) {
     if (buff[i] != ' ' && buff[i] != '\t') {
-      buff[j++] = buff[i];
+      copy[j++] = buff[i];
     }
   }
-  buff[j] = '\0';
+  copy[j] = '\0';
+
+  // reset ini contents before parsing
+  ini->length = 0;
 
   // tokenize buffer
   int cur_section = -1;
-  char *token = strtok(buff, "\t\n");
+  char *token = strtok(copy, "\t\n");
   while (token) {
     // check if section
     if (token[0] == '[' && token[strlen(token) - 1] == ']') {
@@ -97,8 +103,22 @@ int ex_ini_load_dont_use(ex_ini_t *ini, const char *path) {
     token = strtok(NULL, "\t\n");
   }
 
-  free(buff);
+  free(copy);
   return 1;
+}
+
+int ex_ini_load_dont_use(ex_ini_t *ini, const char *path) {
+  log_info("Loading config file %s", path);
+
+  // read config file contents
+  char *buff = ex_io_read(path, "r", nullptr);
+  if (buff == NULL) {
+    return 0;
+  }
+
+  int result = ex_ini_parse(ini, buff);
+  free(buff);
+  return result;
 }
 
 void ex_ini_save(ex_ini_t *ini, const char *path) {
@@ -158,6 +178,7 @@ ex_ini_var_t *ex_ini_new_var(ex_ini_t *ini, const char *sec, const char *key) {
   if (!section) {
     strcpy(ini->sections[ini->length].name, sec);
     ini->sections[ini->length].length = 0;
+    section = &ini->sections[ini->length];
     ini->length++;
   }
 

@@ -91,3 +91,50 @@ add_custom_command(
     WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/source"
     COMMENT "Packing game assets into data.ex"
 )
+
+# --- Unit Tests ---
+option(BUILD_TESTS "Build unit tests" ON)
+
+if(BUILD_TESTS)
+  enable_testing()
+
+  # Common options for tests: no GPU dependencies, just pure logic
+  function(add_exengine_test name)
+    add_executable(${name} ${ARGN})
+    target_include_directories(${name} PRIVATE
+      ${PROJECT_SOURCE_DIR}/include
+      ${PROJECT_SOURCE_DIR}/third_party
+      ${PROJECT_SOURCE_DIR}/tests
+    )
+    target_compile_options(${name} PRIVATE -Wall -Werror)
+    target_compile_options(${name} PRIVATE -fsanitize=address,undefined)
+    target_link_options(${name} PRIVATE -fsanitize=address,undefined)
+    target_link_libraries(${name} m)
+    target_include_directories(${name} PRIVATE ${PROJECT_SOURCE_DIR}/tests)
+    add_test(NAME ${name} COMMAND ${name})
+  endfunction()
+
+  add_exengine_test(test_mathlib
+    tests/test_mathlib.c
+  )
+
+  add_exengine_test(test_list
+    tests/test_list.c
+    source/util/list.c
+  )
+
+  add_exengine_test(test_collision
+    tests/test_collision.c
+    source/math/collision.c
+  )
+
+  add_exengine_test(test_ini
+    tests/test_ini.c
+    source/util/ini.c
+    tests/stubs.c
+  )
+
+  add_exengine_test(test_aabb
+    tests/test_aabb.c
+  )
+endif()

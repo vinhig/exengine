@@ -17,7 +17,12 @@ void ex_list_add(ex_list_node_t *n, void *data) {
     if (n->next != nullptr) {
       n = n->next;
     } else {
-      return;
+      n->next = calloc(1, sizeof(ex_list_node_t));
+      n->next->prev = n;
+      n->next->next = nullptr;
+      n->next->data = nullptr;
+      n = n->next;
+      break;
     }
   }
 

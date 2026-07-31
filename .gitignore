@@ -1,0 +1,5 @@
+build
+cmake-build-*
+.zig-cache
+win-build
+.idea
