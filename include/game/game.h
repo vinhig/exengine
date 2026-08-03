@@ -8,6 +8,7 @@
 #include <stdbool.h>
 
 typedef enum current_scene_e {
+  EDITOR_SCENE,
   FPS_SCENE,
   WORLD_SCENE,
   MAIN_MENU,

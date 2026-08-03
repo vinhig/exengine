@@ -13,6 +13,7 @@
 
 #ifdef USING_IMGUI
 #define CIMGUI_DEFINE_ENUMS_AND_STRUCTS
+#include <glad/glad.h>
 #include <imgui/cimgui.h>
 #include <imgui/cimgui_impl.h>
 #endif
@@ -215,30 +216,19 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
     }
 
     // user draw callback
-#ifdef USING_IMGUI
+    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplSDL3_NewFrame();
     igNewFrame();
 
-    static bool opened = true;
-    igBegin("Hello, world!", &opened, 0);
-    igText("This is some useful text");
-    igButton("hellooo", (ImVec2){32, 64});
-    char buffer[1024] = {};
-    igInputText("bonjour", &buffer[0], 1024, 0, 0, nullptr);
-    igEnd();
-
-#endif
     ex_draw_ptr();
-
-#ifdef USING_IMGUI
     igEndFrame();
     igRender();
 
     ImGui_ImplOpenGL3_RenderDrawData(igGetDrawData());
-#endif
 
-    // swap buffers
     SDL_GL_SwapWindow(display.window);
   }
   /* ------------------- */

@@ -1,8 +1,9 @@
 #include "log/log.h"
 
 #include <exengine/render/vga.h>
-#include <game/game.h>
+#include <game/editor_scene.h>
 #include <game/fps_scene.h>
+#include <game/game.h>
 #include <game/mainmenu_scene.h>
 #include <game/world_scene.h>
 
@@ -19,6 +20,17 @@ typedef struct scene_vtable {
 } scene_vtable_t;
 
 static const scene_vtable_t scene_vtables[] = {
+    [EDITOR_SCENE] = {
+        .init          = editor_scene_init,
+        .update        = editor_scene_update,
+        .draw          = editor_scene_draw,
+        .exit          = editor_scene_exit,
+        .keypressed    = editor_scene_keypressed,
+        .mousepressed  = editor_scene_mousepressed,
+        .mousemoition  = editor_scene_mousemoition,
+        .mousewheel    = editor_scene_mousewheel,
+        .resize        = editor_scene_resize,
+    },
     [FPS_SCENE]   = {
         .init          = fps_scene_init,
         .update        = fps_scene_update,
@@ -54,7 +66,7 @@ static const scene_vtable_t scene_vtables[] = {
     },
 };
 
-current_scene_t current_scene = FPS_SCENE;
+current_scene_t current_scene = EDITOR_SCENE;
 
 void game_change_scene(const current_scene_t new_scene) {
     scene_vtables[current_scene].exit();
