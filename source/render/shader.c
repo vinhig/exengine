@@ -7,14 +7,45 @@
 #include <string.h>
 
 #define EX_MAX_SHADERS 512
+#define EX_MAX_UNIFORMS 256
 
-GLint ex_uniform_map[256][256] = {{0}};
-GLint ex_uniform_locations[256][256] = {{0}};
+// map raw GL program IDs onto bounded internal slots so that arbitrary
+// program IDs can never index out of bounds
+static GLuint ex_uniform_shader_ids[EX_MAX_SHADERS];
+static size_t ex_uniform_shader_count = 0;
+static GLuint ex_uniform_last_shader = 0;
+static size_t ex_uniform_last_slot = 0;
 
-ex_shader_t shader_list[EX_MAX_SHADERS];
-size_t shader_count = 0;
+// per-slot uniform location caches, keyed by the djb2 hash of the uniform name
+static GLint ex_uniform_map[EX_MAX_SHADERS][EX_MAX_UNIFORMS] = {{0}};
+static GLint ex_uniform_locations[EX_MAX_SHADERS][EX_MAX_UNIFORMS] = {{0}};
 
 GLuint active_shader = 0;
+
+static size_t ex_uniform_slot(GLuint shader) {
+  if (shader == ex_uniform_last_shader) {
+    return ex_uniform_last_slot;
+  }
+
+  for (size_t i = 0; i < ex_uniform_shader_count; i++) {
+    if (ex_uniform_shader_ids[i] == shader) {
+      ex_uniform_last_shader = shader;
+      ex_uniform_last_slot = i;
+      return i;
+    }
+  }
+
+  if (ex_uniform_shader_count < EX_MAX_SHADERS) {
+    size_t slot = ex_uniform_shader_count++;
+    ex_uniform_shader_ids[slot] = shader;
+    ex_uniform_last_shader = shader;
+    ex_uniform_last_slot = slot;
+    return slot;
+  }
+
+  // all slots taken, skip caching
+  return (size_t)-1;
+}
 
 inline GLint ex_uniform(GLuint shader, const char *str) {
   const char *string = str;
@@ -26,29 +57,36 @@ inline GLint ex_uniform(GLuint shader, const char *str) {
     key = ((key << 5) + key) + c;
   }
 
+  size_t slot = ex_uniform_slot(shader);
+  if (slot == (size_t)-1) {
+    return glGetUniformLocation(shader, string);
+  }
+
   // check if location cached already
   int i = 0;
-  for (i = 0; i < 256; i++) {
+  for (i = 0; i < EX_MAX_UNIFORMS; i++) {
     // end of array
-    if (!ex_uniform_map[shader][i]) {
+    if (!ex_uniform_map[slot][i]) {
       break;
     }
 
     // check cached
-    if (ex_uniform_map[shader][i] == key) {
-      return ex_uniform_locations[shader][i];
+    if (ex_uniform_map[slot][i] == key) {
+      return ex_uniform_locations[slot][i];
     }
   }
 
   // store and return it
   GLint value = glGetUniformLocation(shader, string);
-  ex_uniform_map[shader][i] = key;
-  ex_uniform_locations[shader][i] = value;
+  if (i < EX_MAX_UNIFORMS) {
+    ex_uniform_map[slot][i] = key;
+    ex_uniform_locations[slot][i] = value;
+  }
 
   return value;
 }
 
-bool ex_gl_check_compilation(GLuint shader, const char* label) {
+bool ex_gl_check_compilation(GLuint shader, const char *label) {
   GLchar compile_log[512];
   GLint success;
 
@@ -82,11 +120,11 @@ GLuint ex_graphic_pipeline_new(const char *path) {
   char *vs_source = ex_io_read(vs_path, "r", nullptr);
   char *fs_source = ex_io_read(fs_path, "r", nullptr);
 
-  auto program = glCreateProgram();
+  GLuint program = glCreateProgram();
 
-  auto vs = glCreateShader(GL_VERTEX_SHADER);
-  auto fs = glCreateShader(GL_FRAGMENT_SHADER);
-  auto gs = 0;
+  GLuint vs = glCreateShader(GL_VERTEX_SHADER);
+  GLuint fs = glCreateShader(GL_FRAGMENT_SHADER);
+  GLuint gs = 0;
 
   glShaderSource(vs, 1, (const char *const *)&vs_source, nullptr);
   glShaderSource(fs, 1, (const char *const *)&fs_source, nullptr);

@@ -131,17 +131,6 @@ void world_scene_init() {
   ex_scene_add_pointlight(scene, pl);
   pl->cast_shadow = 1;
 
-  // erebus_model = ex_iqm_load_model(scene, "data/erebus.iqm", 0);
-  // erebus_model->cast_shadow = 1;
-  // erebus_model->scale = 0.025f;
-  // erebus_model->rotation[0] = -90.0f;
-  // erebus_model->position[0] = 5.0f;
-  // erebus_model->position[1] = 5.0f;
-  // erebus_model->position[2] = 5.0f;
-  // ex_scene_add_model(scene, erebus_model);
-
-  // ex_model_set_anim(erebus_model, "run");
-
   // this ain't it
   font = ex_font_load("data/fonts/OpenSans-Regular.ttf", "abcdefghijklmnopqrstuvwxyzHW!_");
 
@@ -270,8 +259,9 @@ void world_scene_exit() {
 }
 
 void world_scene_keypressed(uint32_t key) {
-  if (key == SDL_SCANCODE_ESCAPE)
+  if (key == SDL_SCANCODE_ESCAPE) {
     game_change_scene(FPS_SCENE);
+  }
 }
 
 void world_scene_mousepressed(uint8_t button) {

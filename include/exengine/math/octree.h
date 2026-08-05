@@ -8,8 +8,8 @@
 
 #pragma once
 
-#include <exengine/util/list.h>
 #include <exengine/math/mathlib.h>
+#include <exengine/util/list.h>
 #include <stdint.h>
 #include <string.h>
 
@@ -125,18 +125,21 @@ static inline float ex_squared(float v) { return v * v; };
  */
 static inline int ex_rect_intersect_sphere(rect_t r, vec3 pos, float radius) {
   float dist = radius * radius;
-  if (pos[0] < r.min[0])
+  if (pos[0] < r.min[0]) {
     dist -= ex_squared(pos[0] - r.min[0]);
-  else if (pos[0] > r.max[0])
+  } else if (pos[0] > r.max[0]) {
     dist -= ex_squared(pos[0] - r.max[0]);
-  if (pos[1] < r.min[1])
+  }
+  if (pos[1] < r.min[1]) {
     dist -= ex_squared(pos[1] - r.min[1]);
-  else if (pos[1] > r.max[1])
+  } else if (pos[1] > r.max[1]) {
     dist -= ex_squared(pos[1] - r.max[1]);
-  if (pos[2] < r.min[2])
+  }
+  if (pos[2] < r.min[2]) {
     dist -= ex_squared(pos[2] - r.min[2]);
-  else if (pos[2] > r.max[2])
+  } else if (pos[2] > r.max[2]) {
     dist -= ex_squared(pos[2] - r.max[2]);
+  }
   return dist >= 0;
 };
 

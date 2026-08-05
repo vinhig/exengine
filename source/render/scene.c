@@ -59,11 +59,13 @@ void ex_scene_add_collision(ex_scene_t *s, ex_model_t *model) {
 
 void ex_scene_build_collision(ex_scene_t *s) {
   // destroy and reconstruct tree
-  if (s->coll_tree->built)
+  if (s->coll_tree->built) {
     s->coll_tree = ex_octree_reset(s->coll_tree);
+  }
 
-  if (s->coll_tree == NULL || s->coll_vertices == NULL || s->coll_vertices_last == 0)
+  if (s->coll_tree == NULL || s->coll_vertices == NULL || s->coll_vertices_last == 0) {
     return;
+  }
 
   rect_t region;
   memcpy(&region, &s->coll_tree->region, sizeof(rect_t));
@@ -108,8 +110,9 @@ void ex_scene_add_pointlight(ex_scene_t *s, ex_point_light_t *pl) {
 }
 
 void ex_scene_update(ex_scene_t *s, float delta_time) {
-  if (!s->collision_built)
+  if (!s->collision_built) {
     ex_scene_build_collision(s);
+  }
 
   // update models animations etc
   for (int i = 0; i < s->renderables.models.count; i++) {
@@ -146,11 +149,13 @@ void ex_scene_destroy(ex_scene_t *s) {
 
   ex_octree_destroy(s->coll_tree);
 
-  if (s->coll_list != NULL)
+  if (s->coll_list != NULL) {
     ex_list_destroy(s->coll_list);
+  }
 
-  if (s->coll_vertices != NULL)
+  if (s->coll_vertices != NULL) {
     free(s->coll_vertices);
+  }
 
   ex_render_destroy();
 

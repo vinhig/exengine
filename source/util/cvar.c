@@ -23,7 +23,7 @@ void ex_cvar_register(cvar_t *cvar) {
   switch (cvar->value_type) {
   case CVAR_F32: {
     if (ex_ini_exists(&configuration, cvar->category, cvar->name)) {
-      auto value = ex_ini_get_float(&configuration, cvar->category, cvar->name);
+      float value = ex_ini_get_float(&configuration, cvar->category, cvar->name);
       cvar->value.f32 = value;
     } else {
       cvar->value.f32 = cvar->default_value.f32;
@@ -34,7 +34,7 @@ void ex_cvar_register(cvar_t *cvar) {
   }
   case CVAR_I32: {
     if (ex_ini_exists(&configuration, cvar->category, cvar->name)) {
-      auto value = (int32_t)ex_ini_get_float(&configuration, cvar->category, cvar->name);
+      int32_t value = (int32_t)ex_ini_get_float(&configuration, cvar->category, cvar->name);
       cvar->value.i32 = value;
     } else {
       cvar->value.i32 = cvar->default_value.i32;
@@ -45,7 +45,7 @@ void ex_cvar_register(cvar_t *cvar) {
   }
   case CVAR_STR: {
     if (ex_ini_exists(&configuration, cvar->category, cvar->name)) {
-      auto value = ex_ini_get_string(&configuration, cvar->category, cvar->name);
+      char *value = ex_ini_get_string(&configuration, cvar->category, cvar->name);
       cvar->value.str = value;
     } else {
       cvar->value.str = cvar->default_value.str;
@@ -56,7 +56,7 @@ void ex_cvar_register(cvar_t *cvar) {
   }
   case CVAR_BOOL: {
     if (ex_ini_exists(&configuration, cvar->category, cvar->name)) {
-      auto value = ex_ini_get_bool(&configuration, cvar->category, cvar->name);
+      bool value = ex_ini_get_bool(&configuration, cvar->category, cvar->name);
       cvar->value.boolean = value;
     } else {
       cvar->value.boolean = cvar->default_value.boolean;

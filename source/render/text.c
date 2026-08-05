@@ -1,14 +1,14 @@
-#include <exengine/render/text.h>
 #include <exengine/math/mathlib.h>
 #include <exengine/render/shader.h>
+#include <exengine/render/text.h>
 #include <exengine/util/io.h>
 
 #include <stdio.h>
 #include <string.h>
 
 #define STB_TRUETYPE_IMPLEMENTATION
-#include <SDL3/SDL_timer.h>
 #include "log/log.h"
+#include <SDL3/SDL_timer.h>
 
 #include <stb_truetype.h>
 
@@ -71,7 +71,7 @@ ex_font_t *ex_font_load(const char *path, const char *letters) {
   char *character = (char *)letters;
   size_t x = 1, y = 1, index = 0;
   while (*character != '\0') {
-    char* c = character++;
+    char *c = character++;
     float *bitmap = ex_msdf_glyph(&font, ex_utf8(c), SIZE, SIZE, &metrics);
 
     // blit msdf bitmap to atlas
@@ -201,8 +201,9 @@ void ex_font_dbg(ex_font_t *f) {
 }
 
 void ex_font_destroy(ex_font_t *f) {
-  if (f == NULL)
+  if (f == NULL) {
     return;
+  }
 
   glDeleteTextures(1, &f->texture);
   free(f->metrics);

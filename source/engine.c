@@ -2,13 +2,13 @@
 
 #include <exengine/engine.h>
 
-#include <physfs/physfs.h>
 #include <exengine/input/input.h>
 #include <exengine/render/text.h>
 #include <exengine/render/window.h>
 #include <exengine/util/cache.h>
 #include <exengine/util/cvar.h>
 #include <exengine/util/ini.h>
+#include <physfs/physfs.h>
 #include <sys/stat.h>
 
 #ifdef USING_IMGUI
@@ -211,7 +211,6 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
       // user update callback
       ex_update_ptr(phys_delta_time, delta_time);
 
-
       accumulator -= phys_delta_time;
     }
 
@@ -244,7 +243,6 @@ void exengine(char **argv, const char *appname, uint8_t flags) {
   // user exit callback
   ex_exit_ptr();
   // -------------- */
-
 
   // destroying the windows means destroying all SDL3 subsystems, so
   // it must be done at the very end

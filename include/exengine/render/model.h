@@ -70,7 +70,7 @@ typedef struct {
    * that is actually visible. Therefore, `instance_count` is always equal
    * or greater to `visible_instance_count`.
    */
-  ex_transform_t * transform_fulls;
+  ex_transform_t *transform_fulls;
   mat4x4 *transform_matrices;
   GLuint instance_vbo;
   size_t instance_count;

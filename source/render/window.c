@@ -82,7 +82,7 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
 
   igCreateContext(nullptr);
 
-  ImGuiIO* io = igGetIO_Nil();
+  ImGuiIO *io = igGetIO_Nil();
   io->WantCaptureKeyboard = true;
   io->WantCaptureMouse = true;
 

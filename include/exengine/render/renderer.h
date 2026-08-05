@@ -18,8 +18,8 @@
 
 #pragma once
 
-#include <exengine/render/camera.h>
 #include <exengine/math/mathlib.h>
+#include <exengine/render/camera.h>
 #include <exengine/render/model.h>
 #include <exengine/render/pointlight.h>
 
@@ -66,8 +66,9 @@ static inline ex_rendernode_t *ex_rendernode_push(ex_renderlist_t *list) {
     size_t len = sizeof(ex_rendernode_t) * list->length;
     ex_rendernode_t *nodes = realloc(list->nodes, len);
 
-    if (nodes)
+    if (nodes) {
       list->nodes = nodes;
+    }
   }
 
   ex_rendernode_t *node = &list->nodes[list->count];
@@ -94,14 +95,16 @@ static inline void ex_rendernode_pop(ex_renderlist_t *list, void *obj) {
     }
   }
 
-  if (!node)
+  if (!node) {
     return;
+  }
 
   // node is somewhere middle of list, pop from list
   if (node->index < list->count) {
     size_t index = node->index;
-    for (int i = index + 1; i < list->count; i++)
+    for (int i = index + 1; i < list->count; i++) {
       list->nodes[index++] = list->nodes[i];
+    }
   }
   list->count--;
 
@@ -111,8 +114,9 @@ static inline void ex_rendernode_pop(ex_renderlist_t *list, void *obj) {
     size_t len = sizeof(ex_rendernode_t) * list->length;
     ex_rendernode_t *nodes = realloc(list->nodes, len);
 
-    if (nodes)
+    if (nodes) {
       list->nodes = nodes;
+    }
   }
 }
 
@@ -140,7 +144,7 @@ void ex_render_forward(ex_renderable_t *renderables);
  * @param camera camera matrices to use
  * @param shader shader to use
  */
-void ex_render_model(ex_model_t *model, const ex_camera_matrices_t* camera, GLuint shader);
+void ex_render_model(ex_model_t *model, const ex_camera_matrices_t *camera, GLuint shader);
 
 /**
  * @brief Render a single mesh or instanced meshes.

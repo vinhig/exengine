@@ -12,7 +12,8 @@
 #include <exengine/render/model.h>
 #include <exengine/render/scene.h>
 
-#define uint uint32_t
+#include <stdint.h>
+
 #define EX_IQM_MAGIC "INTERQUAKEMODEL"
 #define EX_IQM_VERSION 2
 
@@ -30,19 +31,19 @@
 
 typedef struct {
   char magic[16];
-  uint version;
-  uint filesize;
-  uint flags;
-  uint num_text, ofs_text;
-  uint num_meshes, ofs_meshes;
-  uint num_vertexarrays, num_vertexes, ofs_vertexarrays;
-  uint num_triangles, ofs_triangles, ofs_adjacency;
-  uint num_joints, ofs_joints;
-  uint num_poses, ofs_poses;
-  uint num_anims, ofs_anims;
-  uint num_frames, num_framechannels, ofs_frames, ofs_bounds;
-  uint num_comment, ofs_comment;
-  uint num_extensions, ofs_extensions;
+  uint32_t version;
+  uint32_t filesize;
+  uint32_t flags;
+  uint32_t num_text, ofs_text;
+  uint32_t num_meshes, ofs_meshes;
+  uint32_t num_vertexarrays, num_vertexes, ofs_vertexarrays;
+  uint32_t num_triangles, ofs_triangles, ofs_adjacency;
+  uint32_t num_joints, ofs_joints;
+  uint32_t num_poses, ofs_poses;
+  uint32_t num_anims, ofs_anims;
+  uint32_t num_frames, num_framechannels, ofs_frames, ofs_bounds;
+  uint32_t num_comment, ofs_comment;
+  uint32_t num_extensions, ofs_extensions;
 } ex_iqm_header_t;
 
 enum {
@@ -67,35 +68,35 @@ enum {
 };
 
 typedef struct {
-  uint triangle[3];
+  uint32_t triangle[3];
 } ex_iqmadjacency_t;
 
 typedef struct {
-  uint name;
+  uint32_t name;
   int parent;
   float translate[3], rotate[4], scale[3];
 } ex_iqmjoint_t;
 
 typedef struct {
   int parent;
-  uint channelmask;
+  uint32_t channelmask;
   float channeloffset[10];
   float channelscale[10];
 } ex_iqmex_pose_t;
 
 typedef struct {
-  uint name;
-  uint first_frame, num_frames;
+  uint32_t name;
+  uint32_t first_frame, num_frames;
   float framerate;
-  uint flags;
+  uint32_t flags;
 } ex_iqmex_anim_t;
 
 typedef struct {
-  uint type;
-  uint flags;
-  uint format;
-  uint size;
-  uint offset;
+  uint32_t type;
+  uint32_t flags;
+  uint32_t format;
+  uint32_t size;
+  uint32_t offset;
 } ex_iqmvertexarray_t;
 
 typedef struct {
@@ -104,10 +105,10 @@ typedef struct {
 } ex_iqmbounds_t;
 
 typedef struct {
-  uint name;
-  uint material;
-  uint first_vertex, num_vertexes;
-  uint first_triangle, num_triangles;
+  uint32_t name;
+  uint32_t material;
+  uint32_t first_vertex, num_vertexes;
+  uint32_t first_triangle, num_triangles;
 } ex_iqmex_mesh_t;
 
 /**
@@ -124,7 +125,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
  * @param data pointer to raw byte data
  * @return the decoded uint32_t
  */
-uint ex_get_uint(const uint8_t *data);
+uint32_t ex_get_uint(const uint8_t *data);
 
 /**
  * @brief Parse up to 4 float arguments from a string.

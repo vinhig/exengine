@@ -1,6 +1,6 @@
-#include <exengine/render/vga.h>
-#include <exengine/render/shader.h>
 #include <exengine/math/mathlib.h>
+#include <exengine/render/shader.h>
+#include <exengine/render/vga.h>
 #include <exengine/render/vga_font.h>
 #include <exengine/render/window.h>
 #include <stdio.h>
@@ -90,15 +90,17 @@ void ex_vga_print(size_t x, size_t y, const char *str) {
   for (int i = 0; i < strlen(str); i++) {
     size_t c = (str[i] * 16);
 
-    if (c > EX_VGA_FONT_DATA_LEN)
+    if (c > EX_VGA_FONT_DATA_LEN) {
       c = 0;
+    }
 
     if (x >= EX_VGA_WIDTH * EX_VGA_FONT_WIDTH) {
       x = 0;
       y += EX_VGA_FONT_HEIGHT;
     }
-    if (y >= EX_VGA_HEIGHT * EX_VGA_FONT_HEIGHT)
+    if (y >= EX_VGA_HEIGHT * EX_VGA_FONT_HEIGHT) {
       y = 0;
+    }
 
     for (int j = 0; j < 16; j++) {
       size_t p = (EX_VGA_WIDTH * y) + x;
@@ -107,10 +109,11 @@ void ex_vga_print(size_t x, size_t y, const char *str) {
 
       for (int k = 0; k < 8; k++) {
         int color = (byte >> k) & 0x01;
-        if (color)
+        if (color) {
           ex_vga_data[p + (8 - k)] = ex_vga_fg;
-        else
+        } else {
           ex_vga_data[p + (8 - k)] = ex_vga_bg;
+        }
       }
     }
 

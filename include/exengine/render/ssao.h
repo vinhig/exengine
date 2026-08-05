@@ -24,7 +24,7 @@ void ex_ssao_init();
  * @param gnormal    G-buffer normal texture
  * @param fbo_vao    fullscreen quad VAO
  */
-void ex_ssao_render(mat4x4* projection, mat4x4* view, GLuint gposition, GLuint gnormal, GLuint fbo_vao);
+void ex_ssao_render(mat4x4 *projection, mat4x4 *view, GLuint gposition, GLuint gnormal, GLuint fbo_vao);
 
 /**
  * @brief Bind the SSAO occlusion texture.

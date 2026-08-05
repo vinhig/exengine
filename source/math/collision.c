@@ -43,8 +43,9 @@ float ex_signed_distance_to_plane(const vec3 base_point, const ex_plane_t *plane
 int ex_is_front_facing(ex_plane_t *plane, const vec3 direction) {
   double f = vec3_mul_inner(plane->normal, direction);
 
-  if (f <= 0.0)
+  if (f <= 0.0) {
     return 1;
+  }
 
   return 0;
 }
@@ -81,8 +82,9 @@ int ex_get_lowest_root(float a, float b, float c, float max, float *root) {
   float determinant = b * b - 4.0f * a * c;
 
   // if negative there is no solution
-  if (determinant < 0.0f)
+  if (determinant < 0.0f) {
     return 0;
+  }
 
   // calculate two roots
   float sqrtD = sqrtf(determinant);
@@ -123,21 +125,24 @@ int ray_in_tri(vec3 from, vec3 to, vec3 v0, vec3 v1, vec3 v2, vec3 intersect) {
   vec3_mul_cross(h, vector, edge2);
   float a = vec3_mul_inner(edge1, h);
 
-  if (a > -FLT_EPSILON && a < FLT_EPSILON)
+  if (a > -FLT_EPSILON && a < FLT_EPSILON) {
     return 0;
+  }
 
   float f = 1.0 / a;
 
   vec3_sub(s, from, v0);
 
   float u = f * vec3_mul_inner(s, h);
-  if (u < 0.0 || u > 1.0)
+  if (u < 0.0 || u > 1.0) {
     return 0;
+  }
 
   vec3_mul_cross(q, s, edge1);
   float v = f * vec3_mul_inner(vector, q);
-  if (v < 0.0 || u + v > 1.0)
+  if (v < 0.0 || u + v > 1.0) {
     return 0;
+  }
 
   float t = f * vec3_mul_inner(edge2, q);
   if (t > FLT_EPSILON) {
@@ -154,8 +159,9 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
   ex_plane_t plane = ex_triangle_to_plane(p1, p2, p3);
 
   // only check front facing triangles
-  if (!ex_is_front_facing(&plane, packet->e_norm_velocity))
+  if (!ex_is_front_facing(&plane, packet->e_norm_velocity)) {
     return;
+  }
 
   // get interval of plane intersection
   double t0, t1;
@@ -198,14 +204,18 @@ void ex_collision_check_triangle(ex_coll_packet_t *packet, const vec3 p1, const 
     }
 
     // clamp to [0,1]
-    if (t0 < 0.0)
+    if (t0 < 0.0) {
       t0 = 0.0;
-    if (t1 < 0.0)
+    }
+    if (t1 < 0.0) {
       t1 = 0.0;
-    if (t0 > 1.0)
+    }
+    if (t0 > 1.0) {
       t0 = 1.0;
-    if (t1 > 1.0)
+    }
+    if (t1 > 1.0) {
       t1 = 1.0;
+    }
   }
 
   // time to check for a collision

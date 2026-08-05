@@ -10,8 +10,8 @@ typedef enum cvar_id_e {
 } cvar_id_t;
 
 typedef struct cvar_s {
-  char* category;
-  char* name;
+  char *category;
+  char *name;
   cvar_id_t id;
 
   // default value to set the value to if nothing is
@@ -19,7 +19,7 @@ typedef struct cvar_s {
   union {
     float f32;
     int i32;
-    char* str;
+    char *str;
     bool boolean;
   } default_value;
 
@@ -29,7 +29,7 @@ typedef struct cvar_s {
   union {
     int i32;
     float f32;
-    char* str;
+    char *str;
     bool boolean;
   } value;
 
@@ -40,9 +40,9 @@ typedef struct cvar_s {
     CVAR_BOOL,
   } value_type;
 
-  void* data_ptr;
+  void *data_ptr;
 
-  void (*callback)(struct cvar_s* var);
+  void (*callback)(struct cvar_s *var);
 } cvar_t;
 
 /**
@@ -54,21 +54,21 @@ void ex_cvar_init();
  * @brief Register a cvar for access and persistence.
  * @param cvar cvar to register (must have the same lifetime as the game itself)
  */
-void ex_cvar_register(cvar_t* cvar);
+void ex_cvar_register(cvar_t *cvar);
 
 /**
  * @brief Look up a cvar by its enum ID.
  * @param id the cvar ID
  * @return pointer to the cvar, or NULL
  */
-const cvar_t* ex_cvar_get_by_id(cvar_id_t id);
+const cvar_t *ex_cvar_get_by_id(cvar_id_t id);
 
 /**
  * @brief Look up a cvar by its name string.
  * @param name the cvar name
  * @return pointer to the cvar, or NULL
  */
-const cvar_t* ex_cvar_get_by_name(const char* name);
+const cvar_t *ex_cvar_get_by_name(const char *name);
 
 /**
  * @brief Clean up all cvars.

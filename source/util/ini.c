@@ -246,7 +246,7 @@ char *ex_ini_get_string(ex_ini_t *ini, const char *sec, const char *key) {
 }
 
 bool ex_ini_get_bool(ex_ini_t *ini, const char *sec, const char *key) {
-  auto str = ex_ini_get_string(ini, sec, key);
+  char *str = ex_ini_get_string(ini, sec, key);
 
   if (strcmp(str, "true") == 0) {
     return true;
@@ -284,8 +284,9 @@ void ex_ini_set_float(ex_ini_t *ini, const char *sec, const char *key, const flo
 }
 
 void ex_ini_set_bool(ex_ini_t *ini, const char *sec, const char *key, bool value) {
-  if (value)
+  if (value) {
     ex_ini_set_string(ini, sec, key, "true");
-  else
+  } else {
     ex_ini_set_string(ini, sec, key, "false");
+  }
 }

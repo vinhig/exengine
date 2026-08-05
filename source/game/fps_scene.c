@@ -17,8 +17,7 @@ static ex_source_t *sound;
 static ex_font_t *font;
 static float move_speed = 1.5f;
 
-void fps_scene_init()
-{
+void fps_scene_init() {
   scene = ex_scene_new(0);
   memcpy(scene->gravity, (vec3){0.0f, -0.1f, 0.0f}, sizeof(vec3));
 
@@ -58,8 +57,7 @@ void fps_scene_init()
   ex_vga_init();
 }
 
-void fps_scene_update(double dt, double ft)
-{
+void fps_scene_update(double dt, double ft) {
   ex_entity_update(e, dt);
   ex_entity_update(cube, dt);
 
@@ -72,7 +70,7 @@ void fps_scene_update(double dt, double ft)
   vec3 temp;
   vec3_sub(temp, cube->position, e->position);
   float len = vec3_len(temp);
-  if (len <= cube->radius[1]/2 + e->radius[1]) {
+  if (len <= cube->radius[1] / 2 + e->radius[1]) {
     vec3_norm(temp, temp);
     vec3_scale(temp, temp, vec3_len(e->velocity));
     vec3_add(cube->velocity, cube->velocity, temp);
@@ -81,8 +79,9 @@ void fps_scene_update(double dt, double ft)
 
   vec3_scale(temp, cube->velocity, 5.0f * dt);
   temp[1] = 0.0f;
-  if (cube->grounded == 1)
+  if (cube->grounded == 1) {
     vec3_sub(cube->velocity, cube->velocity, temp);
+  }
 
   cube->velocity[1] -= (100.0f * dt);
 
@@ -100,14 +99,15 @@ void fps_scene_update(double dt, double ft)
       goto ctrl_end;
     }
 
-    if (f > 1.0f)
+    if (f > 1.0f) {
       f *= f;
+    }
 
     vec3_norm(p, p);
-    vec3_scale(p, p, f*35.0f);
+    vec3_scale(p, p, f * 35.0f);
     f = cube->velocity[1];
     memcpy(cube->velocity, p, sizeof(vec3));
-    cube->velocity[1] += f*0.1f;
+    cube->velocity[1] += f * 0.1f;
 
     if (ex_buttons_down[SDL_BUTTON_RIGHT]) {
       vec3_scale(temp, camera->front, 80.0f);
@@ -118,9 +118,9 @@ void fps_scene_update(double dt, double ft)
 ctrl_end:
 
   if (ex_keys_down[SDL_SCANCODE_F]) {
-    float r = (float)rand()/(float)(RAND_MAX/1.0f);
-    float g = (float)rand()/(float)(RAND_MAX/1.0f);
-    float b = (float)rand()/(float)(RAND_MAX/1.0f);
+    float r = (float)rand() / (float)(RAND_MAX / 1.0f);
+    float g = (float)rand() / (float)(RAND_MAX / 1.0f);
+    float b = (float)rand() / (float)(RAND_MAX / 1.0f);
     ex_point_light_t *l = ex_point_light_new((vec3){0.0f, 0.0f, 0.0f}, (vec3){r, g, b}, 0);
     memcpy(l->position, camera->position, sizeof(vec3));
     ex_scene_add_pointlight(scene, l);
@@ -131,10 +131,11 @@ ctrl_end:
   vec3_scale(temp, e->velocity, 15.0f * dt);
   temp[1] = 0.0f;
 
-  if (e->grounded == 1)
-   vec3_sub(e->velocity, e->velocity, temp);
-  else
+  if (e->grounded == 1) {
+    vec3_sub(e->velocity, e->velocity, temp);
+  } else {
     move_speed = 50.0f;
+  }
 
   e->velocity[1] -= (100.0f * dt);
 
@@ -154,21 +155,23 @@ ctrl_end:
   if (ex_keys_down[SDL_SCANCODE_A]) {
     vec3_mul_cross(side, camera->front, camera->up);
     vec3_norm(side, side);
-    vec3_scale(side, side, (move_speed*0.9f) * dt);
+    vec3_scale(side, side, (move_speed * 0.9f) * dt);
     side[1] = 0.0f;
     vec3_sub(e->velocity, e->velocity, side);
   }
   if (ex_keys_down[SDL_SCANCODE_D]) {
     vec3_mul_cross(side, camera->front, camera->up);
     vec3_norm(side, side);
-    vec3_scale(side, side, (move_speed*0.9f) * dt);
+    vec3_scale(side, side, (move_speed * 0.9f) * dt);
     side[1] = 0.0f;
     vec3_add(e->velocity, e->velocity, side);
   }
-  if (ex_keys_down[SDL_SCANCODE_Q])
+  if (ex_keys_down[SDL_SCANCODE_Q]) {
     e->velocity[1] = 50.0f;
-  if (ex_keys_down[SDL_SCANCODE_Z])
+  }
+  if (ex_keys_down[SDL_SCANCODE_Z]) {
     e->velocity[1] = -50.0f;
+  }
   if (ex_keys_down[SDL_SCANCODE_SPACE] && e->grounded == 1) {
     e->velocity[1] = 20.0f;
   }
@@ -194,8 +197,7 @@ ctrl_end:
   ex_vga_print(2, 2, buf);
 }
 
-void fps_scene_draw()
-{
+void fps_scene_draw() {
   ex_scene_draw(scene, &camera->matrices);
   ex_fps_camera_resize(camera);
 
@@ -204,8 +206,7 @@ void fps_scene_draw()
   ex_vga_render();
 }
 
-void fps_scene_exit()
-{
+void fps_scene_exit() {
   ex_sound_destroy(sound);
   ex_fps_camera_destroy(camera);
   ex_font_destroy(font);
@@ -215,26 +216,22 @@ void fps_scene_exit()
   ex_scene_destroy(scene);
 }
 
-void fps_scene_keypressed(uint32_t key)
-{
-  if (key == SDL_SCANCODE_ESCAPE)
+void fps_scene_keypressed(uint32_t key) {
+  if (key == SDL_SCANCODE_ESCAPE) {
     game_change_scene(WORLD_SCENE);
+  }
 }
 
-void fps_scene_mousepressed(uint8_t button)
-{
+void fps_scene_mousepressed(uint8_t button) {
   ex_sound_restart(sound);
 }
 
-void fps_scene_mousemoition(int xrel, int yrel)
-{
+void fps_scene_mousemoition(int xrel, int yrel) {
 }
 
-void fps_scene_mousewheel(int32_t x, int32_t y)
-{
+void fps_scene_mousewheel(int32_t x, int32_t y) {
 }
 
-void fps_scene_resize(uint32_t width, uint32_t height)
-{
+void fps_scene_resize(uint32_t width, uint32_t height) {
   ex_scene_resize(scene, width, height);
 }

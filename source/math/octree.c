@@ -37,8 +37,9 @@ void ex_octree_init(ex_octree_t *o, rect_t region, ex_list_t *objects) {
 }
 
 void ex_octree_build(ex_octree_t *o) {
-  if (o->obj_list->data == NULL)
+  if (o->obj_list->data == NULL) {
     return;
+  }
 
   if (o->obj_list->next == NULL) {
     ex_octree_finalize(o);
@@ -109,10 +110,11 @@ void ex_octree_build(ex_octree_t *o) {
       obj_count++;
     }
 
-    if (n->next != NULL)
+    if (n->next != NULL) {
       n = n->next;
-    else
+    } else {
       break;
+    }
   }
 
   // create children
@@ -138,17 +140,19 @@ void ex_octree_finalize(ex_octree_t *o) {
   while (n->data != NULL) {
     ex_octree_obj_t *data = n->data;
 
-    if (i == 0)
+    if (i == 0) {
       o->data = calloc(1, o->data_len * sizeof(uint32_t));
+    }
     memcpy(&o->data[i], &data->index, sizeof(uint32_t));
 
     free(n->data);
     n->data = NULL;
     i++;
-    if (n->next != NULL)
+    if (n->next != NULL) {
       n = n->next;
-    else
+    } else {
       break;
+    }
   }
 
   // destroy our temp list
@@ -161,20 +165,24 @@ void ex_octree_finalize(ex_octree_t *o) {
 }
 
 ex_octree_t *ex_octree_reset(ex_octree_t *o) {
-  if (o == NULL)
+  if (o == NULL) {
     return NULL;
+  }
 
-  for (int i = 0; i < 8; i++)
-    if (o->children[i] != NULL)
+  for (int i = 0; i < 8; i++) {
+    if (o->children[i] != NULL) {
       ex_octree_reset(o->children[i]);
+    }
+  }
 
   if (o->obj_list != NULL) {
     ex_list_destroy(o->obj_list);
     o->obj_list = NULL;
   }
 
-  if (o->data_len > 0 && o->data != NULL)
+  if (o->data_len > 0 && o->data != NULL) {
     free(o->data);
+  }
 
   if (!o->first) {
     free(o);
@@ -187,50 +195,60 @@ ex_octree_t *ex_octree_reset(ex_octree_t *o) {
 }
 
 void ex_octree_destroy(ex_octree_t *o) {
-  if (o == NULL)
+  if (o == NULL) {
     return;
+  }
 
-  for (int i = 0; i < 8; i++)
-    if (o->children[i] != NULL)
+  for (int i = 0; i < 8; i++) {
+    if (o->children[i] != NULL) {
       ex_octree_destroy(o->children[i]);
+    }
+  }
 
   if (o->obj_list != NULL) {
     ex_list_destroy(o->obj_list);
     o->obj_list = NULL;
   }
 
-  if (o->data_len > 0 && o->data != NULL)
+  if (o->data_len > 0 && o->data != NULL) {
     free(o->data);
+  }
 
   free(o);
 }
 
 void ex_octree_get_colliding_count(ex_octree_t *o, rect_t *bounds, int *count) {
-  if (o == NULL)
+  if (o == NULL) {
     return;
+  }
 
   // add our data to the list
   if (o->data != NULL) {
-    if (!ex_aabb_aabb(o->region, *bounds))
+    if (!ex_aabb_aabb(o->region, *bounds)) {
       return;
+    }
 
     (*count)++;
   }
 
   // recurse adding data to the list
-  for (int i = 0; i < 8; i++)
-    if (o->children[i] != NULL)
+  for (int i = 0; i < 8; i++) {
+    if (o->children[i] != NULL) {
       ex_octree_get_colliding_count(o->children[i], bounds, count);
+    }
+  }
 }
 
 void ex_octree_get_colliding(ex_octree_t *o, rect_t *bounds, ex_octree_data_t *data_list, int *index) {
-  if (o == NULL)
+  if (o == NULL) {
     return;
+  }
 
   // add our data to the list
   if (o->data != NULL) {
-    if (!ex_aabb_aabb(o->region, *bounds))
+    if (!ex_aabb_aabb(o->region, *bounds)) {
       return;
+    }
 
     data_list[*index].len = o->data_len;
     data_list[*index].data = o->data;
@@ -238,7 +256,9 @@ void ex_octree_get_colliding(ex_octree_t *o, rect_t *bounds, ex_octree_data_t *d
   }
 
   // recurse adding data to the list
-  for (int i = 0; i < 8; i++)
-    if (o->children[i] != NULL)
+  for (int i = 0; i < 8; i++) {
+    if (o->children[i] != NULL) {
       ex_octree_get_colliding(o->children[i], bounds, data_list, index);
+    }
+  }
 }

@@ -10,8 +10,9 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   // check if its already in the cache
   ex_model_t *m_cache = ex_cache_get_model(path);
   if (m_cache != nullptr) {
-    if (flags & EX_KEEP_VERTICES)
+    if (flags & EX_KEEP_VERTICES) {
       ex_scene_add_collision(scene, m_cache);
+    }
     return m_cache;
   }
 
@@ -27,9 +28,9 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   // the header contents
   ex_iqm_header_t header;
 
-   // check magic string and version
+  // check magic string and version
   memcpy(header.magic, data, 16);
-  uint *head = (uint *)&data[16];
+  uint32_t *head = (uint32_t *)&data[16];
   header.version = head[0];
   if (strcmp(header.magic, EX_IQM_MAGIC) != 0 || header.version != EX_IQM_VERSION) {
     log_error("Loaded IQM model (%s) version is not 2.0.", path);
@@ -148,7 +149,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
       anims[i].first = a->first_frame;
       anims[i].last = a->num_frames;
       anims[i].rate = a->framerate;
-      anims[i].loop = a->flags || (1 << 0);
+      anims[i].loop = a->flags | (1 << 0);
     }
   }
 
@@ -168,7 +169,7 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
         float v[10];
         for (int o = 0; o < 10; o++) {
           float val = pose->channeloffset[o];
-          uint mask = (1 << o);
+          uint32_t mask = (1 << o);
           if ((pose->channelmask & mask) > 0) {
             val += framedata[0] * pose->channelscale[o];
             framedata++;

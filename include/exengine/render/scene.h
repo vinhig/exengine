@@ -16,8 +16,8 @@
 
 #pragma once
 
-#include <exengine/render/renderer.h>
 #include <exengine/math/octree.h>
+#include <exengine/render/renderer.h>
 #include <exengine/util/list.h>
 
 #define EX_MAX_POINT_LIGHTS 500

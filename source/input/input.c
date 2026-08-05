@@ -14,8 +14,9 @@ void ex_input_event(SDL_Event *event) {
   // keyboard
   case SDL_EVENT_KEY_DOWN: {
     ex_keys_down[event->key.scancode] = 1;
-    if (event->key.repeat == 0 && ex_keypressed_ptr)
+    if (event->key.repeat == 0 && ex_keypressed_ptr) {
       ex_keypressed_ptr(event->key.scancode);
+    }
     break;
   }
   case SDL_EVENT_KEY_UP: {
@@ -26,8 +27,9 @@ void ex_input_event(SDL_Event *event) {
   // mouse
   case SDL_EVENT_MOUSE_BUTTON_DOWN: {
     ex_buttons_down[event->button.button] = 1;
-    if (event->button.down && ex_keypressed_ptr)
+    if (event->button.down && ex_keypressed_ptr) {
       ex_mousepressed_ptr(event->button.button);
+    }
     break;
   }
   case SDL_EVENT_MOUSE_BUTTON_UP: {
@@ -35,21 +37,24 @@ void ex_input_event(SDL_Event *event) {
     break;
   }
   case SDL_EVENT_MOUSE_WHEEL: {
-    if (ex_mousewheel_ptr)
+    if (ex_mousewheel_ptr) {
       ex_mousewheel_ptr(event->wheel.x, event->wheel.y);
+    }
     break;
   }
   case SDL_EVENT_MOUSE_MOTION: {
-    if (ex_mousemotion_ptr)
+    if (ex_mousemotion_ptr) {
       ex_mousemotion_ptr(event->motion.xrel, event->motion.yrel);
+    }
     break;
   }
   }
 }
 
 void ex_input_update() {
-  if (SDL_GetWindowRelativeMouseMode(display.window))
+  if (SDL_GetWindowRelativeMouseMode(display.window)) {
     SDL_GetRelativeMouseState(&ex_mouse_x, &ex_mouse_y);
-  else
+  } else {
     SDL_GetMouseState(&ex_mouse_x, &ex_mouse_y);
+  }
 }

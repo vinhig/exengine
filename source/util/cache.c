@@ -34,10 +34,11 @@ ex_model_t *ex_cache_get_model(const char *path) {
       return ex_model_copy(m);
     }
 
-    if (n->next != NULL)
+    if (n->next != NULL) {
       n = n->next;
-    else
+    } else {
       break;
+    }
   }
 
   // doesnt exist
@@ -56,10 +57,11 @@ GLuint ex_cache_texture(const char *path) {
       return t->id;
     }
 
-    if (n->next != NULL)
+    if (n->next != NULL) {
       n = n->next;
-    else
+    } else {
       break;
+    }
   }
 
   log_trace("Caching texture %s.", path);
@@ -85,10 +87,11 @@ void ex_cache_flush() {
     glDeleteTextures(1, &t->id);
     free(t);
 
-    if (n->next != NULL)
+    if (n->next != NULL) {
       n = n->next;
-    else
+    } else {
       break;
+    }
   }
 
   // free texture list
@@ -99,10 +102,11 @@ void ex_cache_flush() {
   while (n->data != NULL) {
     ex_model_destroy(n->data);
 
-    if (n->next != NULL)
+    if (n->next != NULL) {
       n = n->next;
-    else
+    } else {
       break;
+    }
   }
 
   // free model list

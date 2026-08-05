@@ -1,9 +1,9 @@
 #include <exengine/sound/sound.h>
 #include <exengine/util/io.h>
 
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <stdint.h>
 
 #define STB_VORBIS_HEADER_ONLY
 #include "log/log.h"
@@ -31,12 +31,14 @@ void ex_sound_init() {
 
   // print out available devices
   log_trace("Available output devices:");
-  for (int i = 0; i < ex_sound_outputs->len; i++)
+  for (int i = 0; i < ex_sound_outputs->len; i++) {
     log_trace("\t- %s", ex_sound_outputs->names[i]);
+  }
 
   log_trace("Available input devices:");
-  for (int i = 0; i < ex_sound_inputs->len; i++)
+  for (int i = 0; i < ex_sound_inputs->len; i++) {
     log_trace("\t- %s", ex_sound_inputs->names[i]);
+  }
 
   // set default device as output
   ex_sound_set_output(NULL);
@@ -61,8 +63,9 @@ void ex_sound_init() {
 void ex_sound_list_devices(ex_sound_devices_t *list, const ALenum param) {
   // clear device list
   list->len = 0;
-  for (int i = 0; i < EX_DEVICE_LEN; i++)
+  for (int i = 0; i < EX_DEVICE_LEN; i++) {
     list->names[i][0] = '\0';
+  }
 
   // get NULL separated strings of devices
   const ALCchar *devices = alcGetString(NULL, param);
@@ -133,8 +136,9 @@ ex_source_t *ex_sound_load(const char *path, int type, int looping) {
       int error;
       decoder = stb_vorbis_open_memory(file_data, len, &error, NULL);
 
-      if (decoder == NULL)
+      if (decoder == NULL) {
         log_error("Failed to create ogg decoder for streaming source %s.", path);
+      }
     }
   } else {
     // unsupported file format
@@ -160,18 +164,20 @@ ex_source_t *ex_sound_load(const char *path, int type, int looping) {
   alSource3f(s->id, AL_POSITION, 0, 0, 0);
   alSource3f(s->id, AL_VELOCITY, 0, 0, 0);
   alSourcei(s->id, AL_LOOPING, s->looping);
-  if (type == EX_SOURCE_STREAMING)
+  if (type == EX_SOURCE_STREAMING) {
     alSourcei(s->id, AL_SOURCE_TYPE, AL_STREAMING);
-  else
+  } else {
     alSourcei(s->id, AL_SOURCE_TYPE, AL_STATIC);
+  }
 
   if (s->streaming) {
     // 3 buffer queue
     alGenBuffers(3, &s->buffers[0]);
 
     // set the buffers ready for data
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++) {
       s->ready_buffers[i] = s->buffers[i];
+    }
 
     // set decoder
     s->decoder = (void *)decoder;
@@ -222,8 +228,9 @@ void ex_sound_restart(ex_source_t *s) {
     ALuint buffers[3];
     alSourceUnqueueBuffers(s->id, buffers_done, buffers);
 
-    for (int i = 0; i < 3; i++)
+    for (int i = 0; i < 3; i++) {
       s->ready_buffers[i] = s->buffers[i];
+    }
   }
 
   alSourcePlay(s->id);
@@ -231,19 +238,23 @@ void ex_sound_restart(ex_source_t *s) {
 
 void ex_sound_play(ex_source_t *s) {
   // dont continue stopped stream until restarted
-  if (s->streaming && s->stopped)
+  if (s->streaming && s->stopped) {
     return;
+  }
 
   // restart source if static
-  if (!s->streaming)
+  if (!s->streaming) {
     ex_sound_restart(s);
+  }
 
-  if (!ex_sound_playing(s))
+  if (!ex_sound_playing(s)) {
     alSourcePlay(s->id);
+  }
 
   // only streaming buffers after this
-  if (!s->streaming)
+  if (!s->streaming) {
     return;
+  }
 
   // find out how many buffers are done
   ALint buffers_done = 0;
@@ -269,8 +280,9 @@ void ex_sound_play(ex_source_t *s) {
 
   // decode and queue more PCM data
   for (int i = 0; i < 3; i++) {
-    if (s->ready_buffers[i] == -1)
+    if (s->ready_buffers[i] == -1) {
       continue;
+    }
 
     // get buffer to fill
     ALuint buff = s->ready_buffers[i];

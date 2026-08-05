@@ -130,12 +130,13 @@ static inline void vec3_mul(vec3 v, vec3 a, vec3 b) {
 
 static inline void vec3_trim(vec3 v, vec3 a, float len) {
   float cur_len = vec3_len(a);
-  if (cur_len > len)
+  if (cur_len > len) {
     vec3_scale(v, a, len / cur_len);
-  else {
+  } else {
     int i;
-    for (i = 0; i < 3; i++)
+    for (i = 0; i < 3; i++) {
       v[i] = a[i];
+    }
   }
 }
 

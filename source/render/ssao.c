@@ -11,7 +11,7 @@
 #include <string.h>
 #include <time.h>
 
-constexpr size_t kernelSize = 16;
+enum { kernelSize = 16 };
 
 vec3 ssao_samples[SSAO_NUM_SAMPLES];
 vec3 ssao_noise[kernelSize];
@@ -54,7 +54,6 @@ void ex_ssao_init() {
     // sample[0] *= scale;
     // sample[1] *= scale;
     // sample[2] *= scale;
-
 
     memcpy(ssao_samples[i], sample, sizeof(vec3));
   }
@@ -118,7 +117,7 @@ void ex_ssao_init() {
   ssao_blur_shader = ex_graphic_pipeline_new("ssao");
 }
 
-void ex_ssao_render(mat4x4* projection, mat4x4* view, GLuint gposition, GLuint gnormal, GLuint fbo_vao) {
+void ex_ssao_render(mat4x4 *projection, mat4x4 *view, GLuint gposition, GLuint gnormal, GLuint fbo_vao) {
   glBindFramebuffer(GL_FRAMEBUFFER, ssao_fbo);
   glClear(GL_COLOR_BUFFER_BIT);
 

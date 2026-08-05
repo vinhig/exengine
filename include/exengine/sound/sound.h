@@ -19,8 +19,8 @@
 
 #define EX_DEVICE_LEN 32
 
-#include <MojoAL/AL/alc.h>
 #include <MojoAL/AL/al.h>
+#include <MojoAL/AL/alc.h>
 
 #include <stdlib.h>
 

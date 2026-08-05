@@ -1,5 +1,5 @@
-#include <exengine/render/msdf.h>
 #include <exengine/math/mathlib.h>
+#include <exengine/render/msdf.h>
 
 #include <stdlib.h>
 
@@ -41,8 +41,9 @@ typedef enum {
 int solve_quadratic(double x[2], double a, double b, double c) {
   if (fabs(a) < 1e-14) {
     if (fabs(b) < 1e-14) {
-      if (c == 0)
+      if (c == 0) {
         return -1;
+      }
       return 0;
     }
     x[0] = -c / b;
@@ -71,10 +72,12 @@ int solve_cubic_normed(double *x, double a, double b, double c) {
   double q3 = q * q * q;
   if (r2 < q3) {
     double t = r / sqrt(q3);
-    if (t < -1)
+    if (t < -1) {
       t = -1;
-    if (t > 1)
+    }
+    if (t > 1) {
       t = 1;
+    }
     t = acos(t);
     a /= 3;
     q = -2 * sqrt(q);
@@ -84,22 +87,25 @@ int solve_cubic_normed(double *x, double a, double b, double c) {
     return 3;
   } else {
     double A = -pow(fabs(r) + sqrt(r2 - q3), 1 / 3.);
-    if (r < 0)
+    if (r < 0) {
       A = -A;
+    }
     double B = A == 0 ? 0 : q / A;
     a /= 3;
     x[0] = (A + B) - a;
     x[1] = -0.5 * (A + B) - a;
     x[2] = 0.5 * sqrt(3.) * (A - B);
-    if (fabs(x[2]) < 1e-14)
+    if (fabs(x[2]) < 1e-14) {
       return 2;
+    }
     return 1;
   }
 }
 
 int solve_cubic(double x[3], double a, double b, double c, double d) {
-  if (fabs(a) < 1e-14)
+  if (fabs(a) < 1e-14) {
     return solve_quadratic(x, b, c, d);
+  }
 
   return solve_cubic_normed(x, b / a, c / a, d / a);
 }
@@ -130,10 +136,12 @@ void getortho(vec2 r, vec2 const v, int polarity, int allow_zero) {
 int pixel_clash(const vec3 a, const vec3 b, double threshold) {
   int aIn = (a[0] > .5f) + (a[1] > .5f) + (a[2] > .5f) >= 2;
   int bIn = (b[0] > .5f) + (b[1] > .5f) + (b[2] > .5f) >= 2;
-  if (aIn != bIn)
+  if (aIn != bIn) {
     return 0;
-  if ((a[0] > .5f && a[1] > .5f && a[2] > .5f) || (a[0] < .5f && a[1] < .5f && a[2] < .5f) || (b[0] > .5f && b[1] > .5f && b[2] > .5f) || (b[0] < .5f && b[1] < .5f && b[2] < .5f))
+  }
+  if ((a[0] > .5f && a[1] > .5f && a[2] > .5f) || (a[0] < .5f && a[1] < .5f && a[2] < .5f) || (b[0] > .5f && b[1] > .5f && b[2] > .5f) || (b[0] < .5f && b[1] < .5f && b[2] < .5f)) {
     return 0;
+  }
   float aa, ab, ba, bb, ac, bc;
   if ((a[0] > .5f) != (b[0] > .5f) && (a[0] < .5f) != (b[0] < .5f)) {
     aa = a[0], ba = b[0];
@@ -270,8 +278,9 @@ signed_distance_t linear_dist(const edge_segment_t *e, vec2 origin, double *para
     vec2 ab_ortho;
     getortho(ab_ortho, ab, 0, 0);
     double ortho_dist = vec2_mul_inner(ab_ortho, aq);
-    if (fabs(ortho_dist) < endpoint_distance)
+    if (fabs(ortho_dist) < endpoint_distance) {
       return (signed_distance_t){ortho_dist, 0};
+    }
   }
 
   vec2_norm(ab, ab);
@@ -332,8 +341,9 @@ signed_distance_t quadratic_dist(const edge_segment_t *e, vec2 origin, double *p
     }
   }
 
-  if (*param >= 0 && *param <= 1)
+  if (*param >= 0 && *param <= 1) {
     return (signed_distance_t){min_distance, 0};
+  }
 
   vec2 aa, bb;
   vec2_norm(ab, ab);
@@ -343,10 +353,11 @@ signed_distance_t quadratic_dist(const edge_segment_t *e, vec2 origin, double *p
   vec2_sub(bb, e->p[2], origin);
   vec2_norm(bb, bb);
 
-  if (*param < .5)
+  if (*param < .5) {
     return (signed_distance_t){min_distance, fabs(vec2_mul_inner(ab, qa))};
-  else
+  } else {
     return (signed_distance_t){min_distance, fabs(vec2_mul_inner(aa, bb))};
+  }
 }
 
 // cubic edge signed distance
@@ -395,8 +406,9 @@ signed_distance_t cubic_dist(edge_segment_t *e, vec2 origin, double *param) {
         min_distance = distance;
         *param = t;
       }
-      if (step == search_starts)
+      if (step == search_starts) {
         break;
+      }
 
       vec2 d1 = {};
       vec2 d2 = {};
@@ -406,13 +418,15 @@ signed_distance_t cubic_dist(edge_segment_t *e, vec2 origin, double *param) {
       d2[1] = 6 * as[1] * t + 6 * br[1];
 
       t -= vec2_mul_inner(qpt, d1) / (vec2_mul_inner(d1, d1) + vec2_mul_inner(qpt, d2));
-      if (t < 0 || t > 1)
+      if (t < 0 || t > 1) {
         break;
+      }
     }
   }
 
-  if (*param >= 0 && *param <= 1)
+  if (*param >= 0 && *param <= 1) {
     return (signed_distance_t){min_distance, 0};
+  }
 
   vec2 d0 = {};
   vec2 d1 = {};
@@ -425,10 +439,11 @@ signed_distance_t cubic_dist(edge_segment_t *e, vec2 origin, double *param) {
   vec2_sub(a, e->p[3], origin);
   vec2_norm(a, a);
 
-  if (*param < .5)
+  if (*param < .5) {
     return (signed_distance_t){min_distance, fabs(vec2_mul_inner(d0, qa))};
-  else
+  } else {
     return (signed_distance_t){min_distance, fabs(vec2_mul_inner(d1, a))};
+  }
 }
 
 void dist_to_pseudo(signed_distance_t *distance, vec2 origin, double param, edge_segment_t *e) {
@@ -632,8 +647,9 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
   // figure out how many contours exist
   int contour_count = 0;
   for (int i = 0; i < num_verts; i++) {
-    if (verts[i].type == STBTT_vmove)
+    if (verts[i].type == STBTT_vmove) {
       contour_count++;
+    }
   }
 
   if (contour_count == 0) {
@@ -746,9 +762,11 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
   double anglethreshold = 3.0;
   double crossthreshold = sin(anglethreshold);
   size_t corner_count = 0;
-  for (int i = 0; i < contour_count; ++i)
-    for (int ec = 0; ec < contour_data[i].edge_count; ++ec)
+  for (int i = 0; i < contour_count; ++i) {
+    for (int ec = 0; ec < contour_data[i].edge_count; ++ec) {
       corner_count++;
+    }
+  }
 
   int corners[corner_count];
   int corner_index = 0;
@@ -765,15 +783,17 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
         direction(dir, e, 0);
         vec2_norm(dir, dir);
         vec2_norm(prev_dir, prev_dir);
-        if (is_corner(prev_dir, dir, crossthreshold))
+        if (is_corner(prev_dir, dir, crossthreshold)) {
           corners[corner_index++] = index;
+        }
         direction(prev_dir, e, 1);
       }
     }
 
     if (corner_index == 0) {
-      for (int ec = 0; ec < contour_data[i].edge_count; ++ec)
+      for (int ec = 0; ec < contour_data[i].edge_count; ++ec) {
         contour_data[i].edges[ec].color = WHITE;
+      }
     } else if (corner_index == 1) {
       edge_color_t colors[3] = {WHITE, WHITE};
       switch_color(&colors[0], &seed, BLACK);
@@ -783,8 +803,9 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       int corner = corners[0];
       if (contour_data[i].edge_count >= 3) {
         int m = contour_data[i].edge_count;
-        for (int ec = 0; ec < m; ++ec)
+        for (int ec = 0; ec < m; ++ec) {
           contour_data[i].edges[(corner + ec) % m].color = (colors + 1)[(int)(3 + 2.875 * i / (m - 1) - 1.4375 + .5) - 3];
+        }
       } else if (contour_data[i].edge_count >= 1) {
         edge_segment_t *parts[7] = {};
         edge_split(&contour_data[i].edges[0], parts[0 + 3 * corner], parts[1 + 3 * corner], parts[2 + 3 * corner]);
@@ -836,8 +857,9 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       contour_data[i].edges = calloc(3, sizeof(edge_segment_t));
       if (contour_data[i].edges) {
         contour_data[i].edge_count = 3;
-        for (int ec = 0; ec < 3; ec++)
+        for (int ec = 0; ec < 3; ec++) {
           memcpy(&contour_data[i].edges[ec], &parts[ec], sizeof(edge_segment_t));
+        }
       }
     }
   }
@@ -989,12 +1011,15 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
           }
         }
 
-        if (signed_compare(r.min_distance, sr.min_distance))
+        if (signed_compare(r.min_distance, sr.min_distance)) {
           sr = r;
-        if (signed_compare(g.min_distance, sg.min_distance))
+        }
+        if (signed_compare(g.min_distance, sg.min_distance)) {
           sg = g;
-        if (signed_compare(b.min_distance, sb.min_distance))
+        }
+        if (signed_compare(b.min_distance, sb.min_distance)) {
           sb = b;
+        }
 
         double med_min_dist = fabs(median(r.min_distance.dist, g.min_distance.dist, b.min_distance.dist));
 
@@ -1003,12 +1028,15 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
           winding = -windings[cc];
         }
 
-        if (r.near_edge)
+        if (r.near_edge) {
           dist_to_pseudo(&r.min_distance, p, r.near_param, r.near_edge);
-        if (g.near_edge)
+        }
+        if (g.near_edge) {
           dist_to_pseudo(&g.min_distance, p, g.near_param, g.near_edge);
-        if (b.near_edge)
+        }
+        if (b.near_edge) {
           dist_to_pseudo(&b.min_distance, p, b.near_param, b.near_edge);
+        }
 
         med_min_dist = median(r.min_distance.dist, g.min_distance.dist, b.min_distance.dist);
         contour_sd[cc].r = r.min_distance.dist;
@@ -1016,38 +1044,49 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
         contour_sd[cc].b = b.min_distance.dist;
         contour_sd[cc].med = med_min_dist;
 
-        if (windings[cc] > 0 && med_min_dist >= 0 && fabs(med_min_dist) < fabs(pos_dist))
+        if (windings[cc] > 0 && med_min_dist >= 0 && fabs(med_min_dist) < fabs(pos_dist)) {
           pos_dist = med_min_dist;
-        if (windings[cc] < 0 && med_min_dist <= 0 && fabs(med_min_dist) < fabs(neg_dist))
+        }
+        if (windings[cc] < 0 && med_min_dist <= 0 && fabs(med_min_dist) < fabs(neg_dist)) {
           neg_dist = med_min_dist;
+        }
       }
 
-      if (sr.near_edge)
+      if (sr.near_edge) {
         dist_to_pseudo(&sr.min_distance, p, sr.near_param, sr.near_edge);
-      if (sg.near_edge)
+      }
+      if (sg.near_edge) {
         dist_to_pseudo(&sg.min_distance, p, sg.near_param, sg.near_edge);
-      if (sb.near_edge)
+      }
+      if (sb.near_edge) {
         dist_to_pseudo(&sb.min_distance, p, sb.near_param, sb.near_edge);
+      }
 
       multi_distance_t msd;
       msd.r = msd.g = msd.b = msd.med = INF;
       if (pos_dist >= 0 && fabs(pos_dist) <= fabs(neg_dist)) {
         msd.med = INF;
         winding = 1;
-        for (int i = 0; i < contour_count; ++i)
-          if (windings[i] > 0 && contour_sd[i].med > msd.med && fabs(contour_sd[i].med) < fabs(neg_dist))
+        for (int i = 0; i < contour_count; ++i) {
+          if (windings[i] > 0 && contour_sd[i].med > msd.med && fabs(contour_sd[i].med) < fabs(neg_dist)) {
             msd = contour_sd[i];
+          }
+        }
       } else if (neg_dist <= 0 && fabs(neg_dist) <= fabs(pos_dist)) {
         msd.med = -INF;
         winding = -1;
-        for (int i = 0; i < contour_count; ++i)
-          if (windings[i] < 0 && contour_sd[i].med < msd.med && fabs(contour_sd[i].med) < fabs(pos_dist))
+        for (int i = 0; i < contour_count; ++i) {
+          if (windings[i] < 0 && contour_sd[i].med < msd.med && fabs(contour_sd[i].med) < fabs(pos_dist)) {
             msd = contour_sd[i];
+          }
+        }
       }
 
-      for (int i = 0; i < contour_count; ++i)
-        if (windings[i] != winding && fabs(contour_sd[i].med) < fabs(msd.med))
+      for (int i = 0; i < contour_count; ++i) {
+        if (windings[i] != winding && fabs(contour_sd[i].med) < fabs(msd.med)) {
           msd = contour_sd[i];
+        }
+      }
 
       if (median(sr.min_distance.dist, sg.min_distance.dist, sb.min_distance.dist) == msd.med) {
         msd.r = sr.min_distance.dist;
@@ -1061,8 +1100,9 @@ float *ex_msdf_glyph(stbtt_fontinfo *font, uint32_t c, size_t w, size_t h, ex_me
       bitmap[index + 2] = (float)msd.b / RANGE + .5; // b
     }
   }
-  for (int i = 0; i < contour_count; i++)
+  for (int i = 0; i < contour_count; i++) {
     free(contour_data[i].edges);
+  }
   free(contour_data);
   free(contour_sd);
   free(contours);

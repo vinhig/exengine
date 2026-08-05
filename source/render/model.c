@@ -28,8 +28,9 @@ ex_model_t *ex_model_new() {
   m->bones = nullptr;
   m->current_anim = nullptr;
 
-  for (int i = 0; i < EX_MODEL_MAX_MESHES; i++)
+  for (int i = 0; i < EX_MODEL_MAX_MESHES; i++) {
     m->meshes[i] = nullptr;
+  }
 
   return m;
 }
@@ -40,8 +41,9 @@ ex_model_t *ex_model_copy(ex_model_t *model) {
 
   // copy meshes
   for (int i = 0; i < EX_MODEL_MAX_MESHES; i++) {
-    if (model->meshes[i] != nullptr)
+    if (model->meshes[i] != nullptr) {
       ex_model_add_mesh(m, ex_mesh_copy(model->meshes[i]));
+    }
   }
 
   // copy anims ref
@@ -100,8 +102,9 @@ void ex_model_init_instancing(ex_model_t *m, int count) {
 
   m->transform_matrices = calloc(1, sizeof(mat4x4) * count);
   m->transform_fulls = calloc(1, sizeof(ex_transform_t) * count);
-  for (int i = 0; i < count; i++)
+  for (int i = 0; i < count; i++) {
     mat4x4_identity(m->transform_matrices[i]);
+  }
 
   m->instance_count = count;
 
@@ -112,8 +115,9 @@ void ex_model_init_instancing(ex_model_t *m, int count) {
   for (int i = 0; i < EX_MODEL_MAX_MESHES; i++) {
     ex_mesh_t *mesh = m->meshes[i];
 
-    if (mesh == nullptr)
+    if (mesh == nullptr) {
       continue;
+    }
 
     glBindVertexArray(mesh->VAO);
     glBindBuffer(GL_ARRAY_BUFFER, m->instance_vbo);
@@ -142,16 +146,18 @@ void ex_model_update(ex_model_t *m, float delta_time) {
   // handle animations
   ex_anim_t *anim = m->current_anim;
 
-  if (anim == nullptr)
+  if (anim == nullptr) {
     return;
+  }
 
   // get current frame
   uint32_t current_frame = m->current_time * anim->rate;
   uint32_t len = anim->last + anim->first;
   float position = m->current_time * anim->rate;
 
-  if (current_frame > len && !anim->loop)
+  if (current_frame > len && !anim->loop) {
     return;
+  }
 
   // increase frame time
   m->current_time += delta_time;
@@ -188,46 +194,58 @@ void ex_model_destroy(ex_model_t *m) {
   }
 
   // clean up instancing data
-  if (m->transform_fulls != nullptr)
+  if (m->transform_fulls != nullptr) {
     free(m->transform_fulls);
+  }
 
-  if (m->transform_matrices != nullptr)
+  if (m->transform_matrices != nullptr) {
     free(m->transform_matrices);
+  }
 
-  if (m->instance_count > 0)
+  if (m->instance_count > 0) {
     glDeleteBuffers(1, &m->instance_vbo);
+  }
 
-  if (m->vertices != nullptr)
+  if (m->vertices != nullptr) {
     free(m->vertices);
+  }
 
-  if (m->is_copy)
+  if (m->is_copy) {
     goto free_model;
+  }
 
   // clean up anim data
-  if (m->bones != nullptr)
+  if (m->bones != nullptr) {
     free(m->bones);
+  }
 
-  if (m->anims != nullptr)
+  if (m->anims != nullptr) {
     free(m->anims);
+  }
 
-  if (m->bind_pose != nullptr)
+  if (m->bind_pose != nullptr) {
     free(m->bind_pose);
+  }
 
-  if (m->pose != nullptr)
+  if (m->pose != nullptr) {
     free(m->pose);
+  }
 
   if (m->frames != nullptr) {
-    for (int i = 0; i < m->frames_len; i++)
+    for (int i = 0; i < m->frames_len; i++) {
       free(m->frames[i]);
+    }
 
     free(m->frames);
   }
 
-  if (m->inverse_base != nullptr)
+  if (m->inverse_base != nullptr) {
     free(m->inverse_base);
+  }
 
-  if (m->skeleton != nullptr)
+  if (m->skeleton != nullptr) {
     free(m->skeleton);
+  }
 
 free_model:
   // free model
@@ -280,8 +298,9 @@ void ex_model_set_anim(ex_model_t *m, char *id) {
     }
   }
 
-  if (m->current_anim == nullptr)
+  if (m->current_anim == nullptr) {
     return;
+  }
 
   m->current_time = 0;
   m->current_frame = m->current_anim->first;

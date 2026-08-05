@@ -268,7 +268,7 @@ void ex_render_forward(ex_renderable_t *renderables) {
   /* ---------------- */
 }
 
-void ex_render_model(ex_model_t *model, const ex_camera_matrices_t* camera, GLuint shader) {
+void ex_render_model(ex_model_t *model, const ex_camera_matrices_t *camera, GLuint shader) {
   // Handle transformations and frustum culling each corner of the bbox of
   // the given model is tested against the current camera. If at least one
   // corner is not on screen, visible_instance_count is not incremented and
@@ -297,7 +297,7 @@ void ex_render_model(ex_model_t *model, const ex_camera_matrices_t* camera, GLui
     mat4x4_transform_aabb(world_min, world_max, model->transform_matrices[i_idx], model->aabb_min, model->aabb_max);
 
     // if (ex_frustum_test_aabb(frustum_planes, world_min, world_max)) {
-      model->visible_instance_count++;
+    model->visible_instance_count++;
     // }
   }
 

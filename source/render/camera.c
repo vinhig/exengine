@@ -1,5 +1,5 @@
-#include <exengine/render/camera.h>
 #include <exengine/input/input.h>
+#include <exengine/render/camera.h>
 #include <exengine/render/shader.h>
 
 #include <stdlib.h>
@@ -58,8 +58,9 @@ void ex_fps_camera_resize(ex_fps_camera_t *cam) {
 }
 
 void ex_fps_camera_update(ex_fps_camera_t *cam, bool update_rotation) {
-  if (!cam->update)
+  if (!cam->update) {
     return;
+  }
 
   if (update_rotation) {
     float x = (float)ex_mouse_x;
@@ -74,10 +75,12 @@ void ex_fps_camera_update(ex_fps_camera_t *cam, bool update_rotation) {
     cam->yaw += offset_x;
     cam->pitch += offset_y;
 
-    if (cam->pitch > 89.0f)
+    if (cam->pitch > 89.0f) {
       cam->pitch = 89.0f;
-    if (cam->pitch < -89.0f)
+    }
+    if (cam->pitch < -89.0f) {
       cam->pitch = -89.0f;
+    }
   }
 
   /* update front vector */
