@@ -11,7 +11,7 @@
 
 #include "glad/glad.h"
 
-#include <exengine/math/octree.h>
+#include <exengine/math/mathlib.h>
 #include <exengine/render/mesh.h>
 
 #define EX_MODEL_MAX_MESHES 128
@@ -63,8 +63,6 @@ typedef struct {
   size_t num_vertices;
 
   vec3 aabb_min, aabb_max;
-
-  ex_octree_t *octree_data;
 
   /**
    * All transforms for all possible instances of this model.

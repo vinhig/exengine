@@ -73,9 +73,9 @@ int ex_window_init(uint32_t width, uint32_t height, const char *title) {
   glEnable(GL_FRAMEBUFFER_SRGB);
 
   // lock mouse
-  // SDL_SetWindowRelativeMouseMode(display.window, true);
-  // SDL_CaptureMouse(true);
-  // SDL_SetWindowMouseGrab(display.window, true);
+  SDL_SetWindowRelativeMouseMode(display.window, true);
+  SDL_CaptureMouse(true);
+  SDL_SetWindowMouseGrab(display.window, true);
 
   display.width = width;
   display.height = height;

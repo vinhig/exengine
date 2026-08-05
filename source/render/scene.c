@@ -13,7 +13,7 @@ ex_scene_t *ex_scene_new(uint8_t flags) {
 
   // init physics shiz
   memset(s->gravity, 0, sizeof(vec3));
-  s->coll_tree = ex_octree_new(OBJ_TYPE_UINT);
+  s->coll_tree = ex_octree_new();
   s->coll_list = ex_list_new();
   s->coll_vertices = NULL;
   s->collision_built = 0;
@@ -82,7 +82,7 @@ void ex_scene_build_collision(ex_scene_t *s) {
 
     ex_octree_obj_t *obj = calloc(1, sizeof(ex_octree_obj_t));
 
-    obj->data_uint = i;
+    obj->index = i;
     obj->box = ex_rect_from_triangle(tri);
     ex_list_add(s->coll_tree->obj_list, (void *)obj);
   }

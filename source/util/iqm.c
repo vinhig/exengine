@@ -205,7 +205,6 @@ ex_model_t *ex_iqm_load_model(ex_scene_t *scene, const char *path, uint8_t flags
   model->bind_pose = bind_pose;
   model->pose = pose;
   model->vertices = nullptr;
-  model->octree_data = nullptr;
 
   // calc inverse base pose
   model->inverse_base = nullptr;

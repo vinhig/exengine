@@ -1,39 +1,23 @@
 /* octree
   A simple octree implementation for
-  storing arbitrary data.
+  storing triangle indices.
 
-  Used for collision optimizations,
-  render culling etc.
+  Used as a broad-phase collision
+  optimization.
 */
 
 #pragma once
 
-#include "glad/glad.h"
-
 #include <exengine/util/list.h>
 #include <exengine/math/mathlib.h>
+#include <stdint.h>
 #include <string.h>
 
 #define EX_OCTREE_DEFAULT_MIN_SIZE 5.0f
 extern int ex_octree_min_size;
 
-typedef enum {
-  OBJ_TYPE_UINT,
-  OBJ_TYPE_INT,
-  OBJ_TYPE_BYTE,
-  OBJ_TYPE_FLOAT,
-  OBJ_TYPE_DOUBLE,
-  OBJ_TYPE_NULL
-} ex_octree_obj_type;
-
 typedef struct {
-  union {
-    uint32_t data_uint;
-    int32_t data_int;
-    uint8_t data_byte;
-    float data_float;
-    double data_double;
-  };
+  uint32_t index;
   rect_t box;
 } ex_octree_obj_t;
 
@@ -49,30 +33,18 @@ struct ex_octree_t {
   int max_life, cur_life;
   ex_list_t *obj_list;
   // flags etc
-  uint8_t rendered : 1;
   uint8_t built : 1;
   uint8_t first : 1;
-  uint8_t data_type : 5;
   // data
   size_t data_len;
-  union {
-    uint32_t *data_uint;
-    int32_t *data_int;
-    uint8_t *data_byte;
-    float *data_float;
-    double *data_double;
-  };
-  // debug render stuffs
-  GLuint vbo, vao, ebo;
-  int player_inside;
+  uint32_t *data;
 };
 
 /**
  * @brief Create a new octree.
- * @param type the data type to store (ex_octree_obj_type)
  * @return pointer to the new octree
  */
-ex_octree_t *ex_octree_new(uint8_t type);
+ex_octree_t *ex_octree_new(void);
 
 /**
  * @brief Initialize the tree from a list of objects.
@@ -123,46 +95,6 @@ void ex_octree_get_colliding_count(ex_octree_t *o, rect_t *bounds, int *count);
  * @param index     running index (should be 0 on first call)
  */
 void ex_octree_get_colliding(ex_octree_t *o, rect_t *bounds, ex_octree_data_t *data_list, int *index);
-
-/**
- * @brief Debug-render the octree.
- * @param o the octree to render
- */
-void ex_octree_render(ex_octree_t *o);
-
-/**
- * @brief Get a pointer to the octree's data array.
- * @param o the octree to query
- */
-static inline void *ex_octree_data_ptr(ex_octree_t *o) {
-  switch (o->data_type) {
-  case OBJ_TYPE_UINT:
-    if (o->data_uint != NULL)
-      return o->data_uint;
-    break;
-  case OBJ_TYPE_INT:
-    if (o->data_int != NULL)
-      return o->data_int;
-    break;
-  case OBJ_TYPE_BYTE:
-    if (o->data_byte != NULL)
-      return o->data_byte;
-    break;
-  case OBJ_TYPE_FLOAT:
-    if (o->data_float != NULL)
-      return o->data_float;
-    break;
-  case OBJ_TYPE_DOUBLE:
-    if (o->data_double != NULL)
-      return o->data_double;
-    break;
-  default:
-    return NULL;
-    break;
-  }
-
-  return NULL;
-}
 
 /**
  * @brief Create a new 3D axis-aligned bounding box.

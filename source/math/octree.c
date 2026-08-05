@@ -1,12 +1,11 @@
 #include <exengine/math/octree.h>
-#include <exengine/util/vertices.h>
 
 #include <stdio.h>
 #include <stdlib.h>
 
 int ex_octree_min_size = EX_OCTREE_DEFAULT_MIN_SIZE;
 
-ex_octree_t *ex_octree_new(uint8_t type) {
+ex_octree_t *ex_octree_new(void) {
   ex_octree_t *o = calloc(1, sizeof(ex_octree_t));
 
   for (int i = 0; i < 8; i++) {
@@ -15,18 +14,12 @@ ex_octree_t *ex_octree_new(uint8_t type) {
   memset(o->region.min, 0.0f, sizeof(vec3));
   memset(o->region.max, 1.0f, sizeof(vec3));
 
-  o->rendered = 0;
   o->built = 0;
   o->first = 1;
   o->obj_list = ex_list_new();
 
   o->data_len = 0;
-  o->data_type = type;
-  o->data_uint = NULL;
-  o->data_int = NULL;
-  o->data_byte = NULL;
-  o->data_float = NULL;
-  o->data_double = NULL;
+  o->data = NULL;
 
   return o;
 }
@@ -37,16 +30,10 @@ void ex_octree_init(ex_octree_t *o, rect_t region, ex_list_t *objects) {
     o->children[i] = NULL;
   }
   o->obj_list = objects;
-  o->rendered = 0;
   o->built = 0;
   o->first = 0;
   o->data_len = 0;
-  o->data_type = OBJ_TYPE_NULL;
-  o->data_uint = NULL;
-  o->data_int = NULL;
-  o->data_byte = NULL;
-  o->data_float = NULL;
-  o->data_double = NULL;
+  o->data = NULL;
 }
 
 void ex_octree_build(ex_octree_t *o) {
@@ -134,7 +121,6 @@ void ex_octree_build(ex_octree_t *o) {
       o->children[i] = calloc(1, sizeof(ex_octree_t));
       ex_octree_init(o->children[i], octants[i], obj_lists[i]);
       o->children[i]->data_len = obj_lenghts[i];
-      o->children[i]->data_type = o->data_type;
       ex_octree_build(o->children[i]);
     } else {
       o->children[i] = NULL;
@@ -152,33 +138,9 @@ void ex_octree_finalize(ex_octree_t *o) {
   while (n->data != NULL) {
     ex_octree_obj_t *data = n->data;
 
-    switch (o->data_type) {
-    case OBJ_TYPE_UINT:
-      if (i == 0)
-        o->data_uint = calloc(1, o->data_len * sizeof(uint32_t));
-      memcpy(&o->data_uint[i], &data->data_uint, sizeof(uint32_t));
-      break;
-    case OBJ_TYPE_INT:
-      if (i == 0)
-        o->data_int = calloc(1, o->data_len * sizeof(int32_t));
-      memcpy(&o->data_int[i], &data->data_int, sizeof(int32_t));
-      break;
-    case OBJ_TYPE_BYTE:
-      if (i == 0)
-        o->data_byte = calloc(1, o->data_len * sizeof(uint8_t));
-      memcpy(&o->data_byte[i], &data->data_byte, sizeof(uint8_t));
-      break;
-    case OBJ_TYPE_FLOAT:
-      if (i == 0)
-        o->data_float = calloc(1, o->data_len * sizeof(float));
-      memcpy(&o->data_float[i], &data->data_float, sizeof(float));
-      break;
-    case OBJ_TYPE_DOUBLE:
-      if (i == 0)
-        o->data_double = calloc(1, o->data_len * sizeof(double));
-      memcpy(&o->data_double[i], &data->data_double, sizeof(double));
-      break;
-    }
+    if (i == 0)
+      o->data = calloc(1, o->data_len * sizeof(uint32_t));
+    memcpy(&o->data[i], &data->index, sizeof(uint32_t));
 
     free(n->data);
     n->data = NULL;
@@ -211,43 +173,14 @@ ex_octree_t *ex_octree_reset(ex_octree_t *o) {
     o->obj_list = NULL;
   }
 
-  if (o->data_len > 0 && o->data_type != OBJ_TYPE_NULL) {
-    switch (o->data_type) {
-    case OBJ_TYPE_UINT:
-      if (o->data_uint != NULL)
-        free(o->data_uint);
-      break;
-    case OBJ_TYPE_INT:
-      if (o->data_int != NULL)
-        free(o->data_int);
-      break;
-    case OBJ_TYPE_BYTE:
-      if (o->data_byte != NULL)
-        free(o->data_byte);
-      break;
-    case OBJ_TYPE_FLOAT:
-      if (o->data_float != NULL)
-        free(o->data_float);
-      break;
-    case OBJ_TYPE_DOUBLE:
-      if (o->data_double != NULL)
-        free(o->data_double);
-      break;
-    }
-  }
+  if (o->data_len > 0 && o->data != NULL)
+    free(o->data);
 
-  if (o->rendered) {
-    glDeleteVertexArrays(1, &o->vao);
-    glDeleteBuffers(1, &o->vbo);
-    glDeleteBuffers(1, &o->ebo);
-  }
-
-  int data_type = o->data_type;
   if (!o->first) {
     free(o);
   } else {
     free(o);
-    return ex_octree_new(data_type);
+    return ex_octree_new();
   }
 
   return NULL;
@@ -266,36 +199,8 @@ void ex_octree_destroy(ex_octree_t *o) {
     o->obj_list = NULL;
   }
 
-  if (o->data_len > 0 && o->data_type != OBJ_TYPE_NULL) {
-    switch (o->data_type) {
-    case OBJ_TYPE_UINT:
-      if (o->data_uint != NULL)
-        free(o->data_uint);
-      break;
-    case OBJ_TYPE_INT:
-      if (o->data_int != NULL)
-        free(o->data_int);
-      break;
-    case OBJ_TYPE_BYTE:
-      if (o->data_byte != NULL)
-        free(o->data_byte);
-      break;
-    case OBJ_TYPE_FLOAT:
-      if (o->data_float != NULL)
-        free(o->data_float);
-      break;
-    case OBJ_TYPE_DOUBLE:
-      if (o->data_double != NULL)
-        free(o->data_double);
-      break;
-    }
-  }
-
-  if (o->rendered) {
-    glDeleteVertexArrays(1, &o->vao);
-    glDeleteBuffers(1, &o->vbo);
-    glDeleteBuffers(1, &o->ebo);
-  }
+  if (o->data_len > 0 && o->data != NULL)
+    free(o->data);
 
   free(o);
 }
@@ -305,8 +210,7 @@ void ex_octree_get_colliding_count(ex_octree_t *o, rect_t *bounds, int *count) {
     return;
 
   // add our data to the list
-  void *oct_data = ex_octree_data_ptr(o);
-  if (oct_data != NULL) {
+  if (o->data != NULL) {
     if (!ex_aabb_aabb(o->region, *bounds))
       return;
 
@@ -324,13 +228,12 @@ void ex_octree_get_colliding(ex_octree_t *o, rect_t *bounds, ex_octree_data_t *d
     return;
 
   // add our data to the list
-  void *oct_data = ex_octree_data_ptr(o);
-  if (oct_data != NULL) {
+  if (o->data != NULL) {
     if (!ex_aabb_aabb(o->region, *bounds))
       return;
 
     data_list[*index].len = o->data_len;
-    data_list[*index].data = oct_data;
+    data_list[*index].data = o->data;
     (*index)++;
   }
 
@@ -338,60 +241,4 @@ void ex_octree_get_colliding(ex_octree_t *o, rect_t *bounds, ex_octree_data_t *d
   for (int i = 0; i < 8; i++)
     if (o->children[i] != NULL)
       ex_octree_get_colliding(o->children[i], bounds, data_list, index);
-}
-
-void ex_octree_render(ex_octree_t *o) {
-  if (o == NULL || !o->built)
-    return;
-
-  int alive = 0;
-  for (int i = 0; i < 8; i++) {
-    if (o->children[i] != NULL) {
-      ex_octree_render(o->children[i]);
-      alive++;
-    }
-  }
-
-  if (alive < 1 && o->data_len == 0)
-    return;
-
-  if (!o->rendered) {
-    float vertices[EX_VERTICES_CUBE_LEN];
-    memcpy(vertices, ex_vertices_cube, sizeof(float) * EX_VERTICES_CUBE_LEN);
-
-    for (int i = 0; i < EX_VERTICES_CUBE_LEN; i += 3) {
-      vertices[i + 0] > 0.0f ? (vertices[i + 0] = o->region.max[0]) : (vertices[i + 0] = o->region.min[0]);
-      vertices[i + 1] > 0.0f ? (vertices[i + 1] = o->region.max[1]) : (vertices[i + 1] = o->region.min[1]);
-      vertices[i + 2] > 0.0f ? (vertices[i + 2] = o->region.max[2]) : (vertices[i + 2] = o->region.min[2]);
-    }
-
-    glGenVertexArrays(1, &o->vao);
-    glGenBuffers(1, &o->vbo);
-    glGenBuffers(1, &o->ebo);
-    glBindVertexArray(o->vao);
-
-    glBindBuffer(GL_ARRAY_BUFFER, o->vbo);
-    glBufferData(GL_ARRAY_BUFFER, sizeof(float) * EX_VERTICES_CUBE_LEN, &vertices[0], GL_STATIC_DRAW);
-
-    glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, o->ebo);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * EX_INDICES_CUBE_LEN, &ex_indices_cube[0], GL_STATIC_DRAW);
-
-    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(float) * 3, (GLvoid *)0);
-    glEnableVertexAttribArray(0);
-
-    glBindVertexArray(0);
-    o->rendered = 1;
-  }
-
-  glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-  glDisable(GL_DEPTH_TEST);
-  glDisable(GL_CULL_FACE);
-  glCullFace(GL_NONE);
-  glBindVertexArray(o->vao);
-  glLineWidth(0.5f);
-  glDrawElements(GL_LINES, EX_INDICES_CUBE_LEN, GL_UNSIGNED_INT, 0);
-  glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-  glEnable(GL_DEPTH_TEST);
-  glEnable(GL_CULL_FACE);
-  glBindVertexArray(0);
 }
