@@ -16,6 +16,7 @@ static ex_point_light_t *pl;
 static ex_source_t *sound;
 static ex_font_t *font;
 static float move_speed = 1.5f;
+static ex_model_t* dude_model;
 
 void fps_scene_init() {
   scene = ex_scene_new(0);
@@ -51,6 +52,17 @@ void fps_scene_init() {
   cube->position[2] = 5.0f;
   cube->position[1] = 5.0f;
   cube->position[0] = 0.0f;
+
+  dude_model = ex_iqm_load_model(scene, "data/dude.iqm", 0);
+  dude_model->is_lit = 1;
+  dude_model->cast_shadow = 0;
+  dude_model->transform_fulls->scale = 0.5f;
+  dude_model->transform_fulls->position[2] = 5.0f;
+  dude_model->transform_fulls->position[1] = 1.0f;
+
+  ex_scene_add_model(scene, dude_model);
+
+  ex_model_set_anim(dude_model, "Walk");
 
   font = ex_font_load("data/fonts/OpenSans-Regular.ttf", "abcdefghijklmnopqrstuvwxyzHW!_");
 

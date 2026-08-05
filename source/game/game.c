@@ -66,7 +66,7 @@ static const scene_vtable_t scene_vtables[] = {
     },
 };
 
-current_scene_t current_scene = EDITOR_SCENE;
+current_scene_t current_scene = FPS_SCENE;
 
 void game_change_scene(const current_scene_t new_scene) {
   scene_vtables[current_scene].exit();
